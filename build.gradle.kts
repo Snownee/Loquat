@@ -26,6 +26,7 @@ loom {
 
 repositories {
     maven("https://maven.parchmentmc.org")
+    maven("https://api.modrinth.com/maven")
 }
 
 dependencies {
@@ -39,6 +40,11 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
+    
+    modImplementation("maven.modrinth:lazydfu:4SHylIO9")
+    modImplementation("maven.modrinth:kiwi:1BREBtTP")
+    modImplementation("maven.modrinth:modmenu:gSoPJyVn")
+    modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
 
 }
 

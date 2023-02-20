@@ -1,16 +1,14 @@
-package snownee.loquat;
-
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
-import lombok.Getter;
-import net.minecraft.core.Vec3i;
-import net.minecraft.world.phys.Vec3;
+package snownee.loquat.core.area;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class Volume {
+import lombok.Getter;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec3;
+
+public abstract class Area {
 	@Getter
 	private final UUID uuid = UUID.randomUUID();
 	@Getter
@@ -28,6 +26,5 @@ public abstract class Volume {
 		return contains(pos.getX(),pos.getY(),pos.getZ());
 	}
 
-	public abstract void renderDebug(BufferBuilder bufferBuilder, PoseStack poseStack);
-
+    public abstract Vec3 getCenter();
 }

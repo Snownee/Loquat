@@ -6,12 +6,12 @@
 	"description": "",
 	"authors": [],
 	"contact": {},
-	"license": "All-Rights-Reserved",
+	"license": "ARR",
 	"icon": "assets/loquat/logo.png",
 	"environment": "*",
 	"entrypoints": {
-		"client": ["snownee.loquat.client.LoquatClient"],
-		"main": ["snownee.loquat.Loquat"]
+    "main": ["snownee.loquat.util.CommonProxy"],
+		"client": ["snownee.loquat.util.ClientProxy"]
 	},
 	"mixins": [
 		"loquat.mixins.json"

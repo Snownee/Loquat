@@ -1,0 +1,11 @@
+{
+  "loquat.command.areaAlreadyExists": "Area already exists",
+  "loquat.command.areaNotFound": "Area not found",
+  "loquat.command.create.success": "Created area",
+  "loquat.command.remove.success": "Removed area",
+  "loquat.command.nearby.total": "Found %s nearby areas",
+  "loquat.command.nearby.pos": "[%s,%s,%s]",
+  "loquat.command.nearby.highlight": "[Highlight]",
+  "loquat.command.nearby.more": "[More]",
+  "loquat.command.nearby.select": "[+]"
+}
