@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Area {
@@ -27,4 +28,11 @@ public abstract class Area {
 	}
 
     public abstract Vec3 getCenter();
+
+	public abstract Type<?> getType();
+
+	public static abstract class Type<T extends Area> {
+		public abstract T deserialize(CompoundTag data);
+		public abstract CompoundTag serialize(CompoundTag data, T area);
+	}
 }

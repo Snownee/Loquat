@@ -8,4 +8,9 @@ public class Loquat {
 	public static final String ID = "loquat";
 	public static final String NAME = "Loquat";
 
+	public static void init() {
+		LoquatRegistries.init();
+		AreaTypes.init();
+	}
+
 }

@@ -1,11 +1,17 @@
 package snownee.loquat.core.area;
 
+import java.util.Objects;
+import java.util.stream.DoubleStream;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Objects;
+import snownee.loquat.AreaTypes;
 
 @AllArgsConstructor
 public class AABBArea extends Area {
@@ -47,5 +53,31 @@ public class AABBArea extends Area {
 	@Override
 	public int hashCode() {
 		return Objects.hash(aabb);
+	}
+
+	@Override
+	public Area.Type<?> getType() {
+		return AreaTypes.BOX;
+	}
+
+	public static class Type extends Area.Type<AABBArea> {
+
+		@Override
+		public AABBArea deserialize(CompoundTag data) {
+			ListTag doubleList = data.getList("aabb", Tag.TAG_DOUBLE);
+			return new AABBArea(new AABB(doubleList.getDouble(0), doubleList.getDouble(1), doubleList.getDouble(2), doubleList.getDouble(3), doubleList.getDouble(4), doubleList.getDouble(5)));
+		}
+
+		@Override
+		public CompoundTag serialize(CompoundTag data, AABBArea area) {
+			ListTag doubleList = new ListTag();
+			AABB aabb = area.getAabb();
+			DoubleStream.of(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ)
+					.mapToObj(DoubleTag::valueOf)
+					.forEach(doubleList::add);
+			data.put("aabb", doubleList);
+			return data;
+		}
+
 	}
 }
