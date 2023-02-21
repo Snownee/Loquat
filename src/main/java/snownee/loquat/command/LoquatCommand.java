@@ -13,6 +13,7 @@ public class LoquatCommand {
 				.then(CreateCommand.register())
 				.then(RemoveCommand.register())
 				.then(NearbyCommand.register())
+				.then(OutlineCommand.register())
 		);
 	}
 

@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Area {
 	@Getter
-	private final UUID uuid = UUID.randomUUID();
+	@Setter
+	private UUID uuid;
 	@Getter
 	private final List<String> tags = new ArrayList<>();
 

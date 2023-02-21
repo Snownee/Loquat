@@ -1,12 +1,11 @@
 package snownee.loquat.client;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -15,45 +14,61 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import snownee.loquat.AreaTypes;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.util.Color;
 
 public class LoquatClient {
 
-	public static final List<RenderDebugData> renderDebugAreas = Collections.synchronizedList(Lists.newArrayList()); // let's pray it's thread-safe
-	public static final Map<Class<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
+	public static final Map<UUID, RenderDebugData> renderDebugAreas = Collections.synchronizedMap(Maps.newLinkedHashMap()); // let's pray it's thread-safe
+	public static final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
+	private static ResourceKey<Level> oDimension;
 
 	static {
-		renderers.put(AABBArea.class, (ctx, data) -> {
+		renderers.put(AreaTypes.BOX, (ctx, data) -> {
 			var buffer = ctx.bufferSource().getBuffer(RenderType.lines());
-			var aabb = ((AABBArea) data.area).getAabb();
-			var color = Color.rgb(0xFFFFFFFF);
-			LevelRenderer.renderLineBox(ctx.poseStack(), buffer, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1F);
+			var aabb = ((AABBArea) data.area).getAabb().inflate(0.01);
+			var color = Color.rgb(data.color());
+			float alpha = (float) color.getOpacity();
+			if (ctx.time() + 20 > data.expire) {
+				alpha *= (data.expire() - ctx.time()) / 20F;
+			}
+			LevelRenderer.renderLineBox(ctx.poseStack(), buffer, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
 		});
 	}
 
-	public static void render(PoseStack matrixStack, MultiBufferSource bufferSource) {
+	public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource) {
 		ClientLevel level = Minecraft.getInstance().level;
-		if (level == null || renderDebugAreas.isEmpty()) {
+		if (level == null) {
 			return;
 		}
-		var context = new RenderDebugContext(matrixStack, Minecraft.getInstance().renderBuffers().bufferSource());
-		long time = level.getGameTime();
-		renderDebugAreas.removeIf(data -> time >= data.expire);
-		for (var data : renderDebugAreas) {
-			Objects.requireNonNull(renderers.get(data.area.getClass())).accept(context, data);
+		if (oDimension != level.dimension()) {
+			clearDebugAreas();
+			oDimension = level.dimension();
 		}
-		LevelRenderer.renderLineBox(context.poseStack(), context.bufferSource().getBuffer(RenderType.lines()), new AABB(BlockPos.ZERO), 1, 1, 1, 1);
-		Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
+		if (renderDebugAreas.isEmpty()) {
+			return;
+		}
+		long time = level.getGameTime();
+		var context = new RenderDebugContext(matrixStack, bufferSource, time);
+		renderDebugAreas.values().removeIf(data -> time >= data.expire);
+		for (var data : renderDebugAreas.values()) {
+			Objects.requireNonNull(renderers.get(data.area.getType())).accept(context, data);
+		}
+		bufferSource.endBatch();
+	}
+
+	public static void clearDebugAreas() {
+		renderDebugAreas.clear();
 	}
 
 	public record RenderDebugData(Area area, int color, long expire) {
 	}
 
-	public record RenderDebugContext(PoseStack poseStack, MultiBufferSource bufferSource) {
+	public record RenderDebugContext(PoseStack poseStack, MultiBufferSource bufferSource, long time) {
 	}
 
 }

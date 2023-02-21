@@ -3,7 +3,7 @@
 	"id": "loquat",
 	"version": "${version}",
 	"name": "Loquat",
-	"description": "",
+	"description": "Area management tool",
 	"authors": [],
 	"contact": {},
 	"license": "ARR",
@@ -18,7 +18,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.14.14",
-		"fabric": "*",
+		"fabric-api": "*",
+    "kiwi": "*",
 		"minecraft": "1.19.2"
 	}
 }

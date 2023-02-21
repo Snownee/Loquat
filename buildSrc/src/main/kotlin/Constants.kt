@@ -1,7 +1,7 @@
 const val minecraft_version = "1.19.2"
 const val yarn_mappings = "1.19.2+build.28"
 const val loader_version = "0.14.14"
-const val mod_version = "1.0-SNAPSHOT"
+const val mod_version = "1.0.0"
 const val maven_group = "snownee.loquat"
 const val archives_base_name = "loquat"
 const val fabric_version = "0.73.2+1.19.2"

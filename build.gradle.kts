@@ -5,11 +5,14 @@ plugins {
 }
 
 base {
-    version = mod_version
+    version = "$minecraft_version-fabric-$mod_version"
     group = maven_group
 }
 
 loom {
+    mixin {
+        defaultRefmapName.set("$mod_id.refmap.json")
+    }
     accessWidenerPath.set(file("src/main/resources/$mod_id.accesswidener"))
 
     runs.forEach { runSetting ->
@@ -40,9 +43,10 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
-    
+
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
     modImplementation("maven.modrinth:kiwi:1BREBtTP")
+    annotationProcessor("maven.modrinth:kiwi:1BREBtTP")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
 

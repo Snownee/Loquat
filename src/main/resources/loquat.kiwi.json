@@ -1,0 +1,23 @@
+{
+  "KiwiConfig": [
+    {
+      "target": "snownee.loquat.LoquatCommonConfig"
+    }
+  ],
+  "KiwiPacket": [
+    {
+      "target": "snownee.loquat.network.CRequestHighlightPacket",
+      "data": {
+        "dir": "PLAY_TO_SERVER",
+        "value": "request_highlight"
+      }
+    },
+    {
+      "target": "snownee.loquat.network.SHighlightPacket",
+      "data": {
+        "dir": "PLAY_TO_CLIENT",
+        "value": "highlight"
+      }
+    }
+  ]
+}

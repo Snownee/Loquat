@@ -7,5 +7,6 @@
   "loquat.command.nearby.pos": "[%s,%s,%s]",
   "loquat.command.nearby.highlight": "[Highlight]",
   "loquat.command.nearby.more": "[More]",
-  "loquat.command.nearby.select": "[+]"
+  "loquat.command.nearby.select": "[+]",
+  "loquat.command.outline.success": "Outline mode: %s"
 }
