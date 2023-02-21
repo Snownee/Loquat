@@ -11,7 +11,7 @@ public class LoquatCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal(Loquat.ID).requires(cs -> cs.hasPermission(2))
 				.then(CreateCommand.register())
-				.then(RemoveCommand.register())
+				.then(DeleteCommand.register())
 				.then(NearbyCommand.register())
 				.then(OutlineCommand.register())
 		);

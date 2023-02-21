@@ -18,9 +18,9 @@ import snownee.kiwi.network.PacketHandler;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 
-@KiwiPacket(value = "request_highlight", dir = KiwiPacket.Direction.PLAY_TO_SERVER)
-public class CRequestHighlightPacket extends PacketHandler {
-	public static CRequestHighlightPacket I;
+@KiwiPacket(value = "request_outlines", dir = KiwiPacket.Direction.PLAY_TO_SERVER)
+public class CRequestOutlinesPacket extends PacketHandler {
+	public static CRequestOutlinesPacket I;
 
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
@@ -46,7 +46,7 @@ public class CRequestHighlightPacket extends PacketHandler {
 		if (areas.isEmpty()) {
 			return null;
 		}
-		return executor.apply(() -> SHighlightPacket.highlight(sender, expire, areas));
+		return executor.apply(() -> SOutlinesPacket.outlines(sender, expire, true, areas));
 	}
 
 	public static void requestAll(long time) {

@@ -10,7 +10,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import snownee.loquat.core.AreaManager;
-import snownee.loquat.network.SHighlightPacket;
+import snownee.loquat.network.SOutlinesPacket;
 
 public class OutlineCommand {
 
@@ -23,10 +23,10 @@ public class OutlineCommand {
 					ServerPlayer player = source.getPlayerOrException();
 					boolean show = !showOutlinePlayers.contains(player.getUUID());
 					if (show) {
-						SHighlightPacket.highlight(player, Long.MAX_VALUE, manager.areas());
+						SOutlinesPacket.outlines(player, Long.MAX_VALUE, false, manager.areas());
 						showOutlinePlayers.add(source.getEntityOrException().getUUID());
 					} else {
-						SHighlightPacket.highlight(player, Long.MIN_VALUE, manager.areas());
+						SOutlinesPacket.outlines(player, Long.MIN_VALUE, false, manager.areas());
 						showOutlinePlayers.remove(source.getEntityOrException().getUUID());
 					}
 					source.sendSuccess(Component.translatable("loquat.command.outline.success", show), true);

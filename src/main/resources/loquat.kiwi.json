@@ -6,17 +6,24 @@
   ],
   "KiwiPacket": [
     {
-      "target": "snownee.loquat.network.CRequestHighlightPacket",
+      "target": "snownee.loquat.network.CRequestOutlinesPacket",
       "data": {
         "dir": "PLAY_TO_SERVER",
-        "value": "request_highlight"
+        "value": "request_outlines"
       }
     },
     {
-      "target": "snownee.loquat.network.SHighlightPacket",
+      "target": "snownee.loquat.network.SOutlinesPacket",
       "data": {
         "dir": "PLAY_TO_CLIENT",
-        "value": "highlight"
+        "value": "outlines"
+      }
+    },
+    {
+      "target": "snownee.loquat.network.SSyncSelectionPacket",
+      "data": {
+        "dir": "PLAY_TO_CLIENT",
+        "value": "sync_selection"
       }
     }
   ]

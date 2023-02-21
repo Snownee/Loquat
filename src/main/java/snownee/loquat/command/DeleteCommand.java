@@ -8,10 +8,10 @@ import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
 import snownee.loquat.core.AreaManager;
 
-public class RemoveCommand {
+public class DeleteCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
-		return Commands.literal("remove")
+		return Commands.literal("delete")
 				.then(Commands.argument("uuid", UuidArgument.uuid())
 						.executes(ctx -> {
 							var uuid = UuidArgument.getUuid(ctx, "uuid");

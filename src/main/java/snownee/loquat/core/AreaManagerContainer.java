@@ -1,7 +1,7 @@
 package snownee.loquat.core;
 
 public interface AreaManagerContainer {
-	AreaManager getAreaManager();
+	AreaManager loquat$getAreaManager();
 
-	void setAreaManager(AreaManager areaManager);
+	void loquat$setAreaManager(AreaManager areaManager);
 }

@@ -1,6 +1,5 @@
 package snownee.loquat.core;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,18 +19,22 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.network.SOutlinesPacket;
 
 public class AreaManager extends SavedData {
+
 	public static AreaManager of(ServerLevel level) {
 		AreaManagerContainer container = (AreaManagerContainer) level;
-		AreaManager manager = container.getAreaManager();
+		AreaManager manager = container.loquat$getAreaManager();
 		if (manager == null) {
 			manager = level.getDataStorage().computeIfAbsent(AreaManager::load, AreaManager::new, Loquat.ID);
-			container.setAreaManager(manager);
+			manager.level = level;
+			container.loquat$setAreaManager(manager);
 		}
 		return manager;
 	}
@@ -43,11 +46,13 @@ public class AreaManager extends SavedData {
 		return manager;
 	}
 
+	private ServerLevel level;
 	private final ArrayList<Area> areas = new ArrayList<>();
 	private final HashMap<UUID, Area> map = new HashMap<>();
 	@Getter
 	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
 
+	@SuppressWarnings("rawtypes")
 	public static ListTag saveAreas(Collection<Area> areas) {
 		ListTag tag = new ListTag();
 		for (Area area : areas) {
@@ -77,6 +82,11 @@ public class AreaManager extends SavedData {
 		Asserts.check(!areas.contains(area), "Area already exists");
 		areas.add(area);
 		map.put(area.getUuid(), area);
+		if (level != null) {
+			showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
+				SOutlinesPacket.outlines((ServerPlayer) player, Long.MAX_VALUE, false, List.of(area));
+			});
+		}
 		setDirty();
 	}
 
@@ -94,6 +104,9 @@ public class AreaManager extends SavedData {
 			return false;
 		}
 		areas.remove(area);
+		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
+			SOutlinesPacket.outlines((ServerPlayer) player, Long.MIN_VALUE, false, List.of(area));
+		});
 		setDirty();
 		return true;
 	}
