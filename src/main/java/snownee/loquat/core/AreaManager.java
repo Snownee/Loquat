@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -53,13 +54,15 @@ public class AreaManager extends SavedData {
 	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
 
 	@SuppressWarnings("rawtypes")
-	public static ListTag saveAreas(Collection<Area> areas) {
+	public static ListTag saveAreas(Collection<Area> areas, boolean networking) {
 		ListTag tag = new ListTag();
 		for (Area area : areas) {
 			CompoundTag data = new CompoundTag();
 			data.putUUID("UUID", area.getUuid());
+			if (!area.getTags().isEmpty())
+				data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
 			data.putString("Type", LoquatRegistries.AREA.getKey(area.getType()).toString());
-			((Area.Type) area.getType()).serialize(data, area);
+			((Area.Type) area.getType()).serialize(data, area, networking);
 			tag.add(data);
 		}
 		return tag;
@@ -72,6 +75,12 @@ public class AreaManager extends SavedData {
 			Area.Type<?> type = LoquatRegistries.AREA.get(new ResourceLocation(data.getString("Type")));
 			Area area = type.deserialize(data);
 			area.setUuid(data.getUUID("UUID"));
+			if (data.contains("Tags")) {
+				ListTag tags = data.getList("Tags", Tag.TAG_STRING);
+				for (int j = 0; j < tags.size(); j++) {
+					area.getTags().add(tags.getString(j));
+				}
+			}
 			areas.add(area);
 		}
 		return areas;
@@ -113,7 +122,7 @@ public class AreaManager extends SavedData {
 
 	@Override
 	public CompoundTag save(CompoundTag tag) {
-		tag.put("Areas", saveAreas(areas));
+		tag.put("Areas", saveAreas(areas, false));
 		return tag;
 	}
 

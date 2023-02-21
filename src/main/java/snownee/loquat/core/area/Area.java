@@ -1,7 +1,9 @@
 package snownee.loquat.core.area;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -16,7 +18,9 @@ public abstract class Area {
 	private UUID uuid;
 	@Getter
 	private final List<String> tags = new ArrayList<>();
-
+	@Getter
+	private final Map<String, Zone> zones = new HashMap<>();
+	
 	public abstract boolean contains(int x, int y, int z);
 
 	public abstract boolean contains(double x, double y, double z);
@@ -35,6 +39,6 @@ public abstract class Area {
 
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);
-		public abstract CompoundTag serialize(CompoundTag data, T area);
+		public abstract CompoundTag serialize(CompoundTag data, T area, boolean networking);
 	}
 }

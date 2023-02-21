@@ -69,7 +69,7 @@ public class AABBArea extends Area {
 		}
 
 		@Override
-		public CompoundTag serialize(CompoundTag data, AABBArea area) {
+		public CompoundTag serialize(CompoundTag data, AABBArea area, boolean networking) {
 			ListTag doubleList = new ListTag();
 			AABB aabb = area.getAabb();
 			DoubleStream.of(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ)

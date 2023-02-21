@@ -44,7 +44,7 @@ public class SOutlinesPacket extends PacketHandler {
 			buf.writeVarLong(expire);
 			buf.writeBoolean(highlight);
 			CompoundTag tag = new CompoundTag();
-			tag.put("0", AreaManager.saveAreas(areas));
+			tag.put("0", AreaManager.saveAreas(areas, true));
 			buf.writeNbt(tag);
 		});
 	}

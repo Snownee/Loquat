@@ -20,22 +20,33 @@ public class SSyncSelectionPacket extends PacketHandler {
 		var player = Minecraft.getInstance().player;
 		if (player == null)
 			return null;
-		var selections = SelectionManager.of(player).getSelections();
+		var manager = SelectionManager.of(player);
+		var selections = manager.getSelections();
+		var selectedAreas = manager.getSelectedAreas();
 		selections.clear();
+		selectedAreas.clear();
 		int size = buf.readVarInt();
 		for (int i = 0; i < size; i++) {
 			selections.add(new PosSelection(buf.readBlockPos(), buf.readBlockPos()));
+		}
+		size = buf.readVarInt();
+		for (int i = 0; i < size; i++) {
+			selectedAreas.add(buf.readUUID());
 		}
 		return null;
 	}
 
 	public static void sync(ServerPlayer player) {
 		I.send(player, buf -> {
-			var selections = SelectionManager.of(player).getSelections();
-			buf.writeVarInt(selections.size());
-			for (var selection : selections) {
+			var manager = SelectionManager.of(player);
+			buf.writeVarInt(manager.getSelections().size());
+			for (var selection : manager.getSelections()) {
 				buf.writeBlockPos(selection.pos1);
 				buf.writeBlockPos(selection.pos2);
+			}
+			buf.writeVarInt(manager.getSelectedAreas().size());
+			for (var uuid : manager.getSelectedAreas()) {
+				buf.writeUUID(uuid);
 			}
 		});
 	}

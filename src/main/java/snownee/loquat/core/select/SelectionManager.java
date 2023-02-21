@@ -1,6 +1,8 @@
 package snownee.loquat.core.select;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
@@ -19,9 +21,16 @@ public class SelectionManager {
 	}
 
 	@Getter
-	private final List<PosSelection> selections = Lists.newArrayList();
+	private final List<PosSelection> selections;
 	@Getter
 	private boolean lastOneIncomplete;
+	@Getter
+	private final List<UUID> selectedAreas;
+
+	public SelectionManager(boolean isClientSide) {
+		selections = isClientSide ? Collections.synchronizedList(Lists.newArrayList()) : Lists.newArrayList();
+		selectedAreas = isClientSide ? Collections.synchronizedList(Lists.newArrayList()) : Lists.newArrayList();
+	}
 
 	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
 		if (!isHoldingTool(player))
@@ -46,7 +55,7 @@ public class SelectionManager {
 	}
 
 	public static boolean isHoldingTool(Player player) {
-		return player.hasPermissions(2) && player.getMainHandItem().is(LoquatCommonConfig.selectionItem);
+		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatCommonConfig.selectionItem);
 	}
 
 }

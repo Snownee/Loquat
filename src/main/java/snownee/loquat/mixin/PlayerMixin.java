@@ -1,5 +1,6 @@
 package snownee.loquat.mixin;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +16,7 @@ public class PlayerMixin implements LoquatPlayer {
 	@Override
 	public SelectionManager loquat$getSelectionManager() {
 		if (loquat$selection == null) {
-			loquat$selection = new SelectionManager();
+			loquat$selection = new SelectionManager(((Entity) (Object) this).level.isClientSide);
 		}
 		return loquat$selection;
 	}
