@@ -44,6 +44,12 @@ public class AreaManager extends SavedData {
 	public static AreaManager load(CompoundTag tag) {
 		AreaManager manager = new AreaManager();
 		loadAreas(tag.getList("Areas", Tag.TAG_COMPOUND)).forEach(manager::add);
+		for (Tag t : tag.getList("Events", Tag.TAG_COMPOUND)) {
+			AreaEvent event = AreaEvent.deserialize(manager, (CompoundTag) t);
+			if (event != null) {
+				manager.events.add(event);
+			}
+		}
 		manager.setDirty(false);
 		return manager;
 	}
@@ -53,6 +59,8 @@ public class AreaManager extends SavedData {
 	private final HashMap<UUID, Area> map = new HashMap<>();
 	@Getter
 	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
+	@Getter
+	private final List<AreaEvent> events = new ArrayList<>();
 
 	@SuppressWarnings("rawtypes")
 	public static ListTag saveAreas(Collection<Area> areas, boolean networking) {
@@ -137,10 +145,23 @@ public class AreaManager extends SavedData {
 	@Override
 	public CompoundTag save(CompoundTag tag) {
 		tag.put("Areas", saveAreas(areas, false));
+		ListTag eventList = new ListTag();
+		for (AreaEvent event : events) {
+			eventList.add(event.serialize(new CompoundTag()));
+		}
+		tag.put("Events", eventList);
 		return tag;
 	}
 
 	public List<Area> areas() {
 		return Collections.unmodifiableList(areas);
+	}
+
+	public void tick() {
+		events.removeIf(event -> {
+			event.tick(level);
+			++event.ticksExisted;
+			return event.isFinished();
+		});
 	}
 }

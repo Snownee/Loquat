@@ -3,6 +3,7 @@ package snownee.loquat.command;
 import java.util.UUID;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
@@ -17,14 +18,21 @@ import snownee.loquat.core.select.SelectionManager;
 public class LoquatCommand {
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-		dispatcher.register(Commands.literal(Loquat.ID).requires(cs -> cs.hasPermission(2))
+		LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(Loquat.ID).requires(cs -> cs.hasPermission(2))
 				.then(CreateCommand.register())
 				.then(DeleteCommand.register())
 				.then(NearbyCommand.register())
 				.then(OutlineCommand.register())
-				.then(UnselectCommand.register())
-				.then(ZoneCommand.register())
-		);
+				.then(UnselectCommand.register());
+		if (Loquat.hasLychee) {
+			builder.then(SpawnCommand.register());
+		} else {
+			builder.then(Commands.literal("spawn").requires(cs -> cs.hasPermission(2)).executes(ctx -> {
+				ctx.getSource().sendFailure(Component.translatable("loquat.command.lycheeNotInstalled"));
+				return 0;
+			}));
+		}
+		dispatcher.register(builder);
 	}
 
 	public static final SimpleCommandExceptionType EMPTY_SELECTION = new SimpleCommandExceptionType(Component.translatable("loquat.command.emptySelection"));

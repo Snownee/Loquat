@@ -47,6 +47,7 @@ dependencies {
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
     modImplementation("maven.modrinth:kiwi:1BREBtTP")
     annotationProcessor("maven.modrinth:kiwi:1BREBtTP")
+    modImplementation("maven.modrinth:lychee:fOHwZlPc")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
 

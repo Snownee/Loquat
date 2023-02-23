@@ -6,7 +6,8 @@
   "refmap": "loquat.refmap.json",
   "mixins": [
     "PlayerMixin",
-    "ServerLevelMixin"
+    "ServerLevelMixin",
+    "fabric.SpawnerLoaderMixin"
   ],
   "client": [
     "client.ScreenMixin"

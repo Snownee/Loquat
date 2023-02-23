@@ -1,25 +1,30 @@
 {
-	"schemaVersion": 1,
-	"id": "loquat",
-	"version": "${version}",
-	"name": "Loquat",
-	"description": "Area management tool",
-	"authors": [],
-	"contact": {},
-	"license": "ARR",
-	"icon": "assets/loquat/logo.png",
-	"environment": "*",
-	"entrypoints": {
-    "main": ["snownee.loquat.util.CommonProxy"],
-		"client": ["snownee.loquat.util.ClientProxy"]
-	},
-	"mixins": [
-		"loquat.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.14.14",
-		"fabric-api": "*",
+  "schemaVersion": 1,
+  "id": "loquat",
+  "version": "${version}",
+  "name": "Loquat",
+  "description": "Area management tool",
+  "authors": [],
+  "contact": {},
+  "license": "ARR",
+  "icon": "assets/loquat/logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "snownee.loquat.util.CommonProxy"
+    ],
+    "client": [
+      "snownee.loquat.util.ClientProxy"
+    ]
+  },
+  "mixins": [
+    "loquat.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "fabric-api": "*",
     "kiwi": "*",
-		"minecraft": "1.19.2"
-	}
+    "lychee": "*",
+    "minecraft": "1.19.2"
+  }
 }

@@ -13,5 +13,8 @@
   "loquat.command.nearby.highlight": "[Highlight]",
   "loquat.command.nearby.more": "[More]",
   "loquat.command.nearby.select": "[±]",
-  "loquat.command.outline.success": "Outline mode: %s"
+  "loquat.command.outline.success": "Outline mode: %s",
+  "loquat.command.spawnerNotExists": "Spawner not exists",
+  "loquat.command.spawn.success": "Spawner %s is working",
+  "loquat.command.lycheeNotInstalled": "Lychee is not installed"
 }
