@@ -1,8 +1,8 @@
 package snownee.loquat.core;
 
-import snownee.loquat.core.area.Area;
-
 import java.util.function.Predicate;
+
+import snownee.loquat.core.area.Area;
 
 public class AreaSelector implements Predicate<Area> {
 

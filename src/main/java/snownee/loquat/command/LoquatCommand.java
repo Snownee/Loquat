@@ -14,6 +14,7 @@ public class LoquatCommand {
 				.then(DeleteCommand.register())
 				.then(NearbyCommand.register())
 				.then(OutlineCommand.register())
+				.then(UnselectCommand.register())
 		);
 	}
 

@@ -20,7 +20,7 @@ public abstract class Area {
 	private final List<String> tags = new ArrayList<>();
 	@Getter
 	private final Map<String, Zone> zones = new HashMap<>();
-	
+
 	public abstract boolean contains(int x, int y, int z);
 
 	public abstract boolean contains(double x, double y, double z);

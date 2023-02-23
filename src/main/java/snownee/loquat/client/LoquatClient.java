@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
@@ -16,9 +17,11 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
@@ -36,18 +39,21 @@ public class LoquatClient {
 
 	static {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
-			var buffer = ctx.bufferSource().getBuffer(RenderType.lines());
 			var aabb = ((AABBArea) data.area).getAabb().inflate(0.01);
-			var color = Color.rgb(data.color());
-			float alpha = (float) color.getOpacity();
+			var color = data.type.color;
+			float alpha = 1;
 			if (ctx.time() + 10 > data.expire) {
-				alpha *= (data.expire() - ctx.time()) / 10F;
+				alpha *= (data.expire - ctx.time()) / 10F;
 			}
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
+			DebugRenderer.renderFilledBox(aabb.move(ctx.pos.reverse()), color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
+			var buffer = ctx.bufferSource().getBuffer(RenderType.lines());
 			LevelRenderer.renderLineBox(ctx.poseStack(), buffer, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
 		});
 	}
 
-	public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource) {
+	public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource, Vec3 pos) {
 		ClientLevel level = Minecraft.getInstance().level;
 		LocalPlayer player = Minecraft.getInstance().player;
 		if (level == null || player == null) {
@@ -63,19 +69,21 @@ public class LoquatClient {
 			return;
 		}
 		long time = level.getGameTime();
-		var context = new RenderDebugContext(matrixStack, bufferSource, time);
+		var context = new RenderDebugContext(matrixStack, bufferSource, time, pos);
 		if (!outlines.isEmpty()) {
-			renderAreas(context, level, outlines);
+			renderAreas(context, level, player, outlines);
 		}
 		if (!selections.isEmpty()) {
 			renderSelections(context, level, selections);
 		}
-		bufferSource.endBatch();
 	}
 
-	private static void renderAreas(RenderDebugContext context, ClientLevel level, Map<UUID, RenderDebugData> outlines) {
+	private static void renderAreas(RenderDebugContext context, ClientLevel level, LocalPlayer player, Map<UUID, RenderDebugData> outlines) {
 		outlines.values().removeIf(data -> context.time >= data.expire);
+		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
+			if (data.type != DebugAreaType.HIGHLIGHT)
+				data.type = selectionManager.isSelected(data.area) ? DebugAreaType.SELECTED : DebugAreaType.NORMAL;
 			Objects.requireNonNull(renderers.get(data.area.getType())).accept(context, data);
 		}
 	}
@@ -92,10 +100,31 @@ public class LoquatClient {
 		normalOutlines.clear();
 	}
 
-	public record RenderDebugData(Area area, int color, long expire) {
+	public enum DebugAreaType {
+		NORMAL(Color.rgb(255, 255, 255)),
+		HIGHLIGHT(Color.rgb(255, 255, 255)),
+		SELECTED(Color.rgb(180, 255, 180));
+
+		private final Color color;
+
+		DebugAreaType(Color color) {
+			this.color = color;
+		}
 	}
 
-	public record RenderDebugContext(PoseStack poseStack, MultiBufferSource bufferSource, long time) {
+	public static class RenderDebugData {
+		public final Area area;
+		public DebugAreaType type;
+		public long expire;
+
+		public RenderDebugData(Area area, DebugAreaType type, long expire) {
+			this.area = area;
+			this.type = type;
+			this.expire = expire;
+		}
+	}
+
+	public record RenderDebugContext(PoseStack poseStack, MultiBufferSource bufferSource, long time, Vec3 pos) {
 	}
 
 }

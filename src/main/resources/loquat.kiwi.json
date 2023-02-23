@@ -13,6 +13,13 @@
       }
     },
     {
+      "target": "snownee.loquat.network.CSelectAreaPacket",
+      "data": {
+        "dir": "PLAY_TO_SERVER",
+        "value": "select_area"
+      }
+    },
+    {
       "target": "snownee.loquat.network.SOutlinesPacket",
       "data": {
         "dir": "PLAY_TO_CLIENT",

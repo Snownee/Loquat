@@ -28,11 +28,12 @@ public class SOutlinesPacket extends PacketHandler {
 		if (expire == Long.MIN_VALUE) {
 			expire = level.getGameTime() + 10;
 		}
-		var outlines = buf.readBoolean() ? LoquatClient.highlightOutlines : LoquatClient.normalOutlines;
+		boolean highlight = buf.readBoolean();
+		var outlines = highlight ? LoquatClient.highlightOutlines : LoquatClient.normalOutlines;
 		CompoundTag tag = buf.readNbt();
 		for (Area area : AreaManager.loadAreas(tag.getList("0", Tag.TAG_COMPOUND))) {
 			var debugData = outlines.get(area.getUuid());
-			debugData = new LoquatClient.RenderDebugData(area, 0xFFFFFFFF, expire);
+			debugData = new LoquatClient.RenderDebugData(area, highlight ? LoquatClient.DebugAreaType.HIGHLIGHT : LoquatClient.DebugAreaType.NORMAL, expire);
 			outlines.put(area.getUuid(), debugData);
 		}
 		return null;
