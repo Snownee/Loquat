@@ -1,17 +1,15 @@
 package snownee.loquat.core.area;
 
 import java.util.Objects;
-import java.util.stream.DoubleStream;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.DoubleTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
+import snownee.loquat.util.AABBSerializer;
 
 @AllArgsConstructor
 public class AABBArea extends Area {
@@ -64,18 +62,12 @@ public class AABBArea extends Area {
 
 		@Override
 		public AABBArea deserialize(CompoundTag data) {
-			ListTag doubleList = data.getList("aabb", Tag.TAG_DOUBLE);
-			return new AABBArea(new AABB(doubleList.getDouble(0), doubleList.getDouble(1), doubleList.getDouble(2), doubleList.getDouble(3), doubleList.getDouble(4), doubleList.getDouble(5)));
+			return new AABBArea(AABBSerializer.read(data.getList("AABB", Tag.TAG_DOUBLE)));
 		}
 
 		@Override
 		public CompoundTag serialize(CompoundTag data, AABBArea area, boolean networking) {
-			ListTag doubleList = new ListTag();
-			AABB aabb = area.getAabb();
-			DoubleStream.of(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ)
-					.mapToObj(DoubleTag::valueOf)
-					.forEach(doubleList::add);
-			data.put("aabb", doubleList);
+			data.put("AABB", AABBSerializer.write(area.aabb));
 			return data;
 		}
 

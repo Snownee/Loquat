@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import snownee.loquat.LoquatCommonConfig;
+import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.network.SSyncSelectionPacket;
 
@@ -36,12 +37,28 @@ public class SelectionManager {
 	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
 		if (!isHoldingTool(player))
 			return false;
-		if (lastOneIncomplete) {
-			selections.get(selections.size() - 1).pos2 = pos;
+		if (player.isShiftKeyDown()) {
+			AreaManager manager = AreaManager.of(world);
+			for (Area area : manager.areas()) {
+				if (!area.contains(pos))
+					continue;
+				if (selectedAreas.contains(area.getUuid())) {
+					selectedAreas.remove(area.getUuid());
+				} else {
+					selectedAreas.add(area.getUuid());
+				}
+			}
 		} else {
-			selections.add(new PosSelection(pos));
+			if (selections.isEmpty()) {
+				lastOneIncomplete = false;
+			}
+			if (lastOneIncomplete) {
+				selections.get(selections.size() - 1).pos2 = pos;
+			} else {
+				selections.add(new PosSelection(pos));
+			}
+			lastOneIncomplete = !lastOneIncomplete;
 		}
-		lastOneIncomplete = !lastOneIncomplete;
 		SSyncSelectionPacket.sync(player);
 		return true;
 	}
@@ -50,7 +67,6 @@ public class SelectionManager {
 		if (!isHoldingTool(player) || !player.isShiftKeyDown())
 			return false;
 		selections.clear();
-		lastOneIncomplete = false;
 		SSyncSelectionPacket.sync(player);
 		return true;
 	}

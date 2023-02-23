@@ -22,11 +22,11 @@ public class CreateCommand {
 					var source = ctx.getSource();
 					var selections = SelectionManager.of(source.getPlayerOrException()).getSelections();
 					if (selections.isEmpty()) {
-						source.sendFailure(Component.nullToEmpty("No selection"));
+						source.sendFailure(Component.translatable("loquat.command.emptySelection"));
 						return 0;
 					}
 					if (selections.size() > 1) {
-						source.sendFailure(Component.nullToEmpty("Too many selections"));
+						source.sendFailure(Component.translatable("loquat.command.tooManySelections"));
 						return 0;
 					}
 					var selection = selections.get(0);

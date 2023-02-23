@@ -47,7 +47,7 @@ public class LoquatClient {
 			}
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			DebugRenderer.renderFilledBox(aabb.move(ctx.pos.reverse()), color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
+			DebugRenderer.renderFilledBox(aabb.move(ctx.pos), color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
 			var buffer = ctx.bufferSource().getBuffer(RenderType.lines());
 			LevelRenderer.renderLineBox(ctx.poseStack(), buffer, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
 		});
@@ -85,6 +85,27 @@ public class LoquatClient {
 			if (data.type != DebugAreaType.HIGHLIGHT)
 				data.type = selectionManager.isSelected(data.area) ? DebugAreaType.SELECTED : DebugAreaType.NORMAL;
 			Objects.requireNonNull(renderers.get(data.area.getType())).accept(context, data);
+			if (data.type == DebugAreaType.SELECTED) {
+				var buffer = context.bufferSource().getBuffer(RenderType.lines());
+				data.area.getZones().forEach((name, zone) -> {
+					float alpha = 1;
+					if (context.time() + 10 > data.expire) {
+						alpha *= (data.expire - context.time()) / 10F;
+					}
+					RenderSystem.disableTexture();
+					RenderSystem.disableDepthTest();
+					for (AABB aabb : zone.aabbs()) {
+						var center = aabb.getCenter();
+						if (aabb.getYsize() > 1) {
+							aabb = aabb.inflate(0.02);
+						} else {
+							aabb = aabb.deflate(0.2, 0.5, 0.2).move(0, -0.499, 0);
+						}
+						LevelRenderer.renderLineBox(context.poseStack(), buffer, aabb, 1, 0.6F, 0, alpha);
+						DebugRenderer.renderFloatingText(name, center.x, center.y, center.z, 0, 0.045F);
+					}
+				});
+			}
 		}
 	}
 
@@ -92,7 +113,7 @@ public class LoquatClient {
 		var buffer = context.bufferSource().getBuffer(RenderType.lines());
 		for (PosSelection selection : selections) {
 			AABB aabb = selection.toAABB().inflate(0.01);
-			LevelRenderer.renderLineBox(context.poseStack(), buffer, aabb, 0, 0, 1, 1);
+			LevelRenderer.renderLineBox(context.poseStack(), buffer, aabb, 0.4F, 0.4F, 1, 1);
 		}
 	}
 
@@ -101,9 +122,7 @@ public class LoquatClient {
 	}
 
 	public enum DebugAreaType {
-		NORMAL(Color.rgb(255, 255, 255)),
-		HIGHLIGHT(Color.rgb(255, 255, 255)),
-		SELECTED(Color.rgb(180, 255, 180));
+		NORMAL(Color.rgb(255, 255, 255)), HIGHLIGHT(Color.rgb(255, 255, 255)), SELECTED(Color.rgb(180, 255, 180));
 
 		private final Color color;
 

@@ -25,6 +25,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.core.area.Zone;
 import snownee.loquat.network.SOutlinesPacket;
 
 public class AreaManager extends SavedData {
@@ -61,6 +62,11 @@ public class AreaManager extends SavedData {
 			data.putUUID("UUID", area.getUuid());
 			if (!area.getTags().isEmpty())
 				data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
+			if (!area.getZones().isEmpty()) {
+				CompoundTag zones = new CompoundTag();
+				area.getZones().forEach((name, zone) -> zones.put(name, zone.serialize(new CompoundTag())));
+				data.put("Zones", zones);
+			}
 			data.putString("Type", LoquatRegistries.AREA.getKey(area.getType()).toString());
 			((Area.Type) area.getType()).serialize(data, area, networking);
 			tag.add(data);
@@ -81,6 +87,12 @@ public class AreaManager extends SavedData {
 					area.getTags().add(tags.getString(j));
 				}
 			}
+			if (data.contains("Zones")) {
+				CompoundTag zones = data.getCompound("Zones");
+				for (String name : zones.getAllKeys()) {
+					area.getZones().put(name, Zone.deserialize(zones.getCompound(name)));
+				}
+			}
 			areas.add(area);
 		}
 		return areas;
@@ -91,11 +103,7 @@ public class AreaManager extends SavedData {
 		Asserts.check(!areas.contains(area), "Area already exists");
 		areas.add(area);
 		map.put(area.getUuid(), area);
-		if (level != null) {
-			showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
-				SOutlinesPacket.outlines((ServerPlayer) player, Long.MAX_VALUE, false, List.of(area));
-			});
-		}
+		showOutline(Long.MAX_VALUE, List.of(area));
 		setDirty();
 	}
 
@@ -113,11 +121,17 @@ public class AreaManager extends SavedData {
 			return false;
 		}
 		areas.remove(area);
-		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
-			SOutlinesPacket.outlines((ServerPlayer) player, Long.MIN_VALUE, false, List.of(area));
-		});
+		showOutline(Long.MIN_VALUE, List.of(area));
 		setDirty();
 		return true;
+	}
+
+	public void showOutline(long duration, List<Area> areas) {
+		if (level == null)
+			return;
+		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
+			SOutlinesPacket.outlines((ServerPlayer) player, duration, false, areas);
+		});
 	}
 
 	@Override
