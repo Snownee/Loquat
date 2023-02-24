@@ -1,5 +1,9 @@
 package snownee.loquat;
 
+import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
+
 import snownee.kiwi.Mod;
 import snownee.kiwi.loader.Platform;
 
@@ -8,6 +12,7 @@ public class Loquat {
 
 	public static final String ID = "loquat";
 	public static final String NAME = "Loquat";
+	public static final Logger LOGGER = LogUtils.getLogger();
 
 	public static boolean hasLychee;
 

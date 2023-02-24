@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import snownee.loquat.LoquatCommonConfig;
+import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.network.SSyncSelectionPacket;
@@ -76,7 +76,7 @@ public class SelectionManager {
 	}
 
 	public static boolean isHoldingTool(Player player) {
-		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatCommonConfig.selectionItem);
+		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
 	}
 
 }

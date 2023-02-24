@@ -1,0 +1,29 @@
+{
+  "waves": [
+    {
+      "wait": 1,
+      "post": [
+        {
+          "type": "loquat:spawn",
+          "mob": "husk",
+          "count": 3
+        },
+        {
+          "type": "loquat:spawn",
+          "mob": "vindicator",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "wait": 3,
+      "post": [
+        {
+          "type": "loquat:spawn",
+          "mob": "slime",
+          "count": 2
+        }
+      ]
+    }
+  ]
+}

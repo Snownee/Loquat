@@ -5,6 +5,9 @@ import net.minecraft.world.item.Items;
 import snownee.kiwi.config.KiwiConfig;
 
 @KiwiConfig
-public class LoquatCommonConfig {
+public class LoquatConfig {
+	@KiwiConfig.Path("debug.enable")
+	public static boolean debug = true;
+
 	public static Item selectionItem = Items.SPECTRAL_ARROW;
 }

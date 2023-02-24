@@ -35,12 +35,12 @@ public class SpawnCommand extends LoquatCommand {
 		String spawnerId = StringArgumentType.getString(ctx, "spawner");
 		var source = ctx.getSource();
 		try {
-			SpawnerLoader.INSTANCE.spawn(spawnerId, source.getLevel(), area, source.getLevel().getRandom());
+			SpawnerLoader.INSTANCE.spawn(spawnerId, source.getLevel(), area);
 		} catch (NullPointerException e) {
 			source.sendFailure(Component.translatable("loquat.command.spawnerNotExists"));
 			return 0;
 		}
-		source.sendSuccess(Component.translatable("loquat.command.spawn.success"), true);
+		source.sendSuccess(Component.translatable("loquat.command.spawn.success", spawnerId), true);
 		return 1;
 	}
 

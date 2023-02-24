@@ -11,6 +11,7 @@ import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.select.SelectionManager;
+import snownee.loquat.network.SSyncSelectionPacket;
 
 public class DeleteCommand {
 
@@ -45,6 +46,8 @@ public class DeleteCommand {
 								source.sendFailure(Component.translatable("loquat.command.emptySelection"));
 								return 0;
 							}
+							selectedAreas.clear();
+							SSyncSelectionPacket.sync(source.getPlayerOrException());
 							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
 							return count;
 						})

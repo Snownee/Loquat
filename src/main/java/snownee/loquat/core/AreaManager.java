@@ -45,9 +45,13 @@ public class AreaManager extends SavedData {
 		AreaManager manager = new AreaManager();
 		loadAreas(tag.getList("Areas", Tag.TAG_COMPOUND)).forEach(manager::add);
 		for (Tag t : tag.getList("Events", Tag.TAG_COMPOUND)) {
-			AreaEvent event = AreaEvent.deserialize(manager, (CompoundTag) t);
-			if (event != null) {
-				manager.events.add(event);
+			try {
+				AreaEvent event = AreaEvent.deserialize(manager, (CompoundTag) t);
+				if (event != null) {
+					manager.events.add(event);
+				}
+			} catch (Exception e) {
+				Loquat.LOGGER.error("Failed to load area event", e);
 			}
 		}
 		manager.setDirty(false);
