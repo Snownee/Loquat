@@ -1,17 +1,24 @@
 package snownee.loquat.spawner;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import snownee.loquat.Loquat;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.util.CommonProxy;
 import snownee.lychee.core.ActionRuntime;
 import snownee.lychee.core.LycheeContext;
 import snownee.lychee.core.contextual.ContextualHolder;
@@ -30,7 +37,13 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	@Getter
 	private final LycheeContext context;
 
-	private final Queue<SpawnMobAction> pendingMobs = new ArrayDeque<>();
+	private final List<SpawnMobAction> pendingMobs = Lists.newArrayList();
+
+	private int spawnCooldown;
+
+	private final Set<UUID> mobs = Sets.newHashSet();
+
+	private Consumer<Entity> deathListener;
 
 	public ActiveWave(Spawner spawner, String spawnerId, int waveIndex, LycheeContext context) {
 		this.spawner = spawner;
@@ -38,6 +51,53 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		this.waveIndex = waveIndex;
 		this.wave = spawner.waves[waveIndex];
 		this.context = context;
+	}
+
+	public boolean tick(ServerLevel world, Area area) {
+		if (spawnCooldown > 0) {
+			spawnCooldown--;
+			return false;
+		} else {
+			pendingMobs.removeIf(action -> {
+				Entity entity = action.getMob().createMob(world, area, action.getZone());
+				if (entity != null) {
+					mobs.add(entity.getUUID());
+				}
+				return entity != null;
+			});
+			if (!pendingMobs.isEmpty()) {
+				spawnCooldown = 20;
+			}
+		}
+		return isFinished();
+	}
+
+	public void addMob(SpawnMobAction action) {
+		pendingMobs.add(action);
+	}
+
+	public void onStart() {
+		deathListener = entity -> {
+			if (mobs.remove(entity.getUUID())) {
+				onKilled(entity);
+			}
+		};
+		CommonProxy.registerDeathListener(deathListener);
+	}
+
+	public void onKilled(Entity entity) {
+		if (isFinished()) {
+			CommonProxy.unregisterDeathListener(deathListener);
+			deathListener = null;
+		}
+	}
+
+	public boolean isFinished() {
+		return mobs.isEmpty() && pendingMobs.isEmpty() && context.runtime.state == ActionRuntime.State.STOPPED;
+	}
+
+	public int getRamainMobs() {
+		return mobs.size() + pendingMobs.size();
 	}
 
 	@Override
@@ -70,24 +130,9 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		return false;
 	}
 
-	public boolean tick(ServerLevel world, Area area) {
-		while (!pendingMobs.isEmpty()) {
-			SpawnMobAction action = pendingMobs.peek();
-			if (action.getMob().createMob(world, area, action.getZone())) {
-				pendingMobs.poll();
-			} else {
-				pendingMobs.poll();
-			}
-		}
-		return context.runtime.state == ActionRuntime.State.STOPPED;
-	}
-
-	public void addMob(SpawnMobAction action) {
-		pendingMobs.add(action);
-	}
-
 	@Override
 	public void applyPostActions(LycheeContext ctx, int times) {
 		ctx.enqueueActions(getPostActions(), times, true);
 	}
+
 }

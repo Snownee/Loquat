@@ -7,7 +7,7 @@ import snownee.kiwi.config.KiwiConfig;
 @KiwiConfig
 public class LoquatConfig {
 	@KiwiConfig.Path("debug.enable")
-	public static boolean debug = true;
+	public static boolean debug;
 
 	public static Item selectionItem = Items.SPECTRAL_ARROW;
 }

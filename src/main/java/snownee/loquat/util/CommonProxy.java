@@ -1,7 +1,11 @@
 package snownee.loquat.util;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -12,6 +16,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import snownee.loquat.Loquat;
 import snownee.loquat.command.LoquatCommand;
@@ -22,6 +27,8 @@ import snownee.loquat.spawner.SpawnerLoader;
 import snownee.lychee.PostActionTypes;
 
 public class CommonProxy implements ModInitializer {
+
+	private static final ConcurrentLinkedQueue<Consumer<Entity>> entityDeathListeners = new ConcurrentLinkedQueue<>();
 
 	@Override
 	public void onInitialize() {
@@ -49,5 +56,16 @@ public class CommonProxy implements ModInitializer {
 			}
 			return InteractionResultHolder.pass(stack);
 		});
+		ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
+		});
+	}
+
+	public static void registerDeathListener(Consumer<Entity> listener) {
+		entityDeathListeners.add(listener);
+	}
+
+	public static void unregisterDeathListener(Consumer<Entity> listener) {
+		entityDeathListeners.remove(listener);
 	}
 }

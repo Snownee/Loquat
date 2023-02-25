@@ -2,6 +2,7 @@
   "waves": [
     {
       "wait": 1,
+      "timeout": 30,
       "post": [
         {
           "type": "loquat:spawn",
