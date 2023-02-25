@@ -32,7 +32,7 @@ public class SpawnMobAction extends PostAction {
 		Preconditions.checkArgument(recipe instanceof ActiveWave);
 		ActiveWave wave = (ActiveWave) recipe;
 		for (int i = 0; i < count; i++) {
-			wave.addMob(this);
+			wave.addPendingMob(this);
 		}
 	}
 

@@ -1,11 +1,12 @@
 package snownee.loquat.util;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -29,6 +30,7 @@ import snownee.lychee.PostActionTypes;
 public class CommonProxy implements ModInitializer {
 
 	private static final ConcurrentLinkedQueue<Consumer<Entity>> entityDeathListeners = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners = new ConcurrentLinkedQueue<>();
 
 	@Override
 	public void onInitialize() {
@@ -56,7 +58,7 @@ public class CommonProxy implements ModInitializer {
 			}
 			return InteractionResultHolder.pass(stack);
 		});
-		ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
 	}
@@ -67,5 +69,17 @@ public class CommonProxy implements ModInitializer {
 
 	public static void unregisterDeathListener(Consumer<Entity> listener) {
 		entityDeathListeners.remove(listener);
+	}
+
+	public static void registerSuccessiveSpawnListener(BiConsumer<Entity, Entity> listener) {
+		entitySuccessiveSpawnListeners.add(listener);
+	}
+
+	public static void unregisterSuccessiveSpawnListener(BiConsumer<Entity, Entity> listener) {
+		entitySuccessiveSpawnListeners.remove(listener);
+	}
+
+	public static void onSuccessiveSpawn(Entity entity, Entity newEntity) {
+		entitySuccessiveSpawnListeners.forEach(consumer -> consumer.accept(entity, newEntity));
 	}
 }

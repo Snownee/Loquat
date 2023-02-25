@@ -5,14 +5,30 @@
       "timeout": 30,
       "post": [
         {
+          "count": 3,
           "type": "loquat:spawn",
-          "mob": "husk",
-          "count": 3
+          "mob": {
+            "type": "chicken",
+            "nbt": {
+              "Passengers": [
+                {
+                  "id": "husk",
+                  "IsBaby": true
+                }
+              ],
+              "IsChickenJockey": true
+            }
+          }
         },
         {
+          "count": 2,
           "type": "loquat:spawn",
-          "mob": "vindicator",
-          "count": 2
+          "mob": {
+            "type": "rabbit",
+            "nbt": {
+              "RabbitType": 99
+            }
+          }
         }
       ]
     },
@@ -20,9 +36,9 @@
       "wait": 3,
       "post": [
         {
+          "count": 2,
           "type": "loquat:spawn",
-          "mob": "slime",
-          "count": 2
+          "mob": "slime"
         }
       ]
     }

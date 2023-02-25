@@ -1,8 +1,10 @@
 package snownee.loquat.spawner;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -16,6 +18,8 @@ import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.Loquat;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.util.CommonProxy;
@@ -38,12 +42,18 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	private final LycheeContext context;
 
 	private final List<SpawnMobAction> pendingMobs = Lists.newArrayList();
+	private boolean pendingMobsNeedShuffle;
 
 	private int spawnCooldown;
 
 	private final Set<UUID> mobs = Sets.newHashSet();
+	private final Set<UUID> successiveSpawnableMobs = Sets.newHashSet();
 
 	private Consumer<Entity> deathListener;
+	private BiConsumer<Entity, Entity> successiveSpawnListener;
+	private boolean isFinished;
+	private int successiveSpawnCooldown;
+	private int proactiveCheckCooldown;
 
 	public ActiveWave(Spawner spawner, String spawnerId, int waveIndex, LycheeContext context) {
 		this.spawner = spawner;
@@ -54,14 +64,32 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	}
 
 	public boolean tick(ServerLevel world, Area area) {
+		if (successiveSpawnCooldown > 0 && --successiveSpawnCooldown == 0) {
+			checkIfFinished();
+			if (isFinished) {
+				return true;
+			}
+		}
+		if (context.runtime.state == ActionRuntime.State.STOPPED && --proactiveCheckCooldown <= 0) {
+			mobs.removeIf(uuid -> world.getEntity(uuid) == null);
+			checkIfFinished();
+			proactiveCheckCooldown = 60;
+		}
 		if (spawnCooldown > 0) {
 			spawnCooldown--;
 			return false;
 		} else {
+			if (pendingMobsNeedShuffle) {
+				pendingMobsNeedShuffle = false;
+				Collections.shuffle(pendingMobs);
+			}
 			pendingMobs.removeIf(action -> {
 				Entity entity = action.getMob().createMob(world, area, action.getZone());
 				if (entity != null) {
-					mobs.add(entity.getUUID());
+					addMob(entity);
+					if (entity.isVehicle()) {
+						entity.getIndirectPassengers().forEach(this::addMob);
+					}
 				}
 				return entity != null;
 			});
@@ -69,16 +97,46 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 				spawnCooldown = 20;
 			}
 		}
-		return isFinished();
+		if (isFinished) {
+			CommonProxy.unregisterDeathListener(deathListener);
+			deathListener = null;
+			if (successiveSpawnListener != null) {
+				CommonProxy.unregisterSuccessiveSpawnListener(successiveSpawnListener);
+				successiveSpawnListener = null;
+			}
+		}
+		return isFinished;
 	}
 
-	public void addMob(SpawnMobAction action) {
+	public void addPendingMob(SpawnMobAction action) {
+		pendingMobsNeedShuffle = true;
 		pendingMobs.add(action);
+	}
+
+	public void addMob(Entity entity) {
+		if (!(entity instanceof LivingEntity living)) {
+			return;
+		}
+		mobs.add(living.getUUID());
+		if (canSuccessiveSpawn(living)) {
+			successiveSpawnableMobs.add(living.getUUID());
+			if (successiveSpawnListener == null) {
+				successiveSpawnListener = (e, newEntity) -> {
+					if (successiveSpawnableMobs.contains(e.getUUID())) {
+						addMob(newEntity);
+					}
+				};
+				CommonProxy.registerSuccessiveSpawnListener(successiveSpawnListener);
+			}
+		}
 	}
 
 	public void onStart() {
 		deathListener = entity -> {
 			if (mobs.remove(entity.getUUID())) {
+				if (successiveSpawnableMobs.contains(entity.getUUID())) {
+					successiveSpawnCooldown = 30;
+				}
 				onKilled(entity);
 			}
 		};
@@ -86,18 +144,21 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	}
 
 	public void onKilled(Entity entity) {
-		if (isFinished()) {
-			CommonProxy.unregisterDeathListener(deathListener);
-			deathListener = null;
-		}
+		checkIfFinished();
 	}
 
-	public boolean isFinished() {
-		return mobs.isEmpty() && pendingMobs.isEmpty() && context.runtime.state == ActionRuntime.State.STOPPED;
+	public void checkIfFinished() {
+		if (isFinished)
+			return;
+		isFinished = mobs.isEmpty() && pendingMobs.isEmpty() && context.runtime.state == ActionRuntime.State.STOPPED && successiveSpawnCooldown <= 0;
 	}
 
-	public int getRamainMobs() {
+	public int getRemainMobs() {
 		return mobs.size() + pendingMobs.size();
+	}
+
+	public static boolean canSuccessiveSpawn(LivingEntity entity) {
+		return entity instanceof Slime;
 	}
 
 	@Override

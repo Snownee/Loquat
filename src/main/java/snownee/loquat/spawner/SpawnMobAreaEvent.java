@@ -50,7 +50,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		waves.removeIf(wave -> wave.tick(world, area));
 		if (LoquatConfig.debug) {
 			LoquatUtil.runCommandSilently(world, "scoreboard players reset * LoquatSpawner");
-			int mobs = waves.stream().mapToInt(ActiveWave::getRamainMobs).sum();
+			int mobs = waves.stream().mapToInt(ActiveWave::getRemainMobs).sum();
 			LoquatUtil.runCommandSilently(world, "scoreboard players set mobs:%d LoquatSpawner 1".formatted(mobs));
 			int timeout = hasTimeout ? (int) (timeoutInTicks - world.getGameTime()) / 20 : -1;
 			LoquatUtil.runCommandSilently(world, "scoreboard players set timeout:%ds LoquatSpawner 2".formatted(timeout));
@@ -63,9 +63,9 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		builder.withParameter(LootContextParams.ORIGIN, area.getCenter());
 		LycheeContext ctx = builder.create(LycheeCompat.LOOT_CONTEXT_PARAM_SET);
 		ActiveWave activeWave = new ActiveWave(spawner, spawnerId, lastWave++, ctx);
-//		if (LoquatConfig.debug) {
-//			world.getServer().getCommands().performPrefixedCommand(world.getServer().createCommandSourceStack(), "tellraw @a \"Wave %d is coming!\"".formatted(lastWave));
-//		}
+		//		if (LoquatConfig.debug) {
+		//			world.getServer().getCommands().performPrefixedCommand(world.getServer().createCommandSourceStack(), "tellraw @a \"Wave %d is coming!\"".formatted(lastWave));
+		//		}
 		Spawner.Wave wave = activeWave.getWave();
 		if (wave.contextual.checkConditions(activeWave, ctx, 1) > 0) {
 			if (LoquatConfig.debug) {
