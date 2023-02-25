@@ -24,7 +24,8 @@ public class LoquatCommand {
 				.then(NearbyCommand.register())
 				.then(OutlineCommand.register())
 				.then(UnselectCommand.register())
-				.then(ZoneCommand.register());
+				.then(ZoneCommand.register())
+				.then(ReplaceCommand.register());
 		if (Loquat.hasLychee) {
 			builder.then(SpawnCommand.register());
 		} else {

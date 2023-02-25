@@ -60,7 +60,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 	public void newWave(ServerLevel world) {
 		Preconditions.checkArgument(lastWave < spawner.waves.length, "No more wave");
 		LycheeContext.Builder<LycheeContext> builder = new LycheeContext.Builder<>(world);
-		builder.withParameter(LootContextParams.ORIGIN, area.getCenter());
+		builder.withParameter(LootContextParams.ORIGIN, area.getOrigin());
 		LycheeContext ctx = builder.create(LycheeCompat.LOOT_CONTEXT_PARAM_SET);
 		ActiveWave activeWave = new ActiveWave(spawner, spawnerId, lastWave++, ctx);
 		//		if (LoquatConfig.debug) {

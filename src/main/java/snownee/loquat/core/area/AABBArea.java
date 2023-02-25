@@ -41,6 +41,11 @@ public class AABBArea extends Area {
 	}
 
 	@Override
+	public Vec3 getOrigin() {
+		return new Vec3(aabb.minX, aabb.minY, aabb.minZ);
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;

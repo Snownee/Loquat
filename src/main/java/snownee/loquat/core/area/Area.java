@@ -40,6 +40,8 @@ public abstract class Area {
 
 	public abstract Vec3 getCenter();
 
+	public abstract Vec3 getOrigin();
+
 	public abstract Type<?> getType();
 
 	public void getRandomPos(RandomSource random, String zoneId, BlockPos.MutableBlockPos pos) {

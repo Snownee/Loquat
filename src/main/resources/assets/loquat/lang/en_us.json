@@ -7,7 +7,8 @@
   "loquat.command.create.success": "Created area",
   "loquat.command.zone.remove.success": "Removed zone",
   "loquat.command.zone.add.success": "Added zone",
-  "loquat.command.deleted.success": "Deleted area",
+  "loquat.command.delete.success": "Deleted area",
+  "loquat.command.replace.success": "Replaced area",
   "loquat.command.nearby.total": "Found %s nearby areas",
   "loquat.command.nearby.pos": "[%s,%s,%s]",
   "loquat.command.nearby.highlight": "[Highlight]",
@@ -16,5 +17,6 @@
   "loquat.command.outline.success": "Outline mode: %s",
   "loquat.command.spawnerNotExists": "Spawner not exists",
   "loquat.command.spawn.success": "Spawner %s is working",
-  "loquat.command.lycheeNotInstalled": "Lychee is not installed"
+  "loquat.command.lycheeNotInstalled": "Lychee is not installed",
+  "loquat.command.areaMustBeBox": "Area must be a box"
 }
