@@ -13,7 +13,7 @@ loom {
     mixin {
         defaultRefmapName.set("$mod_id.refmap.json")
     }
-    accessWidenerPath.set(file("src/main/resources/$mod_id.accesswidener"))
+    //accessWidenerPath.set(file("src/main/resources/$mod_id.accesswidener"))
 
     runs.forEach { runSetting ->
         runSetting.property("mixin.debug.export=true")
@@ -47,9 +47,10 @@ dependencies {
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
     modImplementation("maven.modrinth:kiwi:1BREBtTP")
     annotationProcessor("maven.modrinth:kiwi:1BREBtTP")
-    modImplementation("maven.modrinth:lychee:fOHwZlPc")
+    modImplementation("maven.modrinth:lychee:3vyGViAH")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
+    modImplementation("maven.modrinth:jade:ZASePpsm")
 
 }
 
@@ -80,6 +81,7 @@ java {
 }
 
 tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from("LICENSE") {
         rename { "${it}_${archives_base_name}" }
     }

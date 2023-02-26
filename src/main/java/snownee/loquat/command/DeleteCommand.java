@@ -22,13 +22,12 @@ public class DeleteCommand {
 							var uuid = UuidArgument.getUuid(ctx, "uuid");
 							var source = ctx.getSource();
 							var manager = AreaManager.of(source.getLevel());
-							if (manager.remove(uuid)) {
-								source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
-								return 1;
-							} else {
+							if (!manager.remove(uuid)) {
 								source.sendFailure(Component.translatable("loquat.command.areaNotFound"));
 								return 0;
 							}
+							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
+							return 1;
 						})
 				)
 				.then(Commands.literal("selection")

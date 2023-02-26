@@ -9,7 +9,7 @@ public class AreaEventTypes {
 	public static void init() {
 	}
 
-	public static final SpawnMobAreaEvent.Type SPAWN_MOB = register("spawn_mob", new SpawnMobAreaEvent.Type());
+	public static final SpawnMobAreaEvent.Type SPAWN_MOBS = register("spawn_mobs", new SpawnMobAreaEvent.Type());
 
 	public static <T extends AreaEvent.Type<?>> T register(String name, T t) {
 		Registry.register(LoquatRegistries.AREA_EVENT, name, t);

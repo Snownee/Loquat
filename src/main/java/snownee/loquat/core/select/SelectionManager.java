@@ -79,4 +79,9 @@ public class SelectionManager {
 		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
 	}
 
+	public static boolean removeInvalidAreas(ServerPlayer player) {
+		AreaManager areaManager = AreaManager.of((ServerLevel) player.level);
+		return SelectionManager.of(player).getSelectedAreas().removeIf(uuid -> areaManager.get(uuid) == null);
+	}
+
 }

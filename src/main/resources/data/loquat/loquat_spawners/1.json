@@ -25,6 +25,10 @@
           "type": "loquat:spawn",
           "mob": {
             "type": "rabbit",
+            "randomize": false,
+            "attrs": {
+              "hp": 20
+            },
             "nbt": {
               "RabbitType": 99
             }

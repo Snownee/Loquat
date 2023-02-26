@@ -1,13 +1,21 @@
 package snownee.loquat.spawner;
 
+import java.util.Map;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
@@ -16,18 +24,34 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.NaturalSpawner;
 import snownee.loquat.core.area.Area;
 import snownee.lychee.util.LUtil;
 
-public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean randomize) {
+public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean randomize,
+					   @Nullable Object2DoubleMap<String> attrs) {
+
+	public static final Map<String, Attribute> SIMPLE_ATTRIBUTES = Maps.newHashMap();
+
+	static {
+		SIMPLE_ATTRIBUTES.put("hp", Attributes.MAX_HEALTH);
+		SIMPLE_ATTRIBUTES.put("movement_speed", Attributes.MOVEMENT_SPEED);
+		SIMPLE_ATTRIBUTES.put("damage", Attributes.ATTACK_DAMAGE);
+		SIMPLE_ATTRIBUTES.put("attack_speed", Attributes.ATTACK_SPEED);
+		SIMPLE_ATTRIBUTES.put("armor", Attributes.ARMOR);
+		SIMPLE_ATTRIBUTES.put("armor_toughness", Attributes.ARMOR_TOUGHNESS);
+		SIMPLE_ATTRIBUTES.put("knockback_resistance", Attributes.KNOCKBACK_RESISTANCE);
+		SIMPLE_ATTRIBUTES.put("knockback", Attributes.ATTACK_KNOCKBACK);
+	}
 
 	public static MobEntry load(JsonElement json) {
 		if (json.isJsonPrimitive()) {
 			String entityTypeId = json.getAsString();
 			CompoundTag nbt = new CompoundTag();
 			nbt.putString("id", entityTypeId);
-			return new MobEntry(EntityType.byString(entityTypeId).orElseThrow(), nbt, false);
+			return new MobEntry(EntityType.byString(entityTypeId).orElseThrow(), nbt, false, null);
 		} else if (json.isJsonObject()) {
 			JsonObject jsonObject = json.getAsJsonObject();
 			String entityTypeId = jsonObject.get("type").getAsString();
@@ -40,7 +64,17 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			}
 			nbt.putString("id", entityTypeId);
 			boolean randomize = GsonHelper.getAsBoolean(jsonObject, "randomize", true);
-			return new MobEntry(entityType, nbt, randomize);
+			Object2DoubleMap<String> attrs = jsonObject.has("attrs") ? new Object2DoubleArrayMap<>() : null;
+			if (attrs != null) {
+				jsonObject.getAsJsonObject("attrs").entrySet().forEach(entry -> {
+					Attribute attr = SIMPLE_ATTRIBUTES.computeIfAbsent(entry.getKey(), s -> {
+						return Registry.ATTRIBUTE.get(new ResourceLocation(s));
+					});
+					Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
+					attrs.put(entry.getKey(), entry.getValue().getAsDouble());
+				});
+			}
+			return new MobEntry(entityType, nbt, randomize, attrs);
 		}
 		throw new IllegalArgumentException("Invalid mob entry: " + json);
 	}
@@ -50,6 +84,14 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 		jsonObject.addProperty("type", EntityType.getKey(type).toString());
 		if (nbt.getAllKeys().size() > 1) {
 			jsonObject.add("nbt", LUtil.tagToJson(nbt));
+		}
+		if (!randomize) {
+			jsonObject.addProperty("randomize", false);
+		}
+		if (attrs != null) {
+			JsonObject attrsObject = new JsonObject();
+			attrs.forEach(attrsObject::addProperty);
+			jsonObject.add("attrs", attrsObject);
 		}
 		return jsonObject;
 	}
@@ -63,6 +105,7 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			if (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, world, pos, type)) {
 				if (entity == null) {
 					entity = EntityType.loadEntityRecursive(nbt.copy(), world, e -> {
+						e.moveTo(pos, e.getYRot(), e.getXRot());
 						if (randomize && e instanceof Mob mob) {
 							mob.finalizeSpawn(world, world.getCurrentDifficultyAt(pos), MobSpawnType.TRIGGERED, null, null);
 						}
@@ -72,8 +115,9 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 						return null;
 					}
 					Preconditions.checkState(entity instanceof LivingEntity, "Entity %s is not a LivingEntity", entity);
+				} else {
+					entity.moveTo(pos, entity.getYRot(), entity.getXRot());
 				}
-				entity.moveTo(pos, entity.getYRot(), entity.getXRot());
 				//				AABBArea aabbArea = new AABBArea(entity.getBoundingBox());
 				//				aabbArea.setUuid(UUID.randomUUID());
 				//				if (LoquatConfig.debug) {
@@ -83,6 +127,16 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 				//				}
 				if (world.noCollision(entity)) {
 					entity.getIndirectPassengers().forEach(e -> e.moveTo(pos, e.getYRot(), e.getXRot()));
+					if (attrs != null) {
+						for (Object2DoubleMap.Entry<String> entry : attrs.object2DoubleEntrySet()) {
+							Attribute attr = SIMPLE_ATTRIBUTES.get(entry.getKey());
+							Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
+							((LivingEntity) entity).getAttribute(attr).setBaseValue(entry.getDoubleValue());
+							if ("hp".equals(entry.getKey())) {
+								((LivingEntity) entity).setHealth((float) entry.getDoubleValue());
+							}
+						}
+					}
 					world.addFreshEntityWithPassengers(entity);
 					return entity;
 				}

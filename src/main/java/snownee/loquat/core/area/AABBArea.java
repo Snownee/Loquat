@@ -27,7 +27,7 @@ public class AABBArea extends Area {
 
 	@Override
 	public boolean contains(int x, int y, int z) {
-		return aabb.contains(x, y, z);
+		return aabb.intersects(x, y, z, x + 1, y + 1, z + 1);
 	}
 
 	@Override
@@ -47,8 +47,10 @@ public class AABBArea extends Area {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		AABBArea aabbArea = (AABBArea) o;
 		return Objects.equals(aabb, aabbArea.aabb);
 	}

@@ -83,13 +83,13 @@ public class SpawnMobAreaEvent extends AreaEvent {
 			activeWave.applyPostActions(ctx, 1);
 			if (wave.wait > 0)
 				ctx.runtime.jobs.push(new Job(new Delay(wave.wait), 1));
-			ctx.runtime.run(activeWave, ctx, 1);
+			ctx.runtime.run(activeWave, ctx);
 		}
 	}
 
 	@Override
 	public AreaEvent.Type<?> getType() {
-		return AreaEventTypes.SPAWN_MOB;
+		return AreaEventTypes.SPAWN_MOBS;
 	}
 
 	public static class Type extends AreaEvent.Type<SpawnMobAreaEvent> {

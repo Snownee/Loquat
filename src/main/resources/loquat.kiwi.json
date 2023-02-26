@@ -1,9 +1,4 @@
 {
-  "KiwiConfig": [
-    {
-      "target": "snownee.loquat.LoquatConfig"
-    }
-  ],
   "KiwiPacket": [
     {
       "target": "snownee.loquat.network.CRequestOutlinesPacket",
@@ -32,6 +27,19 @@
         "dir": "PLAY_TO_CLIENT",
         "value": "sync_selection"
       }
+    }
+  ],
+  "KiwiModule": [
+    {
+      "target": "snownee.loquat.modular.ModularModule",
+      "data": {
+        "value": "modular"
+      }
+    }
+  ],
+  "KiwiConfig": [
+    {
+      "target": "snownee.loquat.LoquatConfig"
     }
   ]
 }

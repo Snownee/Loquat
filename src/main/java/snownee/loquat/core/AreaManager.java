@@ -9,8 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.http.util.Asserts;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 import lombok.Getter;
@@ -112,7 +111,8 @@ public class AreaManager extends SavedData {
 
 	public void add(Area area) {
 		Objects.requireNonNull(area.getUuid(), "Area UUID cannot be null");
-		Asserts.check(!areas.contains(area), "Area already exists");
+		Preconditions.checkState(!areas.contains(area), "Area already exists", area);
+		Preconditions.checkState(!map.containsKey(area.getUuid()), "Area UUID already exists", area);
 		areas.add(area);
 		map.put(area.getUuid(), area);
 		showOutline(Long.MAX_VALUE, List.of(area));
@@ -163,9 +163,14 @@ public class AreaManager extends SavedData {
 
 	public void tick() {
 		events.removeIf(event -> {
-			event.tick(level);
-			++event.ticksExisted;
-			return event.isFinished();
+			try {
+				event.tick(level);
+				++event.ticksExisted;
+				return event.isFinished();
+			} catch (Exception e) {
+				Loquat.LOGGER.error("Failed to tick area event", e);
+				return true;
+			}
 		});
 	}
 }

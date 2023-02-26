@@ -45,6 +45,7 @@ public class LoquatCommand {
 		if (selection.getSelectedAreas().isEmpty()) {
 			throw EMPTY_SELECTION.create();
 		}
+		SelectionManager.removeInvalidAreas(source.getPlayerOrException());
 		if (selection.getSelectedAreas().size() > 1) {
 			throw TOO_MANY_SELECTIONS.create();
 		}
