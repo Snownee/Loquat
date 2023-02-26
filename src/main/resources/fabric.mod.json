@@ -23,8 +23,8 @@
   "depends": {
     "fabricloader": ">=0.14.14",
     "fabric-api": "*",
-    "kiwi": "*",
-    "lychee": "*",
-    "minecraft": "1.19.2"
+    "kiwi": ">=8.3.1",
+    "lychee": ">=3.8.3",
+    "minecraft": ">=1.19.2"
   }
 }

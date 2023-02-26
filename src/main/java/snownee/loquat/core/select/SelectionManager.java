@@ -11,6 +11,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.StructureBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
@@ -48,6 +51,16 @@ public class SelectionManager {
 					selectedAreas.add(area.getUuid());
 				}
 			}
+		} else if (world.getBlockEntity(pos) instanceof StructureBlockEntity be) {
+			if (selections.size() == 1) {
+				AABB aabb = selections.get(0).toAABB();
+				be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ));
+				be.setStructureSize(new BlockPos(aabb.getXsize(), aabb.getYsize(), aabb.getZsize()));
+			}
+			be.setShowBoundingBox(true);
+			be.setChanged();
+			BlockState blockState = world.getBlockState(pos);
+			world.sendBlockUpdated(pos, blockState, blockState, 3);
 		} else {
 			if (selections.isEmpty()) {
 				lastOneIncomplete = false;

@@ -45,8 +45,8 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
-    modImplementation("maven.modrinth:kiwi:1BREBtTP")
-    annotationProcessor("maven.modrinth:kiwi:1BREBtTP")
+    modImplementation("maven.modrinth:kiwi:PNqoRwku")
+    annotationProcessor("maven.modrinth:kiwi:PNqoRwku")
     modImplementation("maven.modrinth:lychee:3vyGViAH")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
