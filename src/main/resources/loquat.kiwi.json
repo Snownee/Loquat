@@ -15,6 +15,13 @@
       }
     },
     {
+      "target": "snownee.loquat.network.CSelectionClickPacket",
+      "data": {
+        "dir": "PLAY_TO_SERVER",
+        "value": "selection_click"
+      }
+    },
+    {
       "target": "snownee.loquat.network.SOutlinesPacket",
       "data": {
         "dir": "PLAY_TO_CLIENT",
@@ -26,14 +33,6 @@
       "data": {
         "dir": "PLAY_TO_CLIENT",
         "value": "sync_selection"
-      }
-    }
-  ],
-  "KiwiModule": [
-    {
-      "target": "snownee.loquat.modular.ModularModule",
-      "data": {
-        "value": "modular"
       }
     }
   ],

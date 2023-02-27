@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import com.google.common.math.LongMath;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
@@ -29,7 +28,7 @@ public class CRequestOutlinesPacket extends PacketHandler {
 		}
 		long expire = LongMath.checkedAdd(buf.readVarLong(), sender.level.getGameTime());
 		boolean all = buf.readBoolean();
-		AreaManager manager = AreaManager.of((ServerLevel) sender.level);
+		AreaManager manager = AreaManager.of(sender.getLevel());
 		List<Area> areas;
 		if (all) {
 			areas = manager.areas();

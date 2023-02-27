@@ -5,14 +5,13 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "loquat.refmap.json",
   "mixins": [
-    "BlockEntityAccess",
     "PlayerMixin",
     "ServerLevelMixin",
-    "StructureBlockEntityAccess",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin"
   ],
   "client": [
+    "client.MultiPlayerGameModeMixin",
     "client.ScreenMixin"
   ],
   "injectors": {

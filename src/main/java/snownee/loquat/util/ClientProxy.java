@@ -4,10 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.blockentity.StructureBlockRenderer;
 import snownee.loquat.client.LoquatClient;
-import snownee.loquat.modular.ModularModule;
 
 public class ClientProxy implements ClientModInitializer {
 	@Override
@@ -21,6 +18,5 @@ public class ClientProxy implements ClientModInitializer {
 			matrixStack.popPose();
 		});
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LoquatClient.clearDebugAreas());
-		BlockEntityRenderers.register(ModularModule.SUPER_STRUCTURE_BLOCK_ENTITY.get(), StructureBlockRenderer::new);
 	}
 }

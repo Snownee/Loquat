@@ -54,7 +54,7 @@ public class SelectionManager {
 		} else if (world.getBlockEntity(pos) instanceof StructureBlockEntity be) {
 			if (selections.size() == 1) {
 				AABB aabb = selections.get(0).toAABB();
-				be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ));
+				be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ).subtract(pos));
 				be.setStructureSize(new BlockPos(aabb.getXsize(), aabb.getYsize(), aabb.getZsize()));
 			}
 			be.setShowBoundingBox(true);
@@ -93,7 +93,7 @@ public class SelectionManager {
 	}
 
 	public static boolean removeInvalidAreas(ServerPlayer player) {
-		AreaManager areaManager = AreaManager.of((ServerLevel) player.level);
+		AreaManager areaManager = AreaManager.of(player.getLevel());
 		return SelectionManager.of(player).getSelectedAreas().removeIf(uuid -> areaManager.get(uuid) == null);
 	}
 

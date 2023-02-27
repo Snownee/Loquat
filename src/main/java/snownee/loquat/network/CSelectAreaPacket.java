@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
@@ -23,7 +22,7 @@ public class CSelectAreaPacket extends PacketHandler {
 		if (!Objects.requireNonNull(sender).hasPermissions(2)) {
 			return null;
 		}
-		AreaManager manager = AreaManager.of((ServerLevel) sender.level);
+		AreaManager manager = AreaManager.of(sender.getLevel());
 		boolean select = buf.readBoolean();
 		Area area = manager.get(buf.readUUID());
 		if (area == null) {
