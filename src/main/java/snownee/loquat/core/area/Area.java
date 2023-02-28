@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.base.Preconditions;
 
 import lombok.Getter;
@@ -14,12 +16,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class Area {
 	@Getter
 	@Setter
+	@Nullable
 	private UUID uuid;
 	@Getter
 	private final List<String> tags = new ArrayList<>();
@@ -37,6 +41,10 @@ public abstract class Area {
 	public final boolean contains(Vec3i pos) {
 		return contains(pos.getX(), pos.getY(), pos.getZ());
 	}
+
+	public abstract boolean intersects(AABB aabb);
+
+	public abstract boolean inside(AABB aabb);
 
 	public abstract Vec3 getCenter();
 
@@ -61,6 +69,8 @@ public abstract class Area {
 		}
 		throw new IllegalStateException();
 	}
+
+	public abstract Area transform(StructurePlaceSettings settings, BlockPos offset);
 
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);

@@ -1,9 +1,5 @@
 package snownee.loquat.util;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -25,34 +21,14 @@ import snownee.loquat.spawner.SpawnMobAction;
 import snownee.loquat.spawner.SpawnerLoader;
 import snownee.lychee.PostActionTypes;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 public class CommonProxy implements ModInitializer {
 
 	private static final ConcurrentLinkedQueue<Consumer<Entity>> entityDeathListeners = new ConcurrentLinkedQueue<>();
 	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners = new ConcurrentLinkedQueue<>();
-
-	@Override
-	public void onInitialize() {
-		Loquat.init();
-		if (Loquat.hasLychee) {
-			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) SpawnerLoader.INSTANCE);
-			PostActionTypes.register("loquat:spawn", SpawnMobAction.TYPE);
-			LycheeCompat.init();
-		}
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			LoquatCommand.register(dispatcher);
-		});
-		UseItemCallback.EVENT.register((player, world, hand) -> {
-			ItemStack stack = player.getItemInHand(hand);
-			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
-					SelectionManager.of(player).rightClickItem((ServerLevel) world, player.blockPosition(), (ServerPlayer) player)) {
-				return InteractionResultHolder.success(stack);
-			}
-			return InteractionResultHolder.pass(stack);
-		});
-		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
-			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
-		});
-	}
 
 	public static void registerDeathListener(Consumer<Entity> listener) {
 		entityDeathListeners.add(listener);
@@ -72,5 +48,29 @@ public class CommonProxy implements ModInitializer {
 
 	public static void onSuccessiveSpawn(Entity entity, Entity newEntity) {
 		entitySuccessiveSpawnListeners.forEach(consumer -> consumer.accept(entity, newEntity));
+	}
+
+	@Override
+	public void onInitialize() {
+		Loquat.init();
+		if (Loquat.hasLychee) {
+			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) SpawnerLoader.INSTANCE);
+			PostActionTypes.register("loquat:spawn", SpawnMobAction.TYPE);
+			LycheeCompat.init();
+		}
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			LoquatCommand.register(dispatcher);
+		});
+		UseItemCallback.EVENT.register((player, world, hand) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
+					SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
+				return InteractionResultHolder.success(stack);
+			}
+			return InteractionResultHolder.pass(stack);
+		});
+		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
+			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
+		});
 	}
 }

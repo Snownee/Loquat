@@ -18,5 +18,7 @@
   "loquat.command.spawnerNotExists": "Spawner not exists",
   "loquat.command.spawn.success": "Spawner %s is working",
   "loquat.command.lycheeNotInstalled": "Lychee is not installed",
-  "loquat.command.areaMustBeBox": "Area must be a box"
+  "loquat.command.areaMustBeBox": "Area must be a box",
+  "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
+  "loquat.msg.shiftUseStructureBlock": "Cleared structure"
 }

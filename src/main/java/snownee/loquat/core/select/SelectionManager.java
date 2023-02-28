@@ -1,91 +1,47 @@
 package snownee.loquat.core.select;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.StructureMode;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.network.SSyncSelectionPacket;
+import snownee.loquat.util.TransformUtil;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class SelectionManager {
-
-	public static SelectionManager of(Player player) {
-		return ((LoquatPlayer) player).loquat$getSelectionManager();
-	}
 
 	@Getter
 	private final List<PosSelection> selections;
 	@Getter
-	private boolean lastOneIncomplete;
-	@Getter
 	private final List<UUID> selectedAreas;
+	@Getter
+	private boolean lastOneIncomplete;
 
 	public SelectionManager(boolean isClientSide) {
 		selections = isClientSide ? Collections.synchronizedList(Lists.newArrayList()) : Lists.newArrayList();
 		selectedAreas = isClientSide ? Collections.synchronizedList(Lists.newArrayList()) : Lists.newArrayList();
 	}
 
-	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
-		if (!isHoldingTool(player))
-			return false;
-		if (player.isShiftKeyDown()) {
-			AreaManager manager = AreaManager.of(world);
-			for (Area area : manager.areas()) {
-				if (!area.contains(pos))
-					continue;
-				if (selectedAreas.contains(area.getUuid())) {
-					selectedAreas.remove(area.getUuid());
-				} else {
-					selectedAreas.add(area.getUuid());
-				}
-			}
-		} else if (world.getBlockEntity(pos) instanceof StructureBlockEntity be) {
-			if (selections.size() == 1) {
-				AABB aabb = selections.get(0).toAABB();
-				be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ).subtract(pos));
-				be.setStructureSize(new BlockPos(aabb.getXsize(), aabb.getYsize(), aabb.getZsize()));
-			}
-			be.setShowBoundingBox(true);
-			be.setChanged();
-			BlockState blockState = world.getBlockState(pos);
-			world.sendBlockUpdated(pos, blockState, blockState, 3);
-		} else {
-			if (selections.isEmpty()) {
-				lastOneIncomplete = false;
-			}
-			if (lastOneIncomplete) {
-				selections.get(selections.size() - 1).pos2 = pos;
-			} else {
-				selections.add(new PosSelection(pos));
-			}
-			lastOneIncomplete = !lastOneIncomplete;
-		}
-		SSyncSelectionPacket.sync(player);
-		return true;
-	}
-
-	public boolean rightClickItem(ServerLevel world, BlockPos pos, ServerPlayer player) {
-		if (!isHoldingTool(player) || !player.isShiftKeyDown())
-			return false;
-		selections.clear();
-		SSyncSelectionPacket.sync(player);
-		return true;
-	}
-
-	public boolean isSelected(Area area) {
-		return selectedAreas.contains(area.getUuid());
+	public static SelectionManager of(Player player) {
+		return ((LoquatPlayer) player).loquat$getSelectionManager();
 	}
 
 	public static boolean isHoldingTool(Player player) {
@@ -95,6 +51,90 @@ public class SelectionManager {
 	public static boolean removeInvalidAreas(ServerPlayer player) {
 		AreaManager areaManager = AreaManager.of(player.getLevel());
 		return SelectionManager.of(player).getSelectedAreas().removeIf(uuid -> areaManager.get(uuid) == null);
+	}
+
+	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
+		if (!isHoldingTool(player))
+			return false;
+		if (world.getBlockEntity(pos) instanceof StructureBlockEntity be) {
+			if (player.isShiftKeyDown()) {
+				selectedAreas.clear();
+				Vec3i size = be.getStructureSize();
+				if (size.getX() > 0 && size.getY() > 0 && size.getZ() > 0) {
+					AABB aabb = TransformUtil.getAABB(be);
+					AreaManager.of(world).areas().forEach(area -> {
+						if (area.inside(aabb)) {
+							selectedAreas.add(area.getUuid());
+						}
+					});
+				}
+				player.displayClientMessage(Component.translatable("loquat.msg.shiftClickStructureBlock"), false);
+			} else {
+				if (selections.size() == 1) {
+					AABB aabb = selections.get(0).toAABB();
+					be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ).subtract(pos));
+					if (be.getMode() != StructureMode.LOAD)
+						be.setStructureSize(new BlockPos(aabb.getXsize(), aabb.getYsize(), aabb.getZsize()));
+				}
+			}
+			be.setShowBoundingBox(true);
+			be.setChanged();
+			BlockState blockState = world.getBlockState(pos);
+			world.sendBlockUpdated(pos, blockState, blockState, 3);
+		} else {
+			if (player.isShiftKeyDown()) {
+				AreaManager manager = AreaManager.of(world);
+				for (Area area : manager.areas()) {
+					if (!area.contains(pos))
+						continue;
+					if (selectedAreas.contains(area.getUuid())) {
+						selectedAreas.remove(area.getUuid());
+					} else {
+						selectedAreas.add(area.getUuid());
+					}
+				}
+			} else {
+				if (selections.isEmpty()) {
+					lastOneIncomplete = false;
+				}
+				if (lastOneIncomplete) {
+					selections.get(selections.size() - 1).pos2 = pos;
+				} else {
+					selections.add(new PosSelection(pos));
+				}
+				lastOneIncomplete = !lastOneIncomplete;
+			}
+		}
+		SSyncSelectionPacket.sync(player);
+		return true;
+	}
+
+	public boolean rightClickItem(ServerLevel world, HitResult hit, ServerPlayer player) {
+		if (!isHoldingTool(player) || !player.isShiftKeyDown())
+			return false;
+		if (hit instanceof BlockHitResult blockHit && world.getBlockEntity(blockHit.getBlockPos()) instanceof StructureBlockEntity be && be.getMode() == StructureMode.LOAD) {
+			Vec3i size = be.getStructureSize();
+			if (size.getX() < 1 || size.getY() < 1 || size.getZ() < 1) {
+				return false;
+			}
+			AABB aabb = TransformUtil.getAABB(be);
+			BlockPos.betweenClosedStream(aabb).forEach(pos -> {
+				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+			});
+			BlockPos.betweenClosedStream(aabb).forEach(pos -> {
+				world.blockUpdated(pos, Blocks.AIR);
+			});
+			AreaManager.of(world).removeAllInside(aabb);
+			player.displayClientMessage(Component.translatable("loquat.msg.shiftUseStructureBlock"), false);
+		} else {
+			selectedAreas.clear();
+		}
+		SSyncSelectionPacket.sync(player);
+		return true;
+	}
+
+	public boolean isSelected(Area area) {
+		return selectedAreas.contains(area.getUuid());
 	}
 
 }

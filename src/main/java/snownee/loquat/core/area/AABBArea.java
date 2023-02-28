@@ -1,15 +1,18 @@
 package snownee.loquat.core.area;
 
-import java.util.Objects;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.util.AABBSerializer;
+import snownee.loquat.util.TransformUtil;
+
+import java.util.Objects;
 
 @AllArgsConstructor
 public class AABBArea extends Area {
@@ -36,6 +39,16 @@ public class AABBArea extends Area {
 	}
 
 	@Override
+	public boolean intersects(AABB aabb) {
+		return this.aabb.intersects(aabb);
+	}
+
+	@Override
+	public boolean inside(AABB aabb2) {
+		return aabb2.contains(aabb.minX, aabb.minY, aabb.minZ) && aabb2.maxX >= aabb.maxX && aabb2.maxY >= aabb.maxY && aabb2.maxZ >= aabb.maxZ;
+	}
+
+	@Override
 	public Vec3 getCenter() {
 		return aabb.getCenter();
 	}
@@ -43,6 +56,11 @@ public class AABBArea extends Area {
 	@Override
 	public Vec3 getOrigin() {
 		return new Vec3(aabb.minX, aabb.minY, aabb.minZ);
+	}
+
+	@Override
+	public AABBArea transform(StructurePlaceSettings settings, BlockPos offset) {
+		return new AABBArea(TransformUtil.transform(settings, offset, aabb));
 	}
 
 	@Override

@@ -1,14 +1,5 @@
 package snownee.loquat.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -21,13 +12,24 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.phys.AABB;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
 import snownee.loquat.network.SOutlinesPacket;
 
+import java.util.*;
+
 public class AreaManager extends SavedData {
+
+	private final ArrayList<Area> areas = new ArrayList<>();
+	private final HashMap<UUID, Area> map = new HashMap<>();
+	@Getter
+	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
+	@Getter
+	private final List<AreaEvent> events = new ArrayList<>();
+	private ServerLevel level;
 
 	public static AreaManager of(ServerLevel level) {
 		AreaManagerContainer container = (AreaManagerContainer) level;
@@ -57,20 +59,13 @@ public class AreaManager extends SavedData {
 		return manager;
 	}
 
-	private ServerLevel level;
-	private final ArrayList<Area> areas = new ArrayList<>();
-	private final HashMap<UUID, Area> map = new HashMap<>();
-	@Getter
-	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
-	@Getter
-	private final List<AreaEvent> events = new ArrayList<>();
-
 	@SuppressWarnings("rawtypes")
 	public static ListTag saveAreas(Collection<Area> areas, boolean networking) {
 		ListTag tag = new ListTag();
 		for (Area area : areas) {
 			CompoundTag data = new CompoundTag();
-			data.putUUID("UUID", area.getUuid());
+			if (area.getUuid() != null)
+				data.putUUID("UUID", area.getUuid());
 			if (!area.getTags().isEmpty())
 				data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
 			if (!area.getZones().isEmpty()) {
@@ -91,7 +86,9 @@ public class AreaManager extends SavedData {
 			CompoundTag data = tag.getCompound(i);
 			Area.Type<?> type = LoquatRegistries.AREA.get(new ResourceLocation(data.getString("Type")));
 			Area area = type.deserialize(data);
-			area.setUuid(data.getUUID("UUID"));
+			if (data.contains("UUID")) {
+				area.setUuid(data.getUUID("UUID"));
+			}
 			if (data.contains("Tags")) {
 				ListTag tags = data.getList("Tags", Tag.TAG_STRING);
 				for (int j = 0; j < tags.size(); j++) {
@@ -136,6 +133,17 @@ public class AreaManager extends SavedData {
 		showOutline(Long.MIN_VALUE, List.of(area));
 		setDirty();
 		return true;
+	}
+
+	public boolean removeAllInside(AABB aabb) {
+		List<UUID> toRemove = new ArrayList<>();
+		for (Area area : areas) {
+			if (area.inside(aabb)) {
+				toRemove.add(area.getUuid());
+			}
+		}
+		toRemove.forEach(this::remove);
+		return !toRemove.isEmpty();
 	}
 
 	public void showOutline(long duration, List<Area> areas) {

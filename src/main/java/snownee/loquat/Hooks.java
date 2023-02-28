@@ -1,15 +1,23 @@
 package snownee.loquat;
 
-import java.util.List;
-import java.util.UUID;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.phys.AABB;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
+import snownee.loquat.core.AreaManager;
+import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
+import snownee.loquat.util.TransformUtil;
+
+import java.util.List;
+import java.util.UUID;
 
 public final class Hooks {
 	public static boolean handleComponentClicked(String value) {
@@ -30,5 +38,25 @@ public final class Hooks {
 			return true;
 		}
 		return false;
+	}
+
+	public static void fillFromWorld(AreaManager manager, BlockPos pos, Vec3i size, List<Area> areas) {
+		AABB aabb = new AABB(pos, pos.offset(size));
+		var settings = new StructurePlaceSettings();
+		for (Area area : manager.areas()) {
+			if (area.inside(aabb)) {
+				area = TransformUtil.transform(settings, pos.multiply(-1), area);
+				area.setUuid(null);
+				areas.add(area);
+			}
+		}
+	}
+
+	public static void placeInWorld(AreaManager manager, BlockPos pos, BlockPos blockPos, List<Area> areas, StructurePlaceSettings settings, Vec3i size) {
+		manager.removeAllInside(TransformUtil.transform(settings, blockPos, new AABB(pos, pos.offset(size))));
+		for (Area area : areas) {
+			// still not sure the difference between pos and blockPos...
+			manager.add(TransformUtil.transform(settings, blockPos, area));
+		}
 	}
 }
