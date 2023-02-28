@@ -28,8 +28,11 @@ loom {
 }
 
 repositories {
-    maven("https://maven.parchmentmc.org")
     maven("https://api.modrinth.com/maven")
+    maven("https://maven.saps.dev/minecraft")
+    maven("https://maven.architectury.dev")
+    maven("https://maven.blamejared.com/")
+    maven("https://maven.parchmentmc.org")
 }
 
 dependencies {
@@ -52,6 +55,7 @@ dependencies {
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
     modImplementation("maven.modrinth:jade:ZASePpsm")
 
+    modImplementation("dev.latvian.mods:kubejs-fabric:1902.6.0-build.119")
 }
 
 tasks.processResources {

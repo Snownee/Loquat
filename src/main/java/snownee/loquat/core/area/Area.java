@@ -1,13 +1,5 @@
 package snownee.loquat.core.area;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.base.Preconditions;
 
 import lombok.Getter;
@@ -20,15 +12,20 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.stream.Stream;
+
 public abstract class Area {
-	@Getter
-	@Setter
-	@Nullable
-	private UUID uuid;
 	@Getter
 	private final List<String> tags = new ArrayList<>();
 	@Getter
 	private final Map<String, Zone> zones = new HashMap<>();
+	@Getter
+	@Setter
+	@Nullable
+	private UUID uuid;
 
 	public abstract boolean contains(int x, int y, int z);
 
@@ -49,6 +46,8 @@ public abstract class Area {
 	public abstract Vec3 getCenter();
 
 	public abstract Vec3 getOrigin();
+
+	public abstract Stream<BlockPos> allBlockPosIn();
 
 	public abstract Type<?> getType();
 
@@ -71,6 +70,8 @@ public abstract class Area {
 	}
 
 	public abstract Area transform(StructurePlaceSettings settings, BlockPos offset);
+
+	public abstract Object getBounds();
 
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);

@@ -20,6 +20,7 @@ import snownee.loquat.core.area.Zone;
 import snownee.loquat.network.SOutlinesPacket;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class AreaManager extends SavedData {
 
@@ -30,6 +31,7 @@ public class AreaManager extends SavedData {
 	@Getter
 	private final List<AreaEvent> events = new ArrayList<>();
 	private ServerLevel level;
+	private Set<Object> boundsCache = new HashSet<>();
 
 	public static AreaManager of(ServerLevel level) {
 		AreaManagerContainer container = (AreaManagerContainer) level;
@@ -108,10 +110,12 @@ public class AreaManager extends SavedData {
 
 	public void add(Area area) {
 		Objects.requireNonNull(area.getUuid(), "Area UUID cannot be null");
-		Preconditions.checkState(!areas.contains(area), "Area already exists", area);
-		Preconditions.checkState(!map.containsKey(area.getUuid()), "Area UUID already exists", area);
+		Preconditions.checkState(!map.containsKey(area.getUuid()), "Area UUID already exists: %s", area);
+		Object bounds = area.getBounds();
+		Preconditions.checkState(!boundsCache.contains(bounds), "Area already exists");
 		areas.add(area);
 		map.put(area.getUuid(), area);
+		boundsCache.add(bounds);
 		showOutline(Long.MAX_VALUE, List.of(area));
 		setDirty();
 	}
@@ -124,12 +128,17 @@ public class AreaManager extends SavedData {
 		return map.get(uuid);
 	}
 
+	public Stream<Area> byTag(String tag) {
+		return areas.stream().filter(a -> a.getTags().contains(tag));
+	}
+
 	public boolean remove(UUID uuid) {
 		Area area = map.remove(uuid);
 		if (area == null) {
 			return false;
 		}
 		areas.remove(area);
+		boundsCache.remove(area.getBounds());
 		showOutline(Long.MIN_VALUE, List.of(area));
 		setDirty();
 		return true;

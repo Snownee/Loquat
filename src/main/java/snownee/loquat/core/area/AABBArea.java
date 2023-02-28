@@ -1,5 +1,8 @@
 package snownee.loquat.core.area;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -11,8 +14,6 @@ import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.util.AABBSerializer;
 import snownee.loquat.util.TransformUtil;
-
-import java.util.Objects;
 
 @AllArgsConstructor
 public class AABBArea extends Area {
@@ -64,18 +65,13 @@ public class AABBArea extends Area {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		AABBArea aabbArea = (AABBArea) o;
-		return Objects.equals(aabb, aabbArea.aabb);
+	public Stream<BlockPos> allBlockPosIn() {
+		return BlockPos.betweenClosedStream(aabb);
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(aabb);
+	public Object getBounds() {
+		return aabb;
 	}
 
 	@Override
