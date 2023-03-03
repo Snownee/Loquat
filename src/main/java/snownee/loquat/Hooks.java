@@ -1,23 +1,22 @@
 package snownee.loquat;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
-
-import org.apache.commons.lang3.StringUtils;
-
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
 import snownee.loquat.util.TransformUtil;
-
-import java.util.List;
-import java.util.UUID;
 
 public final class Hooks {
 	public static boolean handleComponentClicked(String value) {

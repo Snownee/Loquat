@@ -1,5 +1,16 @@
 package snownee.loquat.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
@@ -18,9 +29,6 @@ import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
 import snownee.loquat.network.SOutlinesPacket;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 public class AreaManager extends SavedData {
 

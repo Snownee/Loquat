@@ -1,5 +1,7 @@
 package snownee.loquat.util;
 
+import java.util.UUID;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -8,8 +10,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
-
-import java.util.UUID;
 
 public interface TransformUtil {
 

@@ -1,5 +1,14 @@
 package snownee.loquat.core.area;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.base.Preconditions;
 
 import lombok.Getter;
@@ -11,11 +20,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.stream.Stream;
 
 public abstract class Area {
 	@Getter

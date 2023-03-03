@@ -1,6 +1,5 @@
 package snownee.loquat.core.area;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;

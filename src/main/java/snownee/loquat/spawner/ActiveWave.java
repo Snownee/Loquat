@@ -1,7 +1,5 @@
 package snownee.loquat.spawner;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -10,11 +8,12 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -41,7 +40,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	@Getter
 	private final LycheeContext context;
 
-	private final List<SpawnMobAction> pendingMobs = Lists.newArrayList();
+	private final ObjectArrayList<SpawnMobAction> pendingMobs = ObjectArrayList.of();
 	private boolean pendingMobsNeedShuffle;
 
 	private int spawnCooldown;
@@ -81,7 +80,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		} else {
 			if (pendingMobsNeedShuffle) {
 				pendingMobsNeedShuffle = false;
-				Collections.shuffle(pendingMobs);
+				Util.shuffle(pendingMobs, world.random);
 			}
 			pendingMobs.removeIf(action -> {
 				Entity entity = action.getMob().createMob(world, area, action.getZone());
