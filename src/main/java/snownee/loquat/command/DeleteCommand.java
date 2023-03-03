@@ -1,8 +1,5 @@
 package snownee.loquat.command;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.minecraft.commands.CommandSourceStack;
@@ -13,7 +10,7 @@ import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
 
-public class DeleteCommand {
+public class DeleteCommand extends LoquatCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("delete")
@@ -33,19 +30,8 @@ public class DeleteCommand {
 				.then(Commands.literal("selection")
 						.executes(ctx -> {
 							var source = ctx.getSource();
-							var manager = AreaManager.of(source.getLevel());
-							List<UUID> selectedAreas = SelectionManager.of(source.getPlayerOrException()).getSelectedAreas();
-							int count = 0;
-							for (UUID uuid : selectedAreas) {
-								if (manager.remove(uuid)) {
-									count++;
-								}
-							}
-							if (count == 0) {
-								source.sendFailure(Component.translatable("loquat.command.emptySelection"));
-								return 0;
-							}
-							selectedAreas.clear();
+							int count = forEachSelected(source, (uuid, manager) -> manager.remove(uuid));
+							SelectionManager.of(source.getPlayerOrException()).getSelectedAreas().clear();
 							SSyncSelectionPacket.sync(source.getPlayerOrException());
 							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
 							return count;

@@ -1,7 +1,5 @@
 package snownee.loquat.command;
 
-import java.util.UUID;
-
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -15,7 +13,14 @@ import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.function.BiPredicate;
+
 public class LoquatCommand {
+
+	public static final SimpleCommandExceptionType EMPTY_SELECTION = new SimpleCommandExceptionType(Component.translatable("loquat.command.emptySelection"));
+	public static final SimpleCommandExceptionType TOO_MANY_SELECTIONS = new SimpleCommandExceptionType(Component.translatable("loquat.command.tooManySelections"));
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(Loquat.ID).requires(cs -> cs.hasPermission(2))
@@ -25,7 +30,8 @@ public class LoquatCommand {
 				.then(OutlineCommand.register())
 				.then(UnselectCommand.register())
 				.then(ZoneCommand.register())
-				.then(ReplaceCommand.register());
+				.then(ReplaceCommand.register())
+				.then(TagCommand.register());
 		if (Loquat.hasLychee) {
 			builder.then(SpawnCommand.register());
 		} else {
@@ -36,9 +42,6 @@ public class LoquatCommand {
 		}
 		dispatcher.register(builder);
 	}
-
-	public static final SimpleCommandExceptionType EMPTY_SELECTION = new SimpleCommandExceptionType(Component.translatable("loquat.command.emptySelection"));
-	public static final SimpleCommandExceptionType TOO_MANY_SELECTIONS = new SimpleCommandExceptionType(Component.translatable("loquat.command.tooManySelections"));
 
 	public static Area getOnlySelectedArea(CommandSourceStack source) throws CommandSyntaxException {
 		var selection = SelectionManager.of(source.getPlayerOrException());
@@ -51,5 +54,22 @@ public class LoquatCommand {
 		}
 		UUID uuid = selection.getSelectedAreas().get(0);
 		return AreaManager.of(source.getLevel()).get(uuid);
+	}
+
+	public static int forEachSelected(CommandSourceStack source, BiPredicate<UUID, AreaManager> action) throws CommandSyntaxException {
+		var manager = AreaManager.of(source.getLevel());
+		SelectionManager.removeInvalidAreas(source.getPlayerOrException());
+		List<UUID> selectedAreas = SelectionManager.of(source.getPlayerOrException()).getSelectedAreas();
+		int count = 0;
+		for (UUID uuid : selectedAreas) {
+			if (action.test(uuid, manager)) {
+				count++;
+			}
+		}
+		if (count == 0) {
+			source.sendFailure(Component.translatable("loquat.command.emptySelection"));
+			return 0;
+		}
+		return count;
 	}
 }

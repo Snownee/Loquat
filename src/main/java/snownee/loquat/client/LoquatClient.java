@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -14,9 +15,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -28,6 +27,7 @@ import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.PosSelection;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.util.Color;
+import snownee.loquat.util.RenderUtil;
 
 public class LoquatClient {
 
@@ -39,17 +39,17 @@ public class LoquatClient {
 
 	static {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
-			var aabb = ((AABBArea) data.area).getAabb().inflate(0.01);
+			var aabb = ((AABBArea) data.area).getAabb().inflate(0.01).move(ctx.pos);
 			var color = data.type.color;
 			float alpha = 1;
 			if (ctx.time() + 10 > data.expire) {
 				alpha *= (data.expire - ctx.time()) / 10F;
 			}
+			RenderUtil.renderLineBox(aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			DebugRenderer.renderFilledBox(aabb.move(ctx.pos), color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
-			var buffer = ctx.bufferSource().getBuffer(RenderType.lines());
-			LevelRenderer.renderLineBox(ctx.poseStack(), buffer, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
+			RenderSystem.enableDepthTest();
+			DebugRenderer.renderFilledBox(aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
 		});
 	}
 
@@ -82,38 +82,39 @@ public class LoquatClient {
 		outlines.values().removeIf(data -> context.time >= data.expire);
 		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
+			if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
+				var center = data.area.getCenter();
+				var tags = Joiner.on(", ").join(data.area.getTags());
+				DebugRenderer.renderFloatingText(tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
+			}
 			if (data.type != DebugAreaType.HIGHLIGHT)
 				data.type = selectionManager.isSelected(data.area) ? DebugAreaType.SELECTED : DebugAreaType.NORMAL;
-			Objects.requireNonNull(renderers.get(data.area.getType())).accept(context, data);
 			if (data.type == DebugAreaType.SELECTED) {
-				var buffer = context.bufferSource().getBuffer(RenderType.lines());
 				data.area.getZones().forEach((name, zone) -> {
 					float alpha = 1;
 					if (context.time() + 10 > data.expire) {
 						alpha *= (data.expire - context.time()) / 10F;
 					}
-					RenderSystem.disableTexture();
-					RenderSystem.disableDepthTest();
 					for (AABB aabb : zone.aabbs()) {
 						var center = aabb.getCenter();
 						if (aabb.getYsize() > 1) {
 							aabb = aabb.inflate(0.02);
 						} else {
-							aabb = aabb.deflate(0.2, 0.5, 0.2).move(0, -0.499, 0);
+							aabb = aabb.deflate(0.2, 0.5, 0.2).move(0, -0.48, 0);
 						}
-						LevelRenderer.renderLineBox(context.poseStack(), buffer, aabb, 1, 0.6F, 0, alpha);
+						RenderUtil.renderLineBox(aabb.move(context.pos), 1, 0.6F, 0, alpha);
 						DebugRenderer.renderFloatingText(name, center.x, center.y, center.z, 0, 0.045F);
 					}
 				});
 			}
+			Objects.requireNonNull(renderers.get(data.area.getType())).accept(context, data);
 		}
 	}
 
 	private static void renderSelections(RenderDebugContext context, ClientLevel level, List<PosSelection> selections) {
-		var buffer = context.bufferSource().getBuffer(RenderType.lines());
 		for (PosSelection selection : selections) {
 			AABB aabb = selection.toAABB().inflate(0.01);
-			LevelRenderer.renderLineBox(context.poseStack(), buffer, aabb, 0.4F, 0.4F, 1, 1);
+			RenderUtil.renderLineBox(aabb.move(context.pos), 0.4F, 0.4F, 1, 1);
 		}
 	}
 
