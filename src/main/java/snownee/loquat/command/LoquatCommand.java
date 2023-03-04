@@ -31,7 +31,9 @@ public class LoquatCommand {
 				.then(UnselectCommand.register())
 				.then(ZoneCommand.register())
 				.then(ReplaceCommand.register())
-				.then(TagCommand.register());
+				.then(TagCommand.register())
+				.then(EmptyCommand.register())
+				.then(SelectTagCommand.register());
 		if (Loquat.hasLychee) {
 			builder.then(SpawnCommand.register());
 		} else {
@@ -67,8 +69,7 @@ public class LoquatCommand {
 			}
 		}
 		if (count == 0) {
-			source.sendFailure(Component.translatable("loquat.command.emptySelection"));
-			return 0;
+			throw EMPTY_SELECTION.create();
 		}
 		return count;
 	}

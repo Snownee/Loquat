@@ -120,7 +120,7 @@ public class AreaManager extends SavedData {
 		Objects.requireNonNull(area.getUuid(), "Area UUID cannot be null");
 		Preconditions.checkState(!map.containsKey(area.getUuid()), "Area UUID already exists: %s", area);
 		Object bounds = area.getBounds();
-		Preconditions.checkState(!boundsCache.contains(bounds), "Area already exists");
+		Preconditions.checkState(!boundsCache.contains(bounds), "Area already exists: same bounds");
 		areas.add(area);
 		map.put(area.getUuid(), area);
 		boundsCache.add(bounds);

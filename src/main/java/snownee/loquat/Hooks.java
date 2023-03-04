@@ -52,10 +52,14 @@ public final class Hooks {
 	}
 
 	public static void placeInWorld(AreaManager manager, BlockPos pos, BlockPos blockPos, List<Area> areas, StructurePlaceSettings settings, Vec3i size) {
-		manager.removeAllInside(TransformUtil.transform(settings, blockPos, new AABB(pos, pos.offset(size))));
+		manager.removeAllInside(TransformUtil.transform(settings, pos, new AABB(pos, pos.offset(size))));
 		for (Area area : areas) {
+			area = TransformUtil.transform(settings, pos, area);
+			if (settings.getBoundingBox() != null && !AABB.of(settings.getBoundingBox()).contains(area.getOrigin())) {
+				continue;
+			}
 			// still not sure the difference between pos and blockPos...
-			manager.add(TransformUtil.transform(settings, blockPos, area));
+			manager.add(area);
 		}
 	}
 }

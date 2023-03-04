@@ -67,7 +67,6 @@ public class TreeNodePlacer implements LoquatPlacer {
 			} catch (Throwable e) {
 				Loquat.LOGGER.error("", e);
 			}
-
 		});
 	}
 

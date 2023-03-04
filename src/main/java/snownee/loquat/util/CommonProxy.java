@@ -1,5 +1,10 @@
 package snownee.loquat.util;
 
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import com.google.common.collect.Lists;
 
 import net.fabricmc.api.ModInitializer;
@@ -26,11 +31,6 @@ import snownee.loquat.spawner.LycheeCompat;
 import snownee.loquat.spawner.SpawnMobAction;
 import snownee.loquat.spawner.SpawnerLoader;
 import snownee.lychee.PostActionTypes;
-
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class CommonProxy implements ModInitializer {
 
@@ -88,7 +88,7 @@ public class CommonProxy implements ModInitializer {
 			}
 			rooms.forEach($ -> {
 				$.setUniqueGroup("room");
-				$.setMinEdgeDistance(5);
+				$.setMinEdgeDistance(8);
 			});
 			rooms.get(random.nextInt(rooms.size())).addChild("door", "loquat:treasure");
 			lastNode.addChild("door", "loquat:lobby");

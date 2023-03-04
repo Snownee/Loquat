@@ -1,9 +1,5 @@
 package snownee.loquat.core.select;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
@@ -12,9 +8,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.StructureMode;
@@ -25,7 +19,12 @@ import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.network.SSyncSelectionPacket;
+import snownee.loquat.util.LoquatUtil;
 import snownee.loquat.util.TransformUtil;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class SelectionManager {
 
@@ -119,16 +118,7 @@ public class SelectionManager {
 				return false;
 			}
 			AABB aabb = TransformUtil.getAABB(be);
-			BlockPos.betweenClosedStream(aabb).forEach(pos -> {
-				var be0 = world.getBlockEntity(pos);
-				if (be0 != null) {
-					Clearable.tryClear(be0);
-				}
-				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 34);
-			});
-			BlockPos.betweenClosedStream(aabb).forEach(pos -> {
-				world.blockUpdated(pos, Blocks.AIR);
-			});
+			LoquatUtil.emptyBlocks(world, () -> BlockPos.betweenClosedStream(aabb));
 			AreaManager.of(world).removeAllInside(aabb);
 			player.displayClientMessage(Component.translatable("loquat.msg.shiftUseStructureBlock"), false);
 		} else {
