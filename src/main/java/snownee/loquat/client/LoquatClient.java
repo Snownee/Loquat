@@ -82,10 +82,14 @@ public class LoquatClient {
 		outlines.values().removeIf(data -> context.time >= data.expire);
 		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
-			if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
+			{
 				var center = data.area.getCenter();
-				var tags = Joiner.on(", ").join(data.area.getTags());
-				DebugRenderer.renderFloatingText(tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
+				if (center.distanceToSqr(context.pos.reverse()) > 128 * 128)
+					continue;
+				if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
+					var tags = Joiner.on(", ").join(data.area.getTags());
+					DebugRenderer.renderFloatingText(tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
+				}
 			}
 			if (data.type != DebugAreaType.HIGHLIGHT)
 				data.type = selectionManager.isSelected(data.area) ? DebugAreaType.SELECTED : DebugAreaType.NORMAL;
