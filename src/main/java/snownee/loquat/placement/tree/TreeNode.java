@@ -1,13 +1,15 @@
 package snownee.loquat.placement.tree;
 
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
-
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class TreeNode {
 
@@ -24,6 +26,9 @@ public class TreeNode {
 	@Getter
 	@Setter
 	private int minEdgeDistance;
+	@Getter
+	@Setter
+	private Function<String, String> fallbackPoolProvider = jointName -> null;
 
 	public TreeNode(ResourceLocation pool, @Nullable String parentEdge) {
 		this.pool = pool;
@@ -34,6 +39,13 @@ public class TreeNode {
 		TreeNode child = new TreeNode(new ResourceLocation(childPool), edgeName);
 		children.add(child);
 		return child;
+	}
+
+	public void walk(Consumer<TreeNode> consumer) {
+		consumer.accept(this);
+		for (TreeNode child : children) {
+			child.walk(consumer);
+		}
 	}
 
 }

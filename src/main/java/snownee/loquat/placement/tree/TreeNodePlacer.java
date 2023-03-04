@@ -1,6 +1,7 @@
 package snownee.loquat.placement.tree;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import com.google.common.base.Preconditions;
@@ -8,6 +9,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -77,7 +79,12 @@ public class TreeNodePlacer implements LoquatPlacer {
 		Rotation rotation = step.piece.getRotation();
 		List<StructureTemplate.StructureBlockInfo> jigsawBlocks = element.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation, random);
 		ListMultimap<String, StructureTemplate.StructureBlockInfo> byJointName = ArrayListMultimap.create();
+		Set<StructureTemplate.StructureBlockInfo> resolvedJigsaws = Sets.newHashSet();
 		for (var jigsawBlock : jigsawBlocks) {
+			if (step.jointPos.equals(jigsawBlock.pos.offset(blockPos))) {
+				resolvedJigsaws.add(jigsawBlock);
+				continue;
+			}
 			String jointName = jigsawBlock.nbt.getString("name");
 			byJointName.put(jointName, jigsawBlock);
 		}
@@ -90,7 +97,8 @@ public class TreeNodePlacer implements LoquatPlacer {
 				BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
 				Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state);
 				BlockPos thatJointPos = jointPos.relative(direction);
-				if (step.jointPos.distSqr(jointPos) <= minEdgeDistance * minEdgeDistance) {
+				double dist = step.jointPos.distSqr(jointPos);
+				if (dist <= minEdgeDistance * minEdgeDistance) {
 					continue;
 				}
 				StructureTemplatePool pool = pools.getOptional(child.getPool()).orElseThrow();
@@ -111,6 +119,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 							VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
 							steps.push(new Step(piece, shape, thatJointPos));
 							if (doPlace(child, uniqueGroups, steps, structureTemplateManager, random, pools)) {
+								resolvedJigsaws.add(jigsawBlock);
 								selectedJigsaw = jigsawBlock;
 								break joints;
 							}
@@ -124,6 +133,32 @@ public class TreeNodePlacer implements LoquatPlacer {
 				}
 				steps.pop();
 				return false;
+			}
+		}
+		for (var jigsawBlock : jigsawBlocks) {
+			if (resolvedJigsaws.contains(jigsawBlock)) {
+				continue;
+			}
+			String jointName = jigsawBlock.nbt.getString("name");
+			String fallbackPool = node.getFallbackPoolProvider().apply(jointName);
+			if (fallbackPool == null) {
+				continue;
+			}
+			BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
+			StructureTemplatePool pool = pools.getOptional(new ResourceLocation(fallbackPool)).orElseThrow();
+			StructurePoolElement template = pool.getRandomTemplate(random);
+			for (Rotation rotation2 : Rotation.getShuffled(random)) {
+				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
+				for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
+					if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
+						continue;
+					}
+					BlockPos thatPiecePos = jointPos.offset(jigsawBlock1.pos.multiply(-1));
+					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
+					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
+					VoxelShape shape = Shapes.joinUnoptimized(steps.peek().validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
+					steps.push(new Step(piece, shape, jointPos));
+				}
 			}
 		}
 		return true;

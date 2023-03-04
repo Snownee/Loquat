@@ -65,7 +65,7 @@ public class AABBArea extends Area {
 
 	@Override
 	public Stream<BlockPos> allBlockPosIn() {
-		return BlockPos.betweenClosedStream(aabb);
+		return BlockPos.betweenClosedStream(aabb.deflate(0.25));
 	}
 
 	@Override
