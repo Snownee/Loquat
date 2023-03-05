@@ -82,6 +82,8 @@ public abstract class Area {
 
 	public abstract LongCollection getChunksIn();
 
+	public abstract AABB getRoughAABB();
+
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);
 

@@ -1,11 +1,13 @@
 package snownee.loquat.spawner;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Sets;
@@ -14,10 +16,13 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.minecraft.Util;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.Loquat;
 import snownee.loquat.core.area.Area;
@@ -41,13 +46,10 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	private final LycheeContext context;
 
 	private final ObjectArrayList<SpawnMobAction> pendingMobs = ObjectArrayList.of();
-	private boolean pendingMobsNeedShuffle;
-
-	private int spawnCooldown;
-
 	private final Set<UUID> mobs = Sets.newHashSet();
 	private final Set<UUID> successiveSpawnableMobs = Sets.newHashSet();
-
+	private boolean pendingMobsNeedShuffle;
+	private int spawnCooldown;
 	private Consumer<Entity> deathListener;
 	private BiConsumer<Entity, Entity> successiveSpawnListener;
 	private boolean isFinished;
@@ -60,6 +62,10 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		this.waveIndex = waveIndex;
 		this.wave = spawner.waves[waveIndex];
 		this.context = context;
+	}
+
+	public static boolean canSuccessiveSpawn(LivingEntity entity) {
+		return entity instanceof Slime;
 	}
 
 	public boolean tick(ServerLevel world, Area area) {
@@ -83,7 +89,25 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 				Util.shuffle(pendingMobs, world.random);
 			}
 			pendingMobs.removeIf(action -> {
-				Entity entity = action.getMob().createMob(world, area, action.getZone());
+				List<ServerPlayer> players = world.players();
+				int offset = world.random.nextInt(players.size());
+				MutableObject<ServerPlayer> target = new MutableObject<>();
+				for (int i = 0; i < players.size(); i++) {
+					ServerPlayer player = players.get((i + offset) % players.size());
+					if (!player.isSpectator() && area.contains(player.getBoundingBox())) {
+						target.setValue(player);
+						break;
+					}
+				}
+				Entity entity = action.getMob().createMob(world, area, action.getZone(), e -> {
+					if (target.getValue() == null) {
+						return;
+					}
+					e.lookAt(EntityAnchorArgument.Anchor.EYES, target.getValue().position());
+					if (e instanceof Monster monster) {
+						monster.setTarget(target.getValue());
+					}
+				});
 				if (entity != null) {
 					addMob(entity);
 					if (entity.isVehicle()) {
@@ -154,10 +178,6 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
 	public int getRemainMobs() {
 		return mobs.size() + pendingMobs.size();
-	}
-
-	public static boolean canSuccessiveSpawn(LivingEntity entity) {
-		return entity instanceof Slime;
 	}
 
 	@Override

@@ -1,15 +1,16 @@
 package snownee.loquat.command;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
-
-import java.util.List;
 
 public class TagCommand extends LoquatCommand {
 

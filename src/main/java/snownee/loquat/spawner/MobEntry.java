@@ -1,6 +1,8 @@
 package snownee.loquat.spawner;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -26,6 +29,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.NaturalSpawner;
 import snownee.loquat.core.area.Area;
 import snownee.lychee.util.LUtil;
@@ -96,10 +100,15 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 		return jsonObject;
 	}
 
-	public Entity createMob(ServerLevel world, Area area, String zoneId) {
+	public Entity createMob(ServerLevel world, Area area, String zoneId, Consumer<Entity> consumer) {
 		int attempts = 10;
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		List<LivingEntity> nearbyEntities = world.getEntitiesOfClass(LivingEntity.class, area.getRoughAABB(), EntitySelector.NO_SPECTATORS);
 		Entity entity = null;
+		int bestAttemptX = 0;
+		int bestAttemptY = 0;
+		int bestAttemptZ = 0;
+		double bestAttemptScore = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < attempts; i++) {
 			area.getRandomPos(world.random, zoneId, pos);
 			if (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, world, pos, type)) {
@@ -126,22 +135,52 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 				//					}
 				//				}
 				if (world.noCollision(entity)) {
-					entity.getIndirectPassengers().forEach(e -> e.moveTo(pos, e.getYRot(), e.getXRot()));
-					if (attrs != null) {
-						for (Object2DoubleMap.Entry<String> entry : attrs.object2DoubleEntrySet()) {
-							Attribute attr = SIMPLE_ATTRIBUTES.get(entry.getKey());
-							Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
-							((LivingEntity) entity).getAttribute(attr).setBaseValue(entry.getDoubleValue());
-							if ("hp".equals(entry.getKey())) {
-								((LivingEntity) entity).setHealth((float) entry.getDoubleValue());
+					double score = 0;
+					for (LivingEntity nearbyEntity : nearbyEntities) {
+						double distance = entity.distanceToSqr(nearbyEntity);
+						if (nearbyEntity instanceof Player) {
+							if (distance < 100) {
+								score -= 100 - distance;
+							}
+						} else {
+							if (distance < 9) {
+								score -= 9 - distance;
 							}
 						}
 					}
-					world.addFreshEntityWithPassengers(entity);
-					return entity;
+					if (score > bestAttemptScore) {
+						bestAttemptScore = score;
+						bestAttemptX = pos.getX();
+						bestAttemptY = pos.getY();
+						bestAttemptZ = pos.getZ();
+						if (score == 0) {
+							break;
+						}
+					}
 				}
 			}
 		}
-		return null;
+		if (bestAttemptScore == Double.NEGATIVE_INFINITY) {
+			return null;
+		}
+		if (attrs != null) {
+			for (Object2DoubleMap.Entry<String> entry : attrs.object2DoubleEntrySet()) {
+				Attribute attr = SIMPLE_ATTRIBUTES.get(entry.getKey());
+				Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
+				((LivingEntity) entity).getAttribute(attr).setBaseValue(entry.getDoubleValue());
+				if ("hp".equals(entry.getKey())) {
+					((LivingEntity) entity).setHealth((float) entry.getDoubleValue());
+				}
+			}
+		}
+		pos.set(bestAttemptX, bestAttemptY, bestAttemptZ);
+		entity.moveTo(pos, entity.getYRot(), entity.getXRot());
+		consumer.accept(entity);
+		entity.getIndirectPassengers().forEach(e -> {
+			e.moveTo(pos, e.getYRot(), e.getXRot());
+			consumer.accept(e);
+		});
+		world.addFreshEntityWithPassengers(entity);
+		return entity;
 	}
 }

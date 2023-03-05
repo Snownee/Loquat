@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.util.CommonProxy;
 
-@Mixin(Slime.class)
+@Mixin(Slime.class) //TODO Zombie reinforcement
 public class SlimeMixin {
 
 	@Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)

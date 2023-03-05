@@ -86,6 +86,11 @@ public class AABBArea extends Area {
 	}
 
 	@Override
+	public AABB getRoughAABB() {
+		return getAabb();
+	}
+
+	@Override
 	public LongCollection getChunksIn() {
 		int minX = SectionPos.blockToSectionCoord(aabb.minX);
 		int minZ = SectionPos.blockToSectionCoord(aabb.minZ);
