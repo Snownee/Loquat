@@ -1,19 +1,10 @@
 package snownee.loquat.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Stream;
-
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -28,18 +19,24 @@ import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
+import snownee.loquat.duck.AreaManagerContainer;
 import snownee.loquat.network.SOutlinesPacket;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 public class AreaManager extends SavedData {
 
-	private final ArrayList<Area> areas = new ArrayList<>();
-	private final HashMap<UUID, Area> map = new HashMap<>();
+	private final List<Area> areas = ObjectArrayList.of();
+	private final Map<UUID, Area> map = Maps.newHashMap();
 	@Getter
 	private final Set<UUID> showOutlinePlayers = Sets.newHashSet();
-	@Getter
-	private final List<AreaEvent> events = new ArrayList<>();
+	private final List<AreaEvent> events = ObjectArrayList.of();
+	private final List<AreaEvent> pendingEvents = ObjectArrayList.of();
+	private final Set<Object> boundsCache = Sets.newHashSet();
+	private final Long2ObjectOpenHashMap<Set<Area>> chunkLookup = new Long2ObjectOpenHashMap<>();
 	private ServerLevel level;
-	private Set<Object> boundsCache = new HashSet<>();
+	private boolean ticking;
 
 	public static AreaManager of(ServerLevel level) {
 		AreaManagerContainer container = (AreaManagerContainer) level;
@@ -124,8 +121,10 @@ public class AreaManager extends SavedData {
 		areas.add(area);
 		map.put(area.getUuid(), area);
 		boundsCache.add(bounds);
-		showOutline(Long.MAX_VALUE, List.of(area));
-		setDirty();
+		area.getChunksIn().forEach(chunk -> {
+			chunkLookup.computeIfAbsent(chunk, c -> Sets.newHashSet()).add(area);
+		});
+		setChanged(List.of(area));
 	}
 
 	public boolean contains(Area area) {
@@ -140,6 +139,10 @@ public class AreaManager extends SavedData {
 		return areas.stream().filter(a -> a.getTags().contains(tag));
 	}
 
+	public Stream<Area> byChunk(long chunkPos) {
+		return chunkLookup.getOrDefault(chunkPos, Set.of()).stream();
+	}
+
 	public boolean remove(UUID uuid) {
 		Area area = map.remove(uuid);
 		if (area == null) {
@@ -147,6 +150,15 @@ public class AreaManager extends SavedData {
 		}
 		areas.remove(area);
 		boundsCache.remove(area.getBounds());
+		area.getChunksIn().forEach(chunk -> {
+			Set<Area> areas = chunkLookup.get(chunk);
+			if (areas != null) {
+				areas.remove(area);
+//				if (areas.isEmpty()) {
+//					chunkLookup.remove(chunk);
+//				}
+			}
+		});
 		showOutline(Long.MIN_VALUE, List.of(area));
 		setDirty();
 		return true;
@@ -163,12 +175,17 @@ public class AreaManager extends SavedData {
 		return !toRemove.isEmpty();
 	}
 
-	public void showOutline(long duration, List<Area> areas) {
+	public void showOutline(long duration, Collection<Area> areas) {
 		if (level == null)
 			return;
 		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
 			SOutlinesPacket.outlines((ServerPlayer) player, duration, false, areas);
 		});
+	}
+
+	public void setChanged(Collection<Area> areas) {
+		setDirty();
+		showOutline(Long.MAX_VALUE, areas);
 	}
 
 	@Override
@@ -186,7 +203,21 @@ public class AreaManager extends SavedData {
 		return Collections.unmodifiableList(areas);
 	}
 
+	public List<AreaEvent> events() {
+		return Collections.unmodifiableList(events);
+	}
+
+	public void addEvent(AreaEvent event) {
+		if (ticking) {
+			pendingEvents.add(event);
+			return;
+		}
+		events.add(event);
+		setDirty();
+	}
+
 	public void tick() {
+		ticking = true;
 		events.removeIf(event -> {
 			try {
 				event.tick(level);
@@ -197,5 +228,11 @@ public class AreaManager extends SavedData {
 				return true;
 			}
 		});
+		ticking = false;
+		if (!pendingEvents.isEmpty()) {
+			events.addAll(pendingEvents);
+			pendingEvents.clear();
+			setDirty();
+		}
 	}
 }

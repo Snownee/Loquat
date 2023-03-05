@@ -1,24 +1,22 @@
 package snownee.loquat.command;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.compress.utils.Lists;
-
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.compress.utils.Lists;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
 import snownee.loquat.core.select.PosSelection;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
+
+import java.util.List;
+import java.util.Optional;
 
 public class ZoneCommand extends LoquatCommand {
 
@@ -51,8 +49,7 @@ public class ZoneCommand extends LoquatCommand {
 			return 0;
 		}
 		AreaManager manager = AreaManager.of(source.getLevel());
-		manager.showOutline(Long.MAX_VALUE, List.of(area));
-		manager.setDirty();
+		manager.setChanged(List.of(area));
 		source.sendSuccess(Component.translatable("loquat.command.zone.remove.success"), true);
 		return 1;
 	}
@@ -69,8 +66,7 @@ public class ZoneCommand extends LoquatCommand {
 		aabbs.addAll(selections.stream().map(PosSelection::toAABB).map($ -> $.getYsize() > 1 ? $ : $.move(0, 1, 0)).toList());
 		area.getZones().put(name, new Zone(aabbs));
 		AreaManager manager = AreaManager.of(source.getLevel());
-		manager.showOutline(Long.MAX_VALUE, List.of(area));
-		manager.setDirty();
+		manager.setChanged(List.of(area));
 		selections.clear();
 		SSyncSelectionPacket.sync(source.getPlayerOrException());
 		source.sendSuccess(Component.translatable("loquat.command.zone.add.success"), true);

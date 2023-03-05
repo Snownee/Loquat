@@ -4,8 +4,8 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import snownee.loquat.core.select.LoquatPlayer;
 import snownee.loquat.core.select.SelectionManager;
+import snownee.loquat.duck.LoquatPlayer;
 
 @Mixin(Player.class)
 public class PlayerMixin implements LoquatPlayer {

@@ -1,5 +1,8 @@
 package snownee.loquat.command;
 
+import java.util.List;
+import java.util.UUID;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
@@ -8,9 +11,6 @@ import net.minecraft.commands.Commands;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
-
-import java.util.List;
-import java.util.UUID;
 
 // A temporary solution before the area selector is implemented
 @Deprecated

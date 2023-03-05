@@ -1,14 +1,19 @@
 package snownee.loquat;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.collect.Streams;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import snownee.loquat.core.AreaManager;
@@ -16,6 +21,7 @@ import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
+import snownee.loquat.util.CommonProxy;
 import snownee.loquat.util.TransformUtil;
 
 public final class Hooks {
@@ -61,5 +67,18 @@ public final class Hooks {
 			// still not sure the difference between pos and blockPos...
 			manager.add(area);
 		}
+	}
+
+	public static void tickServerPlayer(ServerPlayer player, Set<Area> areasIn) {
+		AreaManager manager = AreaManager.of(player.getLevel());
+		long chunkPos = ChunkPos.asLong(player.blockPosition());
+		Streams.concat(manager.byChunk(chunkPos), areasIn.stream()).distinct().toList().forEach(area -> {
+			boolean inside = area.contains(player.getBoundingBox());
+			if (inside && areasIn.add(area)) {
+				CommonProxy.postPlayerEnterArea(player, area);
+			} else if (!inside && areasIn.remove(area)) {
+				CommonProxy.postPlayerLeaveArea(player, area);
+			}
+		});
 	}
 }

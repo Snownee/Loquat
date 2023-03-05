@@ -45,7 +45,7 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 
 	public void spawn(String spawnerId, ServerLevel world, Area area) {
 		Spawner spawner = get(spawnerId);
-		AreaManager.of(world).getEvents().add(new SpawnMobAreaEvent(area, spawner, spawnerId));
+		AreaManager.of(world).addEvent(new SpawnMobAreaEvent(area, spawner, spawnerId));
 	}
 
 	public Spawner get(String spawnerId) {

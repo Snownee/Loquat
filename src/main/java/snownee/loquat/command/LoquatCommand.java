@@ -1,5 +1,9 @@
 package snownee.loquat.command;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.function.BiPredicate;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,10 +16,6 @@ import snownee.loquat.Loquat;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.function.BiPredicate;
 
 public class LoquatCommand {
 

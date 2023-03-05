@@ -9,6 +9,7 @@
     "JigsawStructureMixin",
     "PlayerMixin",
     "ServerLevelMixin",
+    "ServerPlayerMixin",
     "StructureTemplateMixin",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin"

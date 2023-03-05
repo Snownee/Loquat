@@ -1,25 +1,18 @@
 {
   "waves": [
     {
-      "wait": 1,
       "timeout": 30,
       "post": [
         {
-          "count": 3,
+          "count": 2,
           "type": "loquat:spawn",
-          "mob": {
-            "type": "chicken",
-            "nbt": {
-              "Passengers": [
-                {
-                  "id": "husk",
-                  "IsBaby": true
-                }
-              ],
-              "IsChickenJockey": true
-            }
-          }
-        },
+          "mob": "husk"
+        }
+      ]
+    },
+    {
+      "wait": 1,
+      "post": [
         {
           "count": 2,
           "type": "loquat:spawn",
@@ -33,16 +26,6 @@
               "RabbitType": 99
             }
           }
-        }
-      ]
-    },
-    {
-      "wait": 3,
-      "post": [
-        {
-          "count": 2,
-          "type": "loquat:spawn",
-          "mob": "slime"
         }
       ]
     }

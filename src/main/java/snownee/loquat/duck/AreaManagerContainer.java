@@ -1,4 +1,6 @@
-package snownee.loquat.core;
+package snownee.loquat.duck;
+
+import snownee.loquat.core.AreaManager;
 
 public interface AreaManagerContainer {
     AreaManager loquat$getAreaManager();

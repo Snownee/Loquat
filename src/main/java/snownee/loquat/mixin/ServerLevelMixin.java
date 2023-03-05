@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.level.ServerLevel;
 import snownee.loquat.core.AreaManager;
-import snownee.loquat.core.AreaManagerContainer;
+import snownee.loquat.duck.AreaManagerContainer;
 
 @Mixin(ServerLevel.class)
 public class ServerLevelMixin implements AreaManagerContainer {

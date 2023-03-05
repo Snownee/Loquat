@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Preconditions;
 
+import it.unimi.dsi.fastutil.longs.LongCollection;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
@@ -47,6 +48,8 @@ public abstract class Area {
 
 	public abstract boolean inside(AABB aabb);
 
+	public abstract boolean contains(AABB aabb);
+
 	public abstract Vec3 getCenter();
 
 	public abstract Vec3 getOrigin();
@@ -76,6 +79,8 @@ public abstract class Area {
 	public abstract Area transform(StructurePlaceSettings settings, BlockPos offset);
 
 	public abstract Object getBounds();
+
+	public abstract LongCollection getChunksIn();
 
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);

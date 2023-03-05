@@ -2,16 +2,23 @@ package snownee.loquat.core.area;
 
 import java.util.stream.Stream;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongCollection;
+import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.util.AABBSerializer;
+import snownee.loquat.util.LoquatUtil;
 import snownee.loquat.util.TransformUtil;
 
 @AllArgsConstructor
@@ -45,7 +52,12 @@ public class AABBArea extends Area {
 
 	@Override
 	public boolean inside(AABB aabb2) {
-		return aabb2.contains(aabb.minX, aabb.minY, aabb.minZ) && aabb2.maxX >= aabb.maxX && aabb2.maxY >= aabb.maxY && aabb2.maxZ >= aabb.maxZ;
+		return LoquatUtil.isAABBFullyInsideAABB(aabb, aabb2);
+	}
+
+	@Override
+	public boolean contains(AABB aabb2) {
+		return LoquatUtil.isAABBFullyInsideAABB(aabb2, aabb);
 	}
 
 	@Override
@@ -71,6 +83,24 @@ public class AABBArea extends Area {
 	@Override
 	public Object getBounds() {
 		return aabb;
+	}
+
+	@Override
+	public LongCollection getChunksIn() {
+		int minX = SectionPos.blockToSectionCoord(aabb.minX);
+		int minZ = SectionPos.blockToSectionCoord(aabb.minZ);
+		int maxX = SectionPos.blockToSectionCoord(aabb.maxX);
+		int maxZ = SectionPos.blockToSectionCoord(aabb.maxZ);
+		if (minX == maxX && minZ == maxZ) {
+			return LongSet.of(ChunkPos.asLong(minX, minZ));
+		}
+		LongList list = new LongArrayList((maxX - minX + 1) * (maxZ - minZ + 1));
+		for (int x = minX; x <= maxX; x++) {
+			for (int z = minZ; z <= maxZ; z++) {
+				list.add(ChunkPos.asLong(x, z));
+			}
+		}
+		return list;
 	}
 
 	@Override

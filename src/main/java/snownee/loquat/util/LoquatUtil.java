@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.TaskChainer;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
@@ -30,6 +31,10 @@ public interface LoquatUtil {
 			world.setBlock(pos, Blocks.AIR.defaultBlockState(), 34);
 		});
 		supplier.get().forEach(pos -> world.blockUpdated(pos, Blocks.AIR));
+	}
+
+	static boolean isAABBFullyInsideAABB(AABB smaller, AABB larger) {
+		return smaller.minX >= larger.minX && smaller.minY >= larger.minY && smaller.minZ >= larger.minZ && smaller.maxX <= larger.maxX && smaller.maxY <= larger.maxY && smaller.maxZ <= larger.maxZ;
 	}
 
 	class SilentCommandSourceStack extends CommandSourceStack {
