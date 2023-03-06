@@ -4,8 +4,17 @@
   "version": "${version}",
   "name": "Loquat",
   "description": "Area management tool",
-  "authors": [],
-  "contact": {},
+  "authors": [
+    "Snownee"
+  ],
+  "contributors": [
+    "zomb_676"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/loquat-fabric",
+    "sources": "https://github.com/Snownee/Loquat",
+    "issues": "https://github.com/Snownee/Loquat/issues"
+  },
   "license": "ARR",
   "icon": "assets/loquat/logo.png",
   "environment": "*",
