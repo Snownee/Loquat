@@ -84,6 +84,8 @@ public abstract class Area {
 
 	public abstract AABB getRoughAABB();
 
+	public abstract double distanceToSqr(Vec3 vec);
+
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);
 

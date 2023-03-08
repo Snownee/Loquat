@@ -91,6 +91,14 @@ public class AABBArea extends Area {
 	}
 
 	@Override
+	public double distanceToSqr(Vec3 vec) {
+		if (aabb.contains(vec)) {
+			return 0;
+		}
+		return aabb.clip(vec, getCenter()).map(vec::distanceToSqr).orElse(Double.MAX_VALUE);
+	}
+
+	@Override
 	public LongCollection getChunksIn() {
 		int minX = SectionPos.blockToSectionCoord(aabb.minX);
 		int minZ = SectionPos.blockToSectionCoord(aabb.minZ);

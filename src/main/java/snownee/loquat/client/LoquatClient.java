@@ -83,9 +83,9 @@ public class LoquatClient {
 		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
 			{
-				var center = data.area.getCenter();
-				if (center.distanceToSqr(context.pos.reverse()) > 128 * 128)
+				if (data.area.distanceToSqr(context.pos.reverse()) > 128 * 128)
 					continue;
+				var center = data.area.getCenter();
 				if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
 					var tags = Joiner.on(", ").join(data.area.getTags());
 					DebugRenderer.renderFloatingText(tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);

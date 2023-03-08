@@ -11,6 +11,7 @@ import com.google.common.collect.Streams;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
@@ -21,11 +22,12 @@ import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
+import snownee.loquat.placement.LoquatPlacements;
 import snownee.loquat.util.CommonProxy;
 import snownee.loquat.util.TransformUtil;
 
-public final class Hooks {
-	public static boolean handleComponentClicked(String value) {
+public interface Hooks {
+	static boolean handleComponentClicked(String value) {
 		String[] s = StringUtils.split(value, ' ');
 		if (s.length == 3 && s[0].equals("@loquat")) {
 			if (s[1].equals("highlight")) {
@@ -45,7 +47,7 @@ public final class Hooks {
 		return false;
 	}
 
-	public static void fillFromWorld(AreaManager manager, BlockPos pos, Vec3i size, List<Area> areas) {
+	static void fillFromWorld(AreaManager manager, BlockPos pos, Vec3i size, List<Area> areas) {
 		AABB aabb = new AABB(pos, pos.offset(size));
 		var settings = new StructurePlaceSettings();
 		for (Area area : manager.areas()) {
@@ -57,7 +59,7 @@ public final class Hooks {
 		}
 	}
 
-	public static void placeInWorld(AreaManager manager, BlockPos pos, BlockPos blockPos, List<Area> areas, StructurePlaceSettings settings, Vec3i size) {
+	static void placeInWorld(AreaManager manager, BlockPos pos, BlockPos blockPos, List<Area> areas, StructurePlaceSettings settings, Vec3i size) {
 		manager.removeAllInside(TransformUtil.transform(settings, pos, new AABB(pos, pos.offset(size))));
 		for (Area area : areas) {
 			area = TransformUtil.transform(settings, pos, area);
@@ -69,7 +71,7 @@ public final class Hooks {
 		}
 	}
 
-	public static void tickServerPlayer(ServerPlayer player, Set<Area> areasIn) {
+	static void tickServerPlayer(ServerPlayer player, Set<Area> areasIn) {
 		AreaManager manager = AreaManager.of(player.getLevel());
 		long chunkPos = ChunkPos.asLong(player.blockPosition());
 		Streams.concat(manager.byChunk(chunkPos), areasIn.stream()).distinct().toList().forEach(area -> {
@@ -79,6 +81,19 @@ public final class Hooks {
 			} else if (!inside && areasIn.remove(area)) {
 				CommonProxy.postPlayerLeaveArea(player, area);
 			}
+		});
+	}
+
+	static void prePlaceStructure(ServerLevel serverLevel, ChunkPos chunkPos, ChunkPos chunkPos2) {
+		ChunkPos.rangeClosed(chunkPos, chunkPos2).forEach(chunkPos3 -> {
+			serverLevel.getChunkSource().addRegionTicket(LoquatPlacements.TICKET_TYPE, chunkPos3, 1, chunkPos3);
+		});
+		serverLevel.getChunkSource().tick(() -> true, false);
+	}
+
+	static void postPlaceStructure(ServerLevel serverLevel, ChunkPos chunkPos, ChunkPos chunkPos2) {
+		ChunkPos.rangeClosed(chunkPos, chunkPos2).forEach(chunkPos3 -> {
+			serverLevel.getChunkSource().removeRegionTicket(LoquatPlacements.TICKET_TYPE, chunkPos3, 1, chunkPos3);
 		});
 	}
 }
