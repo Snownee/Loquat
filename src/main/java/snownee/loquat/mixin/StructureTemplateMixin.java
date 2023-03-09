@@ -26,7 +26,7 @@ import snownee.loquat.Hooks;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 
-@Mixin(StructureTemplate.class)
+@Mixin(value = StructureTemplate.class, priority = 800)
 public class StructureTemplateMixin {
 
 	private final List<Area> loquat$areas = Lists.newArrayList();
@@ -51,7 +51,7 @@ public class StructureTemplateMixin {
 		tag.put("Loquat", loquat);
 	}
 
-	@Inject(method = "placeInWorld", at = @At("TAIL"))
+	@Inject(method = "placeInWorld", at = @At("HEAD"))
 	private void loquat$placeInWorld(ServerLevelAccessor serverLevel, BlockPos pos, BlockPos blockPos, StructurePlaceSettings settings, RandomSource random, int flags, CallbackInfoReturnable<Boolean> cir) {
 		if (loquat$areas.isEmpty()) {
 			return;
@@ -60,7 +60,7 @@ public class StructureTemplateMixin {
 		Hooks.placeInWorld(manager, pos, blockPos, loquat$areas, settings, size);
 	}
 
-	@Inject(method = "fillFromWorld", at = @At("TAIL"))
+	@Inject(method = "fillFromWorld", at = @At("HEAD"))
 	private void loquat$fillFromWorld(Level level, BlockPos pos, Vec3i size, boolean withEntities, Block toIgnore, CallbackInfo ci) {
 		loquat$areas.clear();
 		if (!(level instanceof ServerLevel serverLevel)) {

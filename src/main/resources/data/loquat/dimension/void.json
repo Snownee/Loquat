@@ -1,0 +1,13 @@
+{
+  "type": "loquat:void",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "loquat:void",
+      "lakes": false,
+      "features": false,
+      "layers": [],
+      "structure_overrides": []
+    }
+  }
+}
