@@ -13,7 +13,8 @@
     "ServerPlayerMixin",
     "StructureTemplateMixin",
     "fabric.SlimeMixin",
-    "fabric.SpawnerLoaderMixin"
+    "fabric.SpawnerLoaderMixin",
+    "fabric.ZombieMixin"
   ],
   "client": [
     "client.MultiPlayerGameModeMixin",
