@@ -157,6 +157,8 @@ public class AreaManager extends SavedData {
 			return false;
 		}
 		areas.remove(area);
+		events.removeIf(e -> e.getArea() == area);
+		pendingEvents.removeIf(e -> e.getArea() == area);
 		boundsCache.remove(area.getBounds());
 		area.getChunksIn().forEach(chunk -> {
 			Set<Area> areas = chunkLookup.get(chunk);
@@ -216,6 +218,10 @@ public class AreaManager extends SavedData {
 	}
 
 	public void addEvent(AreaEvent event) {
+		if (!contains(event.getArea())) {
+			Loquat.LOGGER.warn("Attempted to add event for non-existent area: {}", event.getArea());
+			return;
+		}
 		if (ticking) {
 			pendingEvents.add(event);
 			return;

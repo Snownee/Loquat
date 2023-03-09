@@ -5,9 +5,9 @@
   "size": 3,
   "spawn_overrides": {},
   "start_height": {
-    "absolute": 32
+    "absolute": 40
   },
-  "start_pool": "loquat:lobby",
+  "start_pool": "loquat:start",
   "step": "surface_structures",
   "terrain_adaptation": "none",
   "use_expansion_hack": false
