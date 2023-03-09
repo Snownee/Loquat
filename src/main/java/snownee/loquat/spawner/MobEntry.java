@@ -1,7 +1,7 @@
 package snownee.loquat.spawner;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,16 +21,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.NaturalSpawner;
 import snownee.loquat.core.area.Area;
 import snownee.lychee.util.LUtil;
 
@@ -101,68 +97,24 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 	}
 
 	public Entity createMob(ServerLevel world, Area area, String zoneId, Consumer<Entity> consumer) {
-		int attempts = 10;
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		List<LivingEntity> nearbyEntities = world.getEntitiesOfClass(LivingEntity.class, area.getRoughAABB(), EntitySelector.NO_SPECTATORS);
-		Entity entity = null;
-		int bestAttemptX = 0;
-		int bestAttemptY = 0;
-		int bestAttemptZ = 0;
-		double bestAttemptScore = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < attempts; i++) {
-			area.getRandomPos(world.random, zoneId, pos);
-			if (NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, world, pos, type)) {
-				if (entity == null) {
-					entity = EntityType.loadEntityRecursive(nbt.copy(), world, e -> {
-						e.moveTo(pos, e.getYRot(), e.getXRot());
-						if (randomize && e instanceof Mob mob) {
-							mob.finalizeSpawn(world, world.getCurrentDifficultyAt(pos), MobSpawnType.TRIGGERED, null, null);
-						}
-						return e;
-					});
-					if (entity == null) {
-						return null;
-					}
-					Preconditions.checkState(entity instanceof LivingEntity, "Entity %s is not a LivingEntity", entity);
-				} else {
-					entity.moveTo(pos, entity.getYRot(), entity.getXRot());
-				}
-				//				AABBArea aabbArea = new AABBArea(entity.getBoundingBox());
-				//				aabbArea.setUuid(UUID.randomUUID());
-				//				if (LoquatConfig.debug) {
-				//					for (ServerPlayer player : world.players()) {
-				//						SOutlinesPacket.outlines(player, world.getGameTime() + 40, true, List.of(aabbArea));
-				//					}
-				//				}
-				if (world.noCollision(entity)) {
-					double score = 0;
-					for (LivingEntity nearbyEntity : nearbyEntities) {
-						double distance = entity.distanceToSqr(nearbyEntity);
-						if (nearbyEntity instanceof Player) {
-							if (distance < 100) {
-								score -= 100 - distance;
-							}
-						} else {
-							if (distance < 9) {
-								score -= 9 - distance;
-							}
-						}
-					}
-					if (score > bestAttemptScore) {
-						bestAttemptScore = score;
-						bestAttemptX = pos.getX();
-						bestAttemptY = pos.getY();
-						bestAttemptZ = pos.getZ();
-						if (score == 0) {
-							break;
-						}
-					}
-				}
+		area.getRandomPos(world.random, zoneId, pos);
+		Entity entity = EntityType.loadEntityRecursive(nbt.copy(), world, e -> {
+			e.moveTo(pos, e.getYRot(), e.getXRot());
+			if (randomize && e instanceof Mob mob) {
+				mob.finalizeSpawn(world, world.getCurrentDifficultyAt(pos), MobSpawnType.TRIGGERED, null, null);
 			}
-		}
-		if (bestAttemptScore == Double.NEGATIVE_INFINITY) {
+			return e;
+		});
+		if (entity == null) {
 			return null;
 		}
+		Preconditions.checkState(entity instanceof LivingEntity, "Entity %s is not a LivingEntity", entity);
+		Optional<BlockPos.MutableBlockPos> result = area.findSpawnPos(world, zoneId, entity);
+		if (result.isEmpty()) {
+			return null;
+		}
+		pos.set(result.get());
 		if (attrs != null) {
 			for (Object2DoubleMap.Entry<String> entry : attrs.object2DoubleEntrySet()) {
 				Attribute attr = SIMPLE_ATTRIBUTES.get(entry.getKey());
@@ -173,7 +125,6 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 				}
 			}
 		}
-		pos.set(bestAttemptX, bestAttemptY, bestAttemptZ);
 		entity.moveTo(pos, entity.getYRot(), entity.getXRot());
 		consumer.accept(entity);
 		entity.getIndirectPassengers().forEach(e -> {

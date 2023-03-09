@@ -50,7 +50,7 @@ dependencies {
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
     modImplementation("maven.modrinth:kiwi:MRPbB9Ra")
     annotationProcessor("maven.modrinth:kiwi:MRPbB9Ra")
-    modImplementation("maven.modrinth:lychee:3vyGViAH")
+    modImplementation("maven.modrinth:lychee:e98vdCGw")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
     modImplementation("maven.modrinth:jade:ZASePpsm")
