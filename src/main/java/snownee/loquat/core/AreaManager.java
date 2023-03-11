@@ -30,6 +30,7 @@ import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
+import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.AreaManagerContainer;
 import snownee.loquat.network.SOutlinesPacket;
 
@@ -248,5 +249,10 @@ public class AreaManager extends SavedData {
 			pendingEvents.clear();
 			setDirty();
 		}
+	}
+
+	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
+		SelectionManager.of(player).reset(player);
+		SOutlinesPacket.outlines(player, Long.MAX_VALUE, false, areas);
 	}
 }

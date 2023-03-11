@@ -123,8 +123,8 @@ public class SelectionManager {
 			AreaManager.of(world).removeAllInside(aabb);
 			player.displayClientMessage(Component.translatable("loquat.msg.shiftUseStructureBlock"), false);
 		} else {
-			selections.clear();
-			selectedAreas.clear();
+			reset(player);
+			return true;
 		}
 		SSyncSelectionPacket.sync(player);
 		return true;
@@ -134,4 +134,10 @@ public class SelectionManager {
 		return selectedAreas.contains(area.getUuid());
 	}
 
+	public void reset(ServerPlayer player) {
+		selections.clear();
+		selectedAreas.clear();
+		lastOneIncomplete = false;
+		SSyncSelectionPacket.sync(player);
+	}
 }

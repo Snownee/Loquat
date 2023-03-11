@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
 import snownee.loquat.command.LoquatCommand;
+import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.spawner.LycheeCompat;
@@ -103,6 +105,9 @@ public class CommonProxy implements ModInitializer {
 		});
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
+		});
+		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+			AreaManager.of(destination).playerChangedWorld(player, origin);
 		});
 	}
 }
