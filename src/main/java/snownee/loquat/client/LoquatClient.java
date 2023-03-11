@@ -1,6 +1,5 @@
 package snownee.loquat.client;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,9 +30,8 @@ import snownee.loquat.util.RenderUtil;
 
 public class LoquatClient {
 
-	// let's pray it's thread-safe
-	public static final Map<UUID, RenderDebugData> normalOutlines = Collections.synchronizedMap(Maps.newLinkedHashMap());
-	public static final Map<UUID, RenderDebugData> highlightOutlines = Collections.synchronizedMap(Maps.newLinkedHashMap());
+	public static final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
+	public static final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
 	public static final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
 	private static ResourceKey<Level> oDimension;
 
