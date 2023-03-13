@@ -31,8 +31,8 @@ public class EmptyCommand extends LoquatCommand {
 				.then(Commands.literal("selection")
 						.executes(ctx -> {
 							var source = ctx.getSource();
-							int count = forEachSelected(source, (uuid, manager) -> {
-								LoquatUtil.emptyBlocks(source.getLevel(), manager.get(uuid)::allBlockPosIn);
+							int count = forEachSelected(source, (area, manager) -> {
+								LoquatUtil.emptyBlocks(source.getLevel(), area::allBlockPosIn);
 								return true;
 							});
 							source.sendSuccess(Component.translatable("loquat.command.empty.success"), true);

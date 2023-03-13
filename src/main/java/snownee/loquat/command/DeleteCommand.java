@@ -30,7 +30,7 @@ public class DeleteCommand extends LoquatCommand {
 				.then(Commands.literal("selection")
 						.executes(ctx -> {
 							var source = ctx.getSource();
-							int count = forEachSelected(source, (uuid, manager) -> manager.remove(uuid));
+							int count = forEachSelected(source, (area, manager) -> manager.remove(area.getUuid()));
 							SelectionManager.of(source.getPlayerOrException()).getSelectedAreas().clear();
 							SSyncSelectionPacket.sync(source.getPlayerOrException());
 							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);

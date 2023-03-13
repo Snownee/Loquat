@@ -22,8 +22,7 @@ public class TagCommand extends LoquatCommand {
 									var source = ctx.getSource();
 									String tag = StringArgumentType.getString(ctx, "tag");
 									List<Area> areas = Lists.newArrayList();
-									int count = forEachSelected(source, (uuid, manager) -> {
-										Area area = manager.get(uuid);
+									int count = forEachSelected(source, (area, manager) -> {
 										area.getTags().add(tag);
 										areas.add(area);
 										return true;
@@ -40,8 +39,7 @@ public class TagCommand extends LoquatCommand {
 									var source = ctx.getSource();
 									String tag = StringArgumentType.getString(ctx, "tag");
 									List<Area> areas = Lists.newArrayList();
-									int count = forEachSelected(source, (uuid, manager) -> {
-										Area area = manager.get(uuid);
+									int count = forEachSelected(source, (area, manager) -> {
 										if (area.getTags().remove(tag)) {
 											areas.add(area);
 											return true;

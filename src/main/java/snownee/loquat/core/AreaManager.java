@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import snownee.loquat.Loquat;
+import snownee.loquat.LoquatConfig;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
@@ -165,9 +166,9 @@ public class AreaManager extends SavedData {
 			Set<Area> areas = chunkLookup.get(chunk);
 			if (areas != null) {
 				areas.remove(area);
-//				if (areas.isEmpty()) {
-//					chunkLookup.remove(chunk);
-//				}
+				//				if (areas.isEmpty()) {
+				//					chunkLookup.remove(chunk);
+				//				}
 			}
 		});
 		showOutline(Long.MIN_VALUE, List.of(area));
@@ -252,7 +253,8 @@ public class AreaManager extends SavedData {
 	}
 
 	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
-		SelectionManager.of(player).reset(player);
+		if (!LoquatConfig.debug)
+			SelectionManager.of(player).reset(player);
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, areas);
 	}
 }

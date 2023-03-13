@@ -49,11 +49,6 @@ public class SelectionManager {
 		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
 	}
 
-	public static boolean removeInvalidAreas(ServerPlayer player) {
-		AreaManager areaManager = AreaManager.of(player.getLevel());
-		return SelectionManager.of(player).getSelectedAreas().removeIf(uuid -> areaManager.get(uuid) == null);
-	}
-
 	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
 		if (!isHoldingTool(player))
 			return false;

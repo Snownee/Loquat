@@ -1,7 +1,6 @@
 package snownee.loquat.command;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
 import java.util.function.BiPredicate;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -47,24 +46,24 @@ public class LoquatCommand {
 
 	public static Area getOnlySelectedArea(CommandSourceStack source) throws CommandSyntaxException {
 		var selection = SelectionManager.of(source.getPlayerOrException());
-		if (selection.getSelectedAreas().isEmpty()) {
+		var manager = AreaManager.of(source.getLevel());
+		var areas = selection.getSelectedAreas().stream().map(manager::get).filter(Objects::nonNull).toList();
+		if (areas.isEmpty()) {
 			throw EMPTY_SELECTION.create();
 		}
-		SelectionManager.removeInvalidAreas(source.getPlayerOrException());
-		if (selection.getSelectedAreas().size() > 1) {
+		if (areas.size() > 1) {
 			throw TOO_MANY_SELECTIONS.create();
 		}
-		UUID uuid = selection.getSelectedAreas().get(0);
-		return AreaManager.of(source.getLevel()).get(uuid);
+		return areas.get(0);
 	}
 
-	public static int forEachSelected(CommandSourceStack source, BiPredicate<UUID, AreaManager> action) throws CommandSyntaxException {
+	public static int forEachSelected(CommandSourceStack source, BiPredicate<Area, AreaManager> action) throws CommandSyntaxException {
+		var selection = SelectionManager.of(source.getPlayerOrException());
 		var manager = AreaManager.of(source.getLevel());
-		SelectionManager.removeInvalidAreas(source.getPlayerOrException());
-		List<UUID> selectedAreas = SelectionManager.of(source.getPlayerOrException()).getSelectedAreas();
+		var areas = selection.getSelectedAreas().stream().map(manager::get).filter(Objects::nonNull).toList();
 		int count = 0;
-		for (UUID uuid : selectedAreas) {
-			if (action.test(uuid, manager)) {
+		for (Area area : areas) {
+			if (action.test(area, manager)) {
 				count++;
 			}
 		}
