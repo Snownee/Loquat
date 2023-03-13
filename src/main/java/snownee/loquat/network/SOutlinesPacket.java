@@ -28,6 +28,10 @@ public class SOutlinesPacket extends PacketHandler {
 		if (expire == Long.MIN_VALUE) {
 			expire = level.getGameTime() + 10;
 		}
+		boolean clear = buf.readBoolean();
+		if (clear) {
+			LoquatClient.clearDebugAreas();
+		}
 		boolean highlight = buf.readBoolean();
 		var outlines = highlight ? LoquatClient.highlightOutlines : LoquatClient.normalOutlines;
 		CompoundTag tag = buf.readNbt();
@@ -40,9 +44,10 @@ public class SOutlinesPacket extends PacketHandler {
 	}
 
 	// expire == Long.MIN_VALUE means clear
-	public static void outlines(ServerPlayer player, long expire, boolean highlight, Collection<Area> areas) {
+	public static void outlines(ServerPlayer player, long expire, boolean clear, boolean highlight, Collection<Area> areas) {
 		I.send(player, buf -> {
 			buf.writeVarLong(expire);
+			buf.writeBoolean(clear);
 			buf.writeBoolean(highlight);
 			CompoundTag tag = new CompoundTag();
 			tag.put("0", AreaManager.saveAreas(areas, true));

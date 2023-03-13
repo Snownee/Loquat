@@ -23,10 +23,10 @@ public class OutlineCommand {
 					ServerPlayer player = source.getPlayerOrException();
 					boolean show = !showOutlinePlayers.contains(player.getUUID());
 					if (show) {
-						SOutlinesPacket.outlines(player, Long.MAX_VALUE, false, manager.areas());
+						SOutlinesPacket.outlines(player, Long.MAX_VALUE, false, false, manager.areas());
 						showOutlinePlayers.add(source.getEntityOrException().getUUID());
 					} else {
-						SOutlinesPacket.outlines(player, Long.MIN_VALUE, false, manager.areas());
+						SOutlinesPacket.outlines(player, Long.MIN_VALUE, false, false, manager.areas());
 						showOutlinePlayers.remove(source.getEntityOrException().getUUID());
 					}
 					source.sendSuccess(Component.translatable("loquat.command.outline.success", show), true);

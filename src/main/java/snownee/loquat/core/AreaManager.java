@@ -190,7 +190,7 @@ public class AreaManager extends SavedData {
 		if (level == null)
 			return;
 		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
-			SOutlinesPacket.outlines((ServerPlayer) player, duration, false, areas);
+			SOutlinesPacket.outlines((ServerPlayer) player, duration, false, false, areas);
 		});
 	}
 
@@ -253,6 +253,6 @@ public class AreaManager extends SavedData {
 
 	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
 		SelectionManager.of(player).reset(player);
-		SOutlinesPacket.outlines(player, Long.MAX_VALUE, false, areas);
+		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, areas);
 	}
 }

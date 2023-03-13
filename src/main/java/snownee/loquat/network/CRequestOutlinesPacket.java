@@ -45,7 +45,7 @@ public class CRequestOutlinesPacket extends PacketHandler {
 		if (areas.isEmpty()) {
 			return null;
 		}
-		return executor.apply(() -> SOutlinesPacket.outlines(sender, expire, true, areas));
+		return executor.apply(() -> SOutlinesPacket.outlines(sender, expire, false, true, areas));
 	}
 
 	public static void requestAll(long time) {

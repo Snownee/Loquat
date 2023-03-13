@@ -16,8 +16,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
@@ -33,7 +31,6 @@ public class LoquatClient {
 	public static final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
 	public static final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
 	public static final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
-	private static ResourceKey<Level> oDimension;
 
 	static {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
@@ -58,10 +55,6 @@ public class LoquatClient {
 			return;
 		}
 		List<PosSelection> selections = SelectionManager.of(player).getSelections();
-		if (oDimension != level.dimension()) {
-			clearDebugAreas();
-			oDimension = level.dimension();
-		}
 		var outlines = highlightOutlines.isEmpty() ? normalOutlines : highlightOutlines;
 		if (outlines.isEmpty() && selections.isEmpty()) {
 			return;
