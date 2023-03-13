@@ -255,6 +255,7 @@ public class AreaManager extends SavedData {
 	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
 		if (!LoquatConfig.debug)
 			SelectionManager.of(player).reset(player);
-		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, areas);
+		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
+		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
 	}
 }
