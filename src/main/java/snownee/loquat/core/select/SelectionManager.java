@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.StructureMode;
@@ -46,7 +47,7 @@ public class SelectionManager {
 	}
 
 	public static boolean isHoldingTool(Player player) {
-		return player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
+		return LoquatConfig.selectionItem != Items.AIR && player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
 	}
 
 	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
