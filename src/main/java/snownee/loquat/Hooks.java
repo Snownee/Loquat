@@ -9,17 +9,22 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Streams;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
+import snownee.loquat.duck.LoquatStructurePiece;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
 import snownee.loquat.placement.LoquatPlacements;
@@ -29,22 +34,28 @@ import snownee.loquat.util.TransformUtil;
 public interface Hooks {
 	static boolean handleComponentClicked(String value) {
 		String[] s = StringUtils.split(value, ' ');
-		if (s.length == 3 && s[0].equals("@loquat")) {
-			if (s[1].equals("highlight")) {
-				CRequestOutlinesPacket.request(60, List.of(UUID.fromString(s[2])));
-			} else if (s[1].equals("info")) {
-				// TODO
-			} else if (s[1].equals("select")) {
-				Player player = Minecraft.getInstance().player;
-				if (player != null) {
-					SelectionManager manager = SelectionManager.of(player);
-					UUID uuid = UUID.fromString(s[2]);
-					CSelectAreaPacket.send(!manager.getSelectedAreas().contains(uuid), uuid);
-				}
-			}
+		if (s.length != 4 || !s[0].equals("@loquat")) {
+			return false;
+		}
+		LocalPlayer player = Minecraft.getInstance().player;
+		ResourceLocation dimension = ResourceLocation.tryParse(s[2]);
+		if (player == null || dimension == null) {
 			return true;
 		}
-		return false;
+		UUID uuid = UUID.fromString(s[3]);
+		if (s[1].equals("highlight")) {
+			if (!player.level.dimension().location().equals(dimension)) {
+				player.displayClientMessage(Component.translatable("loquat.command.wrongDimension"), false);
+				return true;
+			}
+			CRequestOutlinesPacket.request(60, List.of(uuid));
+		} else if (s[1].equals("info")) {
+			// TODO
+		} else if (s[1].equals("select")) {
+			SelectionManager manager = SelectionManager.of(player);
+			CSelectAreaPacket.send(!manager.getSelectedAreas().contains(uuid), uuid);
+		}
+		return true;
 	}
 
 	static void fillFromWorld(AreaManager manager, BlockPos pos, Vec3i size, List<Area> areas) {
@@ -65,6 +76,18 @@ public interface Hooks {
 			area = TransformUtil.transform(settings, pos, area);
 			if (settings.getBoundingBox() != null && !AABB.of(settings.getBoundingBox()).contains(area.getOrigin())) {
 				continue;
+			}
+			LoquatStructurePiece piece = LoquatStructurePiece.CURRENT.get();
+			if (piece != null && piece.loquat$getAttachedData() != null) {
+				CompoundTag data = piece.loquat$getAttachedData();
+				if (data.contains("Tags")) {
+					for (Tag tag : data.getList("Tags", Tag.TAG_STRING)) {
+						area.getTags().add(tag.getAsString());
+					}
+				}
+				if (data.contains("Data")) {
+					area.setAttachedData(data.getCompound("Data"));
+				}
 			}
 			// still not sure the difference between pos and blockPos...
 			manager.add(area);

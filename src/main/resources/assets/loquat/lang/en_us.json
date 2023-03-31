@@ -16,11 +16,14 @@
   "loquat.command.nearby.pos": "[%s,%s,%s]",
   "loquat.command.nearby.highlight": "[Highlight]",
   "loquat.command.nearby.more": "[More]",
+  "loquat.command.nearby.more.tags": "Tags: %s",
+  "loquat.command.nearby.more.data": "Data: %s",
   "loquat.command.nearby.select": "[±]",
   "loquat.command.spawnerNotExists": "Spawner not exists",
   "loquat.command.spawn.success": "Spawner %s is working",
   "loquat.command.lycheeNotInstalled": "Lychee is not installed",
   "loquat.command.areaMustBeBox": "Area must be a box",
+  "loquat.command.wrongDimension": "Wrong dimension",
   "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
   "loquat.msg.shiftUseStructureBlock": "Cleared structure"
 }

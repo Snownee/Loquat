@@ -90,6 +90,9 @@ public class AreaManager extends SavedData {
 				area.getZones().forEach((name, zone) -> zones.put(name, zone.serialize(new CompoundTag())));
 				data.put("Zones", zones);
 			}
+			if (area.getAttachedData() != null && !area.getAttachedData().isEmpty()) {
+				data.put("Data", area.getAttachedData());
+			}
 			data.putString("Type", LoquatRegistries.AREA.getKey(area.getType()).toString());
 			((Area.Type) area.getType()).serialize(data, area, networking);
 			tag.add(data);
@@ -117,6 +120,9 @@ public class AreaManager extends SavedData {
 				for (String name : zones.getAllKeys()) {
 					area.getZones().put(name, Zone.deserialize(zones.getCompound(name)));
 				}
+			}
+			if (data.contains("Data")) {
+				area.setAttachedData(data.getCompound("Data"));
 			}
 			areas.add(area);
 		}

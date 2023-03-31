@@ -5,10 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "loquat.refmap.json",
   "mixins": [
+    "CommandsMixin",
     "JigsawPlacementMixin",
     "JigsawStructureMixin",
     "PlaceCommandMixin",
     "PlayerMixin",
+    "PoolElementStructurePieceMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin",
     "StructureTemplateMixin",

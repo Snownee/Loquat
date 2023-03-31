@@ -39,6 +39,10 @@ public abstract class Area {
 	@Setter
 	@Nullable
 	private UUID uuid;
+	@Getter
+	@Setter
+	@Nullable
+	private CompoundTag attachedData;
 
 	public abstract boolean contains(int x, int y, int z);
 

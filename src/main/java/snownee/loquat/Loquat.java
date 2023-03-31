@@ -18,7 +18,7 @@ public class Loquat {
 	public static boolean hasLychee;
 
 	public static void init() {
-		if (LoquatConfig.debug || !Platform.isProduction()) {
+		if (LoquatConfig.debug && !Platform.isProduction()) {
 			// print command exceptions
 			SharedConstants.IS_RUNNING_IN_IDE = true;
 		}

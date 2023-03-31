@@ -14,6 +14,9 @@ import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -34,6 +37,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import snownee.loquat.Loquat;
+import snownee.loquat.duck.LoquatStructurePiece;
 import snownee.loquat.placement.LoquatPlacer;
 
 public class TreeNodePlacer implements LoquatPlacer {
@@ -61,9 +65,23 @@ public class TreeNodePlacer implements LoquatPlacer {
 				SetMultimap<String, ResourceLocation> uniqueGroups = HashMultimap.create();
 				Preconditions.checkState(root.getUniqueGroup() == null, "Root node must not have unique group");
 				Stack<Step> steps = new Stack<>();
-				steps.push(new Step(defaultStartPiece, defaultValidSpace, defaultStartPos));
+				steps.push(new Step(defaultStartPiece, defaultValidSpace, defaultStartPos, root));
 				doPlace(root, uniqueGroups, steps, structureTemplateManager, random, pools);
 				for (var step : steps) {
+					if (step.node.tags.size() > 0 || step.node.getData() != null) {
+						CompoundTag data = new CompoundTag();
+						if (step.node.tags.size() > 0) {
+							ListTag tags = new ListTag();
+							for (var tag : step.node.tags) {
+								tags.add(StringTag.valueOf(tag));
+							}
+							data.put("Tags", tags);
+						}
+						if (step.node.getData() != null) {
+							data.put("Data", step.node.getData());
+						}
+						((LoquatStructurePiece) step.piece).loquat$setAttachedData(data);
+					}
 					structurePiecesBuilder.addPiece(step.piece);
 				}
 			} catch (Throwable e) {
@@ -117,7 +135,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 								continue;
 							}
 							VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-							steps.push(new Step(piece, shape, thatJointPos));
+							steps.push(new Step(piece, shape, thatJointPos, child));
 							if (doPlace(child, uniqueGroups, steps, structureTemplateManager, random, pools)) {
 								resolvedJigsaws.add(jigsawBlock);
 								selectedJigsaw = jigsawBlock;
@@ -135,17 +153,18 @@ public class TreeNodePlacer implements LoquatPlacer {
 				return false;
 			}
 		}
+		// Find fallbacks
 		for (var jigsawBlock : jigsawBlocks) {
 			if (resolvedJigsaws.contains(jigsawBlock)) {
 				continue;
 			}
 			String jointName = jigsawBlock.nbt.getString("name");
-			String fallbackPool = node.getFallbackPoolProvider().apply(jointName);
-			if (fallbackPool == null) {
+			TreeNode fallbackNode = node.getFallbackNodeProvider().apply(jointName);
+			if (fallbackNode == null) {
 				continue;
 			}
 			BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
-			StructureTemplatePool pool = pools.getOptional(new ResourceLocation(fallbackPool)).orElseThrow();
+			StructureTemplatePool pool = pools.getOptional(fallbackNode.getPool()).orElseThrow();
 			StructurePoolElement template = pool.getRandomTemplate(random);
 			for (Rotation rotation2 : Rotation.getShuffled(random)) {
 				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
@@ -157,14 +176,14 @@ public class TreeNodePlacer implements LoquatPlacer {
 					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
 					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
 					VoxelShape shape = Shapes.joinUnoptimized(steps.peek().validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-					steps.push(new Step(piece, shape, jointPos));
+					steps.push(new Step(piece, shape, jointPos, fallbackNode));
 				}
 			}
 		}
 		return true;
 	}
 
-	private record Step(PoolElementStructurePiece piece, VoxelShape validSpace, BlockPos jointPos) {
+	private record Step(PoolElementStructurePiece piece, VoxelShape validSpace, BlockPos jointPos, TreeNode node) {
 	}
 
 }
