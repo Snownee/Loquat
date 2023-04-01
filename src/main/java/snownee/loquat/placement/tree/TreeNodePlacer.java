@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
@@ -45,9 +46,9 @@ import snownee.loquat.placement.LoquatPlacer;
 public class TreeNodePlacer implements LoquatPlacer {
 
 	private final String structureIdPattern;
-	private final BuildTreeFunction buildTreeFunction;
+	private final Consumer<BuildTreeContext> buildTreeFunction;
 
-	public TreeNodePlacer(String structureIdPattern, BuildTreeFunction buildTreeFunction) {
+	public TreeNodePlacer(String structureIdPattern, Consumer<BuildTreeContext> buildTreeFunction) {
 		this.structureIdPattern = structureIdPattern;
 		this.buildTreeFunction = buildTreeFunction;
 	}
@@ -70,12 +71,15 @@ public class TreeNodePlacer implements LoquatPlacer {
 			try {
 				TreeNode root = new TreeNode(new ResourceLocation("start"), null);
 				RandomSource random = RandomSource.create();
-				root = buildTreeFunction.buildTree(random, root);
+				BuildTreeContext ctx = new BuildTreeContext(root, random, structureTemplateManager, pools);
+				buildTreeFunction.accept(ctx);
+				root = ctx.root;
 				Preconditions.checkState(root.getUniqueGroup() == null, "Root node must not have unique group");
 				StepStack steps = new StepStack();
 				steps.push(new Step(defaultStartPiece, defaultValidSpace, defaultStartPos, root));
 				doPlace(root, steps, structureTemplateManager, random, pools);
 				for (var step : steps) {
+					step.node.tags.addAll(ctx.globalTags);
 					if (step.node.tags.size() > 0 || step.node.getData() != null) {
 						CompoundTag data = new CompoundTag();
 						if (step.node.tags.size() > 0) {
