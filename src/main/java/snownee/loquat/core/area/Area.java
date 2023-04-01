@@ -150,6 +150,13 @@ public abstract class Area {
 		return Optional.of(pos.set(bestAttemptX, bestAttemptY, bestAttemptZ));
 	}
 
+	public CompoundTag getOrCreateAttachedData() {
+		if (attachedData == null) {
+			attachedData = new CompoundTag();
+		}
+		return attachedData;
+	}
+
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);
 

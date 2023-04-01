@@ -1,6 +1,7 @@
 package snownee.loquat.placement.tree;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
@@ -38,6 +39,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import snownee.loquat.Loquat;
 import snownee.loquat.duck.LoquatStructurePiece;
+import snownee.loquat.mixin.SinglePoolElementAccess;
 import snownee.loquat.placement.LoquatPlacer;
 
 public class TreeNodePlacer implements LoquatPlacer {
@@ -48,6 +50,13 @@ public class TreeNodePlacer implements LoquatPlacer {
 	public TreeNodePlacer(String structureIdPattern, BuildTreeFunction buildTreeFunction) {
 		this.structureIdPattern = structureIdPattern;
 		this.buildTreeFunction = buildTreeFunction;
+	}
+
+	public static Optional<ResourceLocation> getStructureId(StructurePoolElement element) {
+		if (element instanceof SinglePoolElementAccess) {
+			return ((SinglePoolElementAccess) element).getTemplate().left();
+		}
+		return Optional.empty();
 	}
 
 	@Override
@@ -62,11 +71,10 @@ public class TreeNodePlacer implements LoquatPlacer {
 				TreeNode root = new TreeNode(new ResourceLocation("start"), null);
 				RandomSource random = RandomSource.create();
 				root = buildTreeFunction.buildTree(random, root);
-				SetMultimap<String, ResourceLocation> uniqueGroups = HashMultimap.create();
 				Preconditions.checkState(root.getUniqueGroup() == null, "Root node must not have unique group");
-				Stack<Step> steps = new Stack<>();
+				StepStack steps = new StepStack();
 				steps.push(new Step(defaultStartPiece, defaultValidSpace, defaultStartPos, root));
-				doPlace(root, uniqueGroups, steps, structureTemplateManager, random, pools);
+				doPlace(root, steps, structureTemplateManager, random, pools);
 				for (var step : steps) {
 					if (step.node.tags.size() > 0 || step.node.getData() != null) {
 						CompoundTag data = new CompoundTag();
@@ -90,7 +98,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 		});
 	}
 
-	private boolean doPlace(TreeNode node, SetMultimap<String, ResourceLocation> uniqueGroups, Stack<Step> steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools) {
+	private boolean doPlace(TreeNode node, StepStack steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools) {
 		Step step = steps.peek();
 		StructurePoolElement element = step.piece.getElement();
 		BlockPos blockPos = step.piece.getPosition();
@@ -121,6 +129,9 @@ public class TreeNodePlacer implements LoquatPlacer {
 				}
 				StructureTemplatePool pool = pools.getOptional(child.getPool()).orElseThrow();
 				for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
+					if (steps.hasDuplicateElement(child.getUniqueGroup(), template)) {
+						continue;
+					}
 					for (Rotation rotation2 : Rotation.getShuffled(random)) {
 						List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
 						for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
@@ -136,7 +147,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 							}
 							VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
 							steps.push(new Step(piece, shape, thatJointPos, child));
-							if (doPlace(child, uniqueGroups, steps, structureTemplateManager, random, pools)) {
+							if (doPlace(child, steps, structureTemplateManager, random, pools)) {
 								resolvedJigsaws.add(jigsawBlock);
 								selectedJigsaw = jigsawBlock;
 								break joints;
@@ -154,6 +165,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 			}
 		}
 		// Find fallbacks
+		joints:
 		for (var jigsawBlock : jigsawBlocks) {
 			if (resolvedJigsaws.contains(jigsawBlock)) {
 				continue;
@@ -165,18 +177,23 @@ public class TreeNodePlacer implements LoquatPlacer {
 			}
 			BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
 			StructureTemplatePool pool = pools.getOptional(fallbackNode.getPool()).orElseThrow();
-			StructurePoolElement template = pool.getRandomTemplate(random);
-			for (Rotation rotation2 : Rotation.getShuffled(random)) {
-				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
-				for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
-					if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
-						continue;
+			for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
+				if (steps.hasDuplicateElement(fallbackNode.getUniqueGroup(), template)) {
+					continue;
+				}
+				for (Rotation rotation2 : Rotation.getShuffled(random)) {
+					List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
+					for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
+						if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
+							continue;
+						}
+						BlockPos thatPiecePos = jointPos.offset(jigsawBlock1.pos.multiply(-1));
+						BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
+						PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
+						VoxelShape shape = Shapes.joinUnoptimized(steps.peek().validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
+						steps.push(new Step(piece, shape, jointPos, fallbackNode));
+						continue joints;
 					}
-					BlockPos thatPiecePos = jointPos.offset(jigsawBlock1.pos.multiply(-1));
-					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
-					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
-					VoxelShape shape = Shapes.joinUnoptimized(steps.peek().validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-					steps.push(new Step(piece, shape, jointPos, fallbackNode));
 				}
 			}
 		}
@@ -184,6 +201,43 @@ public class TreeNodePlacer implements LoquatPlacer {
 	}
 
 	private record Step(PoolElementStructurePiece piece, VoxelShape validSpace, BlockPos jointPos, TreeNode node) {
+
+		Optional<ResourceLocation> structureId() {
+			return getStructureId(piece.getElement());
+		}
+
+	}
+
+	private static class StepStack extends Stack<Step> {
+
+		private final SetMultimap<String, ResourceLocation> uniqueGroups = HashMultimap.create();
+
+		public boolean hasDuplicateElement(String group, StructurePoolElement element) {
+			if (group == null) {
+				return false;
+			}
+			return getStructureId(element).map($ -> uniqueGroups.containsEntry(group, $)).orElse(false);
+		}
+
+		@Override
+		public Step push(Step step) {
+			String group = step.node.getUniqueGroup();
+			if (group != null) {
+				step.structureId().ifPresent(structureId -> uniqueGroups.put(group, structureId));
+			}
+			return super.push(step);
+		}
+
+		@Override
+		public synchronized Step pop() {
+			Step step = super.pop();
+			String group = step.node.getUniqueGroup();
+			if (group != null) {
+				step.structureId().ifPresent(structureId -> uniqueGroups.remove(group, structureId));
+			}
+			return step;
+		}
+
 	}
 
 }

@@ -13,6 +13,7 @@
     "PoolElementStructurePieceMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin",
+    "SinglePoolElementAccess",
     "StructureTemplateMixin",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin",

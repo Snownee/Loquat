@@ -86,7 +86,7 @@ public interface Hooks {
 					}
 				}
 				if (data.contains("Data")) {
-					area.setAttachedData(data.getCompound("Data"));
+					area.getOrCreateAttachedData().merge(data.getCompound("Data"));
 				}
 			}
 			// still not sure the difference between pos and blockPos...
