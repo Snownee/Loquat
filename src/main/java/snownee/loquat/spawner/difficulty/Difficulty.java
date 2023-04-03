@@ -21,7 +21,7 @@ public class Difficulty {
 
 	public DifficultyLevel getLevel(ServerLevel world) {
 		int level = provider.applyAsInt(world);
-		return levels[Mth.clamp(level, 0, levels.length - 1)];
+		return levels[Mth.clamp(level, 1, levels.length) - 1];
 	}
 
 	public interface Provider extends ToIntFunction<ServerLevel> {
