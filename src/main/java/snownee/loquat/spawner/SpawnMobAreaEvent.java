@@ -14,6 +14,8 @@ import snownee.loquat.AreaEventTypes;
 import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.spawner.difficulty.Difficulty;
+import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.loquat.util.LoquatUtil;
 import snownee.lychee.core.Job;
 import snownee.lychee.core.LycheeContext;
@@ -22,17 +24,21 @@ import snownee.lychee.core.post.Delay;
 public class SpawnMobAreaEvent extends AreaEvent {
 	private final String spawnerId;
 	private final Spawner spawner;
+	private final Difficulty difficulty;
+	private final String difficultyId;
 	private int lastWave;
 	private final List<ActiveWave> waves = Lists.newArrayList();
 
 	private boolean hasTimeout;
 	private long timeoutInTicks;
 
-	public SpawnMobAreaEvent(Area area, Spawner spawner, String spawnerId) {
+	public SpawnMobAreaEvent(Area area, Spawner spawner, String spawnerId, Difficulty difficulty, String difficultyId) {
 		super(area);
 		Preconditions.checkNotNull(spawner, "Spawner %s not found", spawnerId);
 		this.spawnerId = spawnerId;
 		this.spawner = spawner;
+		this.difficultyId = difficultyId;
+		this.difficulty = difficulty;
 	}
 
 	@Override
@@ -62,7 +68,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		LycheeContext.Builder<LycheeContext> builder = new LycheeContext.Builder<>(world);
 		builder.withParameter(LootContextParams.ORIGIN, area.getOrigin());
 		LycheeContext ctx = builder.create(LycheeCompat.LOOT_CONTEXT_PARAM_SET);
-		ActiveWave activeWave = new ActiveWave(spawner, spawnerId, lastWave++, ctx);
+		ActiveWave activeWave = new ActiveWave(spawner, spawnerId, lastWave++, ctx, difficulty.getLevel(world));
 		//		if (LoquatConfig.debug) {
 		//			world.getServer().getCommands().performPrefixedCommand(world.getServer().createCommandSourceStack(), "tellraw @a \"Wave %d is coming!\"".formatted(lastWave));
 		//		}
@@ -78,7 +84,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 			waves.add(activeWave);
 			hasTimeout = wave.timeout > 0;
 			if (hasTimeout)
-				timeoutInTicks = LongMath.checkedAdd(world.getGameTime(), wave.timeout * 20);
+				timeoutInTicks = LongMath.checkedAdd(world.getGameTime(), wave.timeout * 20L);
 			activeWave.onStart();
 			activeWave.applyPostActions(ctx, 1);
 			if (wave.wait > 0)
@@ -96,7 +102,8 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		@Override
 		public SpawnMobAreaEvent deserialize(Area area, CompoundTag data) {
 			String spawnerId = data.getString("Spawner");
-			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, SpawnerLoader.INSTANCE.get(spawnerId), spawnerId);
+			String difficultyId = data.getString("Difficulty");
+			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, SpawnerLoader.INSTANCE.get(spawnerId), spawnerId, DifficultyLoader.INSTANCE.get(difficultyId), difficultyId);
 			event.lastWave = data.getInt("LastWave");
 			event.hasTimeout = data.getBoolean("HasTimeout");
 			if (event.hasTimeout)
@@ -107,6 +114,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		@Override
 		public CompoundTag serialize(CompoundTag data, SpawnMobAreaEvent event) {
 			data.putString("Spawner", event.spawnerId);
+			data.putString("Difficulty", event.difficultyId);
 			data.putInt("LastWave", event.lastWave);
 			data.putBoolean("HasTimeout", event.hasTimeout);
 			if (event.hasTimeout)

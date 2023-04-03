@@ -87,6 +87,7 @@ java {
 
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude("/data/pack")
     exclude("/data/loquat/dimension")
     exclude("/data/loquat/dimension_type")
     exclude("/data/loquat/worldgen/biome")

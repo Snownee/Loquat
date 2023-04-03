@@ -116,6 +116,7 @@ public class SelectionManager {
 			}
 			AABB aabb = TransformUtil.getAABB(be);
 			LoquatUtil.emptyBlocks(world, () -> BlockPos.betweenClosedStream(aabb));
+			//FIXME 无法清除与AABB同样大小的区域
 			AreaManager.of(world).removeAllInside(aabb);
 			player.displayClientMessage(Component.translatable("loquat.msg.shiftUseStructureBlock"), false);
 		} else {

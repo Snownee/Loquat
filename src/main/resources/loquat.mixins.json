@@ -15,6 +15,7 @@
     "ServerPlayerMixin",
     "SinglePoolElementAccess",
     "StructureTemplateMixin",
+    "fabric.DifficultyLoaderMixin",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin",
     "fabric.ZombieMixin"

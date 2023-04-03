@@ -26,6 +26,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.Loquat;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.spawner.difficulty.Difficulty;
 import snownee.loquat.util.CommonProxy;
 import snownee.lychee.core.ActionRuntime;
 import snownee.lychee.core.LycheeContext;
@@ -37,9 +38,9 @@ import snownee.lychee.util.json.JsonPointer;
 public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
 	private final String spawnerId;
-	private final int waveIndex;
 	@Getter
 	private final Spawner spawner;
+	private final int waveIndex;
 	@Getter
 	private final Spawner.Wave wave;
 	@Getter
@@ -55,13 +56,15 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	private boolean isFinished;
 	private int successiveSpawnCooldown;
 	private int proactiveCheckCooldown;
+	private final Difficulty.DifficultyLevel difficulty;
 
-	public ActiveWave(Spawner spawner, String spawnerId, int waveIndex, LycheeContext context) {
+	public ActiveWave(Spawner spawner, String spawnerId, int waveIndex, LycheeContext context, Difficulty.DifficultyLevel difficulty) {
 		this.spawner = spawner;
 		this.spawnerId = spawnerId;
 		this.waveIndex = waveIndex;
 		this.wave = spawner.waves[waveIndex];
 		this.context = context;
+		this.difficulty = difficulty;
 	}
 
 	public static boolean canSuccessiveSpawn(LivingEntity entity) {
@@ -131,6 +134,10 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		return isFinished;
 	}
 
+	public float getMobAmountMultiplier() {
+		return difficulty.amount;
+	}
+
 	public void addPendingMob(SpawnMobAction action) {
 		pendingMobsNeedShuffle = true;
 		pendingMobs.add(action);
@@ -140,6 +147,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		if (!(entity instanceof LivingEntity living)) {
 			return;
 		}
+		living = difficulty.apply(living);
 		mobs.add(living.getUUID());
 		if (canSuccessiveSpawn(living)) {
 			successiveSpawnableMobs.add(living.getUUID());

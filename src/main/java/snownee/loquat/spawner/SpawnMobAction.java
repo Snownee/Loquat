@@ -31,6 +31,7 @@ public class SpawnMobAction extends PostAction {
 	protected void apply(ILycheeRecipe<?> recipe, LycheeContext ctx, int times) {
 		Preconditions.checkArgument(recipe instanceof ActiveWave);
 		ActiveWave wave = (ActiveWave) recipe;
+		int count = (int) (this.count * wave.getMobAmountMultiplier());
 		for (int i = 0; i < count; i++) {
 			wave.addPendingMob(this);
 		}

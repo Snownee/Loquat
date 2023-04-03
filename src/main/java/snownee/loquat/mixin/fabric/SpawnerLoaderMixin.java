@@ -1,5 +1,8 @@
 package snownee.loquat.mixin.fabric;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -12,5 +15,10 @@ public abstract class SpawnerLoaderMixin implements IdentifiableResourceReloadLi
 	@Override
 	public ResourceLocation getFabricId() {
 		return LycheeCompat.SPAWNER_ID;
+	}
+
+	@Override
+	public Collection<ResourceLocation> getFabricDependencies() {
+		return List.of(LycheeCompat.DIFFICULTY_ID);
 	}
 }

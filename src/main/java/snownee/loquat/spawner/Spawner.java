@@ -1,10 +1,12 @@
 package snownee.loquat.spawner;
 
+import snownee.loquat.spawner.difficulty.Difficulty;
 import snownee.lychee.core.contextual.ContextualHolder;
 import snownee.lychee.core.post.PostAction;
 
 public class Spawner {
 	public Wave[] waves;
+	public String difficulty = "default";
 
 	public static class Wave {
 		private static final ContextualHolder EMPTY_CONDITIONS = new ContextualHolder();

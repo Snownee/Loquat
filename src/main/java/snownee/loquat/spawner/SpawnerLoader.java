@@ -3,6 +3,8 @@ package snownee.loquat.spawner;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,20 +20,24 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.spawner.difficulty.Difficulty;
+import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.lychee.core.contextual.ContextualHolder;
 import snownee.lychee.core.post.PostAction;
+import snownee.lychee.fragment.Fragments;
 
 public class SpawnerLoader extends SimpleJsonResourceReloadListener {
-	private static final Gson GSON = new GsonBuilder()
+	public static final Gson GSON = new GsonBuilder()
 			.setPrettyPrinting()
 			.disableHtmlEscaping()
 			.setLenient()
 			.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
 			.registerTypeAdapter(PostAction.class, new PostActionSerializer())
 			.registerTypeAdapter(ContextualHolder.class, new ContextualHolderSerializer())
+			.registerTypeAdapter(Difficulty.Provider.class, new Difficulty.DifficultyProviderSerializer())
 			.create();
-	private final Map<String, Spawner> spawners = Maps.newHashMap();
 	public static final SpawnerLoader INSTANCE = new SpawnerLoader("loquat_spawners");
+	private final Map<String, Spawner> spawners = Maps.newHashMap();
 
 	public SpawnerLoader(String dir) {
 		super(GSON, dir);
@@ -40,12 +46,19 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
 		spawners.clear();
-		map.forEach((id, json) -> spawners.put(id.getPath(), GSON.fromJson(json, Spawner.class)));
+		map.forEach((id, json) -> {
+			Fragments.INSTANCE.process(json);
+			spawners.put(id.getPath(), GSON.fromJson(json, Spawner.class));
+		});
 	}
 
-	public void spawn(String spawnerId, ServerLevel world, Area area) {
+	public void spawn(String spawnerId, @Nullable String difficultyId, ServerLevel world, Area area) {
 		Spawner spawner = get(spawnerId);
-		AreaManager.of(world).addEvent(new SpawnMobAreaEvent(area, spawner, spawnerId));
+		if (difficultyId == null) {
+			difficultyId = spawner.difficulty;
+		}
+		Difficulty difficulty = DifficultyLoader.INSTANCE.get(difficultyId);
+		AreaManager.of(world).addEvent(new SpawnMobAreaEvent(area, spawner, spawnerId, difficulty, difficultyId));
 	}
 
 	public Spawner get(String spawnerId) {

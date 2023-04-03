@@ -26,6 +26,7 @@ import snownee.loquat.command.LoquatCommand;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
+import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.loquat.spawner.LycheeCompat;
 import snownee.loquat.spawner.SpawnMobAction;
 import snownee.loquat.spawner.SpawnerLoader;
@@ -88,6 +89,7 @@ public class CommonProxy implements ModInitializer {
 	public void onInitialize() {
 		Loquat.init();
 		if (Loquat.hasLychee) {
+			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) DifficultyLoader.INSTANCE);
 			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) SpawnerLoader.INSTANCE);
 			PostActionTypes.register("loquat:spawn", SpawnMobAction.TYPE);
 			LycheeCompat.init();
