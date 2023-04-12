@@ -30,8 +30,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import snownee.loquat.core.area.Area;
 import snownee.lychee.util.LUtil;
 
-public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean randomize,
-					   @Nullable Object2DoubleMap<String> attrs) {
+public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean randomize, @Nullable Object2DoubleMap<String> attrs) {
 
 	public static final Map<String, Attribute> SIMPLE_ATTRIBUTES = Maps.newHashMap();
 
@@ -51,7 +50,7 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			String entityTypeId = json.getAsString();
 			CompoundTag nbt = new CompoundTag();
 			nbt.putString("id", entityTypeId);
-			return new MobEntry(EntityType.byString(entityTypeId).orElseThrow(), nbt, false, null);
+			return new MobEntry(EntityType.byString(entityTypeId).orElseThrow(), nbt, true, null);
 		} else if (json.isJsonObject()) {
 			JsonObject jsonObject = json.getAsJsonObject();
 			String entityTypeId = jsonObject.get("type").getAsString();

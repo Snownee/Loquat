@@ -1,0 +1,13 @@
+{
+  "waves": [
+    {
+      "post": [
+        {
+          "count": 2,
+          "type": "loquat:spawn",
+          "mob": "skeleton"
+        }
+      ]
+    }
+  ]
+}
