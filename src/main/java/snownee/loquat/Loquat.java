@@ -26,6 +26,7 @@ public class Loquat {
 		LoquatRegistries.init();
 		AreaTypes.init();
 		AreaEventTypes.init();
+		PlaceProgramTypes.init();
 	}
 
 }

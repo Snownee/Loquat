@@ -7,7 +7,6 @@ import snownee.loquat.spawner.SpawnMobAreaEvent;
 public class AreaEventTypes {
 
 	public static final SpawnMobAreaEvent.Type SPAWN_MOBS = register("spawn_mobs", new SpawnMobAreaEvent.Type());
-	//public static final PlayerEnterExitAreaEvent.Type PLAYER_ENTER_EXIT = register("player_enter_exit", new PlayerEnterExitAreaEvent.Type());
 
 	public static void init() {
 	}
