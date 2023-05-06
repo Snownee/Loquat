@@ -7,6 +7,7 @@ import org.apache.commons.compress.utils.Lists;
 import com.google.common.base.Preconditions;
 import com.google.common.math.LongMath;
 
+import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -22,7 +23,9 @@ import snownee.lychee.core.LycheeContext;
 import snownee.lychee.core.post.Delay;
 
 public class SpawnMobAreaEvent extends AreaEvent {
+	@Getter
 	private final String spawnerId;
+	@Getter
 	private final Spawner spawner;
 	private final Difficulty difficulty;
 	private final String difficultyId;
@@ -53,7 +56,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		if (waves.isEmpty() || (hasTimeout && world.getGameTime() >= timeoutInTicks)) {
 			newWave(world);
 		}
-		waves.removeIf(wave -> wave.tick(world, area));
+		waves.removeIf(wave -> wave.tick(world));
 		if (LoquatConfig.debug) {
 			LoquatUtil.runCommandSilently(world, "scoreboard players reset * LoquatSpawner");
 			int mobs = waves.stream().mapToInt(ActiveWave::getRemainMobs).sum();
@@ -68,7 +71,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		LycheeContext.Builder<LycheeContext> builder = new LycheeContext.Builder<>(world);
 		builder.withParameter(LootContextParams.ORIGIN, area.getOrigin());
 		LycheeContext ctx = builder.create(LycheeCompat.LOOT_CONTEXT_PARAM_SET);
-		ActiveWave activeWave = new ActiveWave(spawner, spawnerId, lastWave++, ctx, difficulty.getLevel(world));
+		ActiveWave activeWave = new ActiveWave(this, lastWave++, ctx, difficulty.getLevel(world));
 		//		if (LoquatConfig.debug) {
 		//			world.getServer().getCommands().performPrefixedCommand(world.getServer().createCommandSourceStack(), "tellraw @a \"Wave %d is coming!\"".formatted(lastWave));
 		//		}

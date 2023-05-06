@@ -22,10 +22,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.Loquat;
-import snownee.loquat.core.area.Area;
+import snownee.loquat.duck.LoquatMob;
 import snownee.loquat.spawner.difficulty.Difficulty;
 import snownee.loquat.util.CommonProxy;
 import snownee.lychee.core.ActionRuntime;
@@ -37,9 +38,7 @@ import snownee.lychee.util.json.JsonPointer;
 
 public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
-	private final String spawnerId;
-	@Getter
-	private final Spawner spawner;
+	private final SpawnMobAreaEvent event;
 	private final int waveIndex;
 	@Getter
 	private final Spawner.Wave wave;
@@ -49,6 +48,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	private final ObjectArrayList<SpawnMobAction> pendingMobs = ObjectArrayList.of();
 	private final Set<UUID> mobs = Sets.newHashSet();
 	private final Set<UUID> successiveSpawnableMobs = Sets.newHashSet();
+	private final Difficulty.DifficultyLevel difficulty;
 	private boolean pendingMobsNeedShuffle;
 	private int spawnCooldown;
 	private Consumer<Entity> deathListener;
@@ -56,13 +56,11 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	private boolean isFinished;
 	private int successiveSpawnCooldown;
 	private int proactiveCheckCooldown;
-	private final Difficulty.DifficultyLevel difficulty;
 
-	public ActiveWave(Spawner spawner, String spawnerId, int waveIndex, LycheeContext context, Difficulty.DifficultyLevel difficulty) {
-		this.spawner = spawner;
-		this.spawnerId = spawnerId;
+	public ActiveWave(SpawnMobAreaEvent event, int waveIndex, LycheeContext context, Difficulty.DifficultyLevel difficulty) {
+		this.event = event;
 		this.waveIndex = waveIndex;
-		this.wave = spawner.waves[waveIndex];
+		this.wave = event.getSpawner().waves[waveIndex];
 		this.context = context;
 		this.difficulty = difficulty;
 	}
@@ -71,7 +69,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		return entity instanceof Slime;
 	}
 
-	public boolean tick(ServerLevel world, Area area) {
+	public boolean tick(ServerLevel world) {
 		if (successiveSpawnCooldown > 0 && --successiveSpawnCooldown == 0) {
 			checkIfFinished();
 			if (isFinished) {
@@ -97,12 +95,12 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 				MutableObject<ServerPlayer> target = new MutableObject<>();
 				for (int i = 0; i < players.size(); i++) {
 					ServerPlayer player = players.get((i + offset) % players.size());
-					if (!player.isSpectator() && area.contains(player.getBoundingBox())) {
+					if (!player.isSpectator() && event.getArea().contains(player.getBoundingBox())) {
 						target.setValue(player);
 						break;
 					}
 				}
-				Entity entity = action.getMob().createMob(world, area, action.getZone(), e -> {
+				Entity entity = action.getMob().createMob(world, event.getArea(), action.getZone(), e -> {
 					if (target.getValue() == null) {
 						return;
 					}
@@ -147,6 +145,10 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 		if (!(entity instanceof LivingEntity living)) {
 			return;
 		}
+		if (entity instanceof Mob mob) {
+			mob.setPersistenceRequired();
+			((LoquatMob) mob).loquat$setRestriction(event);
+		}
 		living = difficulty.apply(living);
 		mobs.add(living.getUUID());
 		if (canSuccessiveSpawn(living)) {
@@ -190,7 +192,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
 	@Override
 	public ResourceLocation lychee$getId() {
-		return new ResourceLocation(Loquat.ID, "spawner/%s/%d".formatted(spawnerId, waveIndex));
+		return new ResourceLocation(Loquat.ID, "spawner/%s/%d".formatted(event.getSpawnerId(), waveIndex));
 	}
 
 	@Override

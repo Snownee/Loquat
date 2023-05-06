@@ -211,6 +211,9 @@ public class AreaManager extends SavedData {
 		tag.put("Areas", saveAreas(areas, false));
 		ListTag eventList = new ListTag();
 		for (AreaEvent event : events) {
+			if (event.isFinished()) {
+				continue;
+			}
 			eventList.add(event.serialize(new CompoundTag()));
 		}
 		tag.put("Events", eventList);

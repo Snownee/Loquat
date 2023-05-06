@@ -8,6 +8,7 @@
     "CommandsMixin",
     "JigsawPlacementMixin",
     "JigsawStructureMixin",
+    "MobMixin",
     "PlaceCommandMixin",
     "PlayerMixin",
     "PoolElementStructurePieceMixin",

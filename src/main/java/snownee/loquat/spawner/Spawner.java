@@ -1,6 +1,5 @@
 package snownee.loquat.spawner;
 
-import snownee.loquat.spawner.difficulty.Difficulty;
 import snownee.lychee.core.contextual.ContextualHolder;
 import snownee.lychee.core.post.PostAction;
 
