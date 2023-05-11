@@ -160,6 +160,6 @@ public abstract class Area {
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);
 
-		public abstract CompoundTag serialize(CompoundTag data, T area, boolean networking);
+		public abstract CompoundTag serialize(CompoundTag data, T area);
 	}
 }

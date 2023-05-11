@@ -15,6 +15,21 @@ import snownee.loquat.core.select.SelectionManager;
 public class SSyncSelectionPacket extends PacketHandler {
 	public static SSyncSelectionPacket I;
 
+	public static void sync(ServerPlayer player) {
+		I.send(player, buf -> {
+			var manager = SelectionManager.of(player);
+			buf.writeVarInt(manager.getSelections().size());
+			for (var selection : manager.getSelections()) {
+				buf.writeBlockPos(selection.pos1);
+				buf.writeBlockPos(selection.pos2);
+			}
+			buf.writeVarInt(manager.getSelectedAreas().size());
+			for (var uuid : manager.getSelectedAreas()) {
+				buf.writeUUID(uuid);
+			}
+		});
+	}
+
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
 		var player = Minecraft.getInstance().player;
@@ -34,20 +49,5 @@ public class SSyncSelectionPacket extends PacketHandler {
 			selectedAreas.add(buf.readUUID());
 		}
 		return null;
-	}
-
-	public static void sync(ServerPlayer player) {
-		I.send(player, buf -> {
-			var manager = SelectionManager.of(player);
-			buf.writeVarInt(manager.getSelections().size());
-			for (var selection : manager.getSelections()) {
-				buf.writeBlockPos(selection.pos1);
-				buf.writeBlockPos(selection.pos2);
-			}
-			buf.writeVarInt(manager.getSelectedAreas().size());
-			for (var uuid : manager.getSelectedAreas()) {
-				buf.writeUUID(uuid);
-			}
-		});
 	}
 }

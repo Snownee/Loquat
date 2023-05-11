@@ -129,7 +129,7 @@ public class AABBArea extends Area {
 		}
 
 		@Override
-		public CompoundTag serialize(CompoundTag data, AABBArea area, boolean networking) {
+		public CompoundTag serialize(CompoundTag data, AABBArea area) {
 			data.put("AABB", AABBSerializer.write(area.aabb));
 			return data;
 		}

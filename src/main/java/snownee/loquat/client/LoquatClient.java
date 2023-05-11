@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
+import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.PosSelection;
@@ -31,6 +32,7 @@ public class LoquatClient {
 	public static final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
 	public static final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
 	public static final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
+	public static final RestrictInstance restrictInstance = new RestrictInstance();
 
 	static {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {

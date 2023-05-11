@@ -11,6 +11,7 @@
   "loquat.command.delete.success": "Deleted area(s)",
   "loquat.command.replace.success": "Replaced area",
   "loquat.command.outline.success": "Outline mode: %s",
+  "loquat.command.restrict.success": "Affected %s permission(s)",
   "loquat.command.tag.success": "Successfully affected %s areas",
   "loquat.command.empty.success": "Emptied area(s)",
   "loquat.command.place.success": "Placed area(s)",
@@ -26,6 +27,8 @@
   "loquat.command.lycheeNotInstalled": "Lychee is not installed",
   "loquat.command.areaMustBeBox": "Area must be a box",
   "loquat.command.wrongDimension": "Wrong dimension",
+  "loquat.command.entitySelectorNotAllowed": "@e selector is not supported here",
+  "loquat.command.nothingChanged": "Nothing changed",
   "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
   "loquat.msg.shiftUseStructureBlock": "Cleared structure"
 }

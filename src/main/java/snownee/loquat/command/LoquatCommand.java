@@ -33,6 +33,7 @@ public class LoquatCommand {
 				.then(TagCommand.register())
 				.then(EmptyCommand.register())
 				.then(PlaceCommand.register())
+				.then(RestrictCommand.register())
 				.then(SelectTagCommand.register());
 		if (Loquat.hasLychee) {
 			builder.then(SpawnCommand.register());

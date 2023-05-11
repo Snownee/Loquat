@@ -36,7 +36,7 @@ public class ReplaceCommand extends LoquatCommand {
 						return 0;
 					}
 					var selection = selections.get(0);
-					var tag = AreaManager.saveAreas(List.of(area), false);
+					var tag = AreaManager.saveAreas(List.of(area));
 					tag.getCompound(0).put("AABB", AABBSerializer.write(selection.toAABB()));
 					areaManager.remove(area.getUuid());
 					areaManager.add(AreaManager.loadAreas(tag).get(0));

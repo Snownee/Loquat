@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -34,6 +38,7 @@ import snownee.loquat.core.area.Zone;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.AreaManagerContainer;
 import snownee.loquat.network.SOutlinesPacket;
+import snownee.loquat.network.SSyncRestrictionPacket;
 
 public class AreaManager extends SavedData {
 
@@ -45,8 +50,15 @@ public class AreaManager extends SavedData {
 	private final List<AreaEvent> pendingEvents = ObjectArrayList.of();
 	private final Set<Object> boundsCache = Sets.newHashSet();
 	private final Long2ObjectOpenHashMap<Set<Area>> chunkLookup = new Long2ObjectOpenHashMap<>();
+	@Getter
+	private final RestrictInstance fallbackRestriction = new RestrictInstance();
 	private ServerLevel level;
 	private boolean ticking;
+	private Map<String, RestrictInstance> restrictions = Maps.newHashMap();
+
+	public AreaManager() {
+		restrictions.put("*", fallbackRestriction);
+	}
 
 	public static AreaManager of(ServerLevel level) {
 		AreaManagerContainer container = (AreaManagerContainer) level;
@@ -72,29 +84,52 @@ public class AreaManager extends SavedData {
 				Loquat.LOGGER.error("Failed to load area event", e);
 			}
 		}
+		if (tag.contains("Restrictions", Tag.TAG_COMPOUND)) {
+			CompoundTag restrictions = tag.getCompound("Restrictions");
+			if (restrictions.contains("*", Tag.TAG_COMPOUND)) {
+				manager.fallbackRestriction.deserializeNBT(manager, restrictions.getList("*", Tag.TAG_COMPOUND));
+			}
+			for (String key : restrictions.getAllKeys()) {
+				if (key.equals("*")) {
+					continue;
+				}
+				RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(key);
+				restrictInstance.deserializeNBT(manager, restrictions.getList(key, Tag.TAG_COMPOUND));
+				manager.restrictions.put(key, restrictInstance);
+			}
+		}
 		manager.setDirty(false);
 		return manager;
 	}
 
+	public static ListTag saveAreas(Collection<Area> areas) {
+		return saveAreas(areas, false, null);
+	}
+
 	@SuppressWarnings("rawtypes")
-	public static ListTag saveAreas(Collection<Area> areas, boolean networking) {
+	public static ListTag saveAreas(Collection<Area> areas, boolean skipMetadata, @Nullable BiConsumer<Area, CompoundTag> consumer) {
 		ListTag tag = new ListTag();
 		for (Area area : areas) {
 			CompoundTag data = new CompoundTag();
-			if (area.getUuid() != null)
-				data.putUUID("UUID", area.getUuid());
-			if (!area.getTags().isEmpty())
-				data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
-			if (!area.getZones().isEmpty()) {
-				CompoundTag zones = new CompoundTag();
-				area.getZones().forEach((name, zone) -> zones.put(name, zone.serialize(new CompoundTag())));
-				data.put("Zones", zones);
-			}
-			if (area.getAttachedData() != null && !area.getAttachedData().isEmpty()) {
-				data.put("Data", area.getAttachedData());
+			if (!skipMetadata) {
+				if (area.getUuid() != null)
+					data.putUUID("UUID", area.getUuid());
+				if (!area.getTags().isEmpty())
+					data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
+				if (!area.getZones().isEmpty()) {
+					CompoundTag zones = new CompoundTag();
+					area.getZones().forEach((name, zone) -> zones.put(name, zone.serialize(new CompoundTag())));
+					data.put("Zones", zones);
+				}
+				if (area.getAttachedData() != null && !area.getAttachedData().isEmpty()) {
+					data.put("Data", area.getAttachedData());
+				}
 			}
 			data.putString("Type", LoquatRegistries.AREA.getKey(area.getType()).toString());
-			((Area.Type) area.getType()).serialize(data, area, networking);
+			((Area.Type) area.getType()).serialize(data, area);
+			if (consumer != null) {
+				consumer.accept(area, data);
+			}
 			tag.add(data);
 		}
 		return tag;
@@ -102,6 +137,11 @@ public class AreaManager extends SavedData {
 
 	public static List<Area> loadAreas(ListTag tag) {
 		List<Area> areas = new ArrayList<>(tag.size());
+		loadAreas(tag, (area, data) -> areas.add(area));
+		return areas;
+	}
+
+	public static void loadAreas(ListTag tag, BiConsumer<Area, CompoundTag> consumer) {
 		for (int i = 0; i < tag.size(); i++) {
 			CompoundTag data = tag.getCompound(i);
 			Area.Type<?> type = LoquatRegistries.AREA.get(new ResourceLocation(data.getString("Type")));
@@ -124,9 +164,8 @@ public class AreaManager extends SavedData {
 			if (data.contains("Data")) {
 				area.setAttachedData(data.getCompound("Data"));
 			}
-			areas.add(area);
+			consumer.accept(area, data);
 		}
-		return areas;
 	}
 
 	public void add(Area area) {
@@ -207,8 +246,9 @@ public class AreaManager extends SavedData {
 	}
 
 	@Override
+	@NotNull
 	public CompoundTag save(CompoundTag tag) {
-		tag.put("Areas", saveAreas(areas, false));
+		tag.put("Areas", saveAreas(areas));
 		ListTag eventList = new ListTag();
 		for (AreaEvent event : events) {
 			if (event.isFinished()) {
@@ -217,6 +257,11 @@ public class AreaManager extends SavedData {
 			eventList.add(event.serialize(new CompoundTag()));
 		}
 		tag.put("Events", eventList);
+		CompoundTag restrictionsData = new CompoundTag();
+		for (Map.Entry<String, RestrictInstance> entry : restrictions.entrySet()) {
+			entry.getValue().serializeNBT().ifPresent($ -> restrictionsData.put(entry.getKey(), $));
+		}
+		tag.put("Restrictions", restrictionsData);
 		return tag;
 	}
 
@@ -266,5 +311,14 @@ public class AreaManager extends SavedData {
 			SelectionManager.of(player).reset(player);
 		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
+		SSyncRestrictionPacket.sync(player);
+	}
+
+	public RestrictInstance getOrCreateRestrictInstance(String playerName) {
+		return restrictions.computeIfAbsent(playerName, $ -> {
+			RestrictInstance restrictInstance = new RestrictInstance();
+			restrictInstance.setFallback(fallbackRestriction);
+			return restrictInstance;
+		});
 	}
 }

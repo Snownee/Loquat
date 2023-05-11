@@ -34,6 +34,13 @@
         "dir": "PLAY_TO_CLIENT",
         "value": "sync_selection"
       }
+    },
+    {
+      "target": "snownee.loquat.network.SSyncRestrictionPacket",
+      "data": {
+        "dir": "PLAY_TO_CLIENT",
+        "value": "sync_restriction"
+      }
     }
   ],
   "KiwiConfig": [

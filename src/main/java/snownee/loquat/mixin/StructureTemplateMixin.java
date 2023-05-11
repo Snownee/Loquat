@@ -47,7 +47,7 @@ public class StructureTemplateMixin {
 		if (loquat$areas.isEmpty())
 			return;
 		CompoundTag loquat = new CompoundTag();
-		loquat.put("Areas", AreaManager.saveAreas(loquat$areas, false));
+		loquat.put("Areas", AreaManager.saveAreas(loquat$areas));
 		tag.put("Loquat", loquat);
 	}
 

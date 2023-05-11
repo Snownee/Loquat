@@ -19,6 +19,18 @@ import snownee.loquat.core.area.Area;
 public class SOutlinesPacket extends PacketHandler {
 	public static SOutlinesPacket I;
 
+	// expire == Long.MIN_VALUE means clear
+	public static void outlines(ServerPlayer player, long expire, boolean clear, boolean highlight, Collection<Area> areas) {
+		I.send(player, buf -> {
+			buf.writeVarLong(expire);
+			buf.writeBoolean(clear);
+			buf.writeBoolean(highlight);
+			CompoundTag tag = new CompoundTag();
+			tag.put("0", AreaManager.saveAreas(areas));
+			buf.writeNbt(tag);
+		});
+	}
+
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
 		var level = Minecraft.getInstance().level;
@@ -41,17 +53,5 @@ public class SOutlinesPacket extends PacketHandler {
 			outlines.put(area.getUuid(), debugData);
 		}
 		return null;
-	}
-
-	// expire == Long.MIN_VALUE means clear
-	public static void outlines(ServerPlayer player, long expire, boolean clear, boolean highlight, Collection<Area> areas) {
-		I.send(player, buf -> {
-			buf.writeVarLong(expire);
-			buf.writeBoolean(clear);
-			buf.writeBoolean(highlight);
-			CompoundTag tag = new CompoundTag();
-			tag.put("0", AreaManager.saveAreas(areas, true));
-			buf.writeNbt(tag);
-		});
 	}
 }
