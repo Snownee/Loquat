@@ -21,6 +21,8 @@
   "loquat.command.nearby.more": "[More]",
   "loquat.command.nearby.more.tags": "Tags: %s",
   "loquat.command.nearby.more.data": "Data: %s",
+  "loquat.command.nearby.more.restrict.global": "G. Restrictions: %s",
+  "loquat.command.nearby.more.restrict.player": "Restrictions: %s",
   "loquat.command.nearby.select": "[±]",
   "loquat.command.spawnerNotExists": "Spawner not exists",
   "loquat.command.spawn.success": "Spawner %s is working",
@@ -30,5 +32,9 @@
   "loquat.command.entitySelectorNotAllowed": "@e selector is not supported here",
   "loquat.command.nothingChanged": "Nothing changed",
   "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
-  "loquat.msg.shiftUseStructureBlock": "Cleared structure"
+  "loquat.msg.shiftUseStructureBlock": "Cleared structure",
+  "loquat.restrict.behavior.enter": "enter",
+  "loquat.restrict.behavior.exit": "exit",
+  "loquat.restrict.behavior.place": "place",
+  "loquat.restrict.behavior.break": "break"
 }

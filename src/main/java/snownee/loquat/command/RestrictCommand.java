@@ -13,6 +13,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
@@ -67,7 +68,7 @@ public class RestrictCommand extends LoquatCommand {
 		AreaManager.of(source.getLevel()).setDirty();
 		List<ServerPlayer> players = source.getLevel().players();
 		if (!names.contains("*")) {
-			players = players.stream().filter($ -> names.contains($.getGameProfile().getName())).toList();
+			players = players.stream().filter($ -> names.contains($.getScoreboardName())).toList();
 		}
 		for (ServerPlayer player : players) {
 			SSyncRestrictionPacket.sync(player);
@@ -90,6 +91,9 @@ public class RestrictCommand extends LoquatCommand {
 			this.name = name;
 		}
 
+		public MutableComponent getDisplayName() {
+			return Component.translatable("loquat.restrict.behavior." + name);
+		}
 	}
 
 }

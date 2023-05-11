@@ -17,6 +17,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import snownee.loquat.core.AreaManager;
+import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 
@@ -53,6 +54,11 @@ public class NearbyCommand {
 									if (area.getAttachedData() != null) {
 										lines.add(Component.translatable("loquat.command.nearby.more.data", NbtUtils.toPrettyComponent(area.getAttachedData())));
 									}
+									printRestrictions(lines, manager.getFallbackRestriction(), area, "global");
+									if (source.getPlayer() != null) {
+										RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(source.getPlayer().getScoreboardName());
+										printRestrictions(lines, restrictInstance, area, "player");
+									}
 									if (lines.isEmpty()) {
 										return style;
 									}
@@ -67,6 +73,20 @@ public class NearbyCommand {
 					}
 					return areas.size();
 				});
+	}
+
+	private static void printRestrictions(List<MutableComponent> lines, RestrictInstance restrictInstance, Area area, String key) {
+		List<MutableComponent> behaviors = Lists.newArrayList();
+		for (RestrictCommand.RestrictBehavior behavior : RestrictCommand.RestrictBehavior.VALUES) {
+			if (restrictInstance.isRestricted(area, behavior)) {
+				behaviors.add(behavior.getDisplayName().withStyle(ChatFormatting.RED));
+			}
+		}
+		if (!behaviors.isEmpty()) {
+			behaviors.stream().reduce((a, b) -> a.append(", ").append(b)).ifPresent(component -> {
+				lines.add(Component.translatable("loquat.command.nearby.more.restrict." + key, component));
+			});
+		}
 	}
 
 	private static UnaryOperator<Style> clickEvent(String type, CommandSourceStack source, Area area) {
