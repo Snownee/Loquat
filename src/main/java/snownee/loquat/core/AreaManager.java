@@ -86,7 +86,7 @@ public class AreaManager extends SavedData {
 		}
 		if (tag.contains("Restrictions", Tag.TAG_COMPOUND)) {
 			CompoundTag restrictions = tag.getCompound("Restrictions");
-			if (restrictions.contains("*", Tag.TAG_COMPOUND)) {
+			if (restrictions.contains("*")) {
 				manager.fallbackRestriction.deserializeNBT(manager, restrictions.getList("*", Tag.TAG_COMPOUND));
 			}
 			for (String key : restrictions.getAllKeys()) {
@@ -206,6 +206,21 @@ public class AreaManager extends SavedData {
 		areas.remove(area);
 		events.removeIf(e -> e.getArea() == area);
 		pendingEvents.removeIf(e -> e.getArea() == area);
+		boolean notifyAll = fallbackRestriction.onRemove(area);
+		restrictions.forEach((key, restriction) -> {
+			if (restriction == fallbackRestriction) {
+				return;
+			}
+			if (restriction.onRemove(area) && !notifyAll) {
+				ServerPlayer player = level.getServer().getPlayerList().getPlayerByName(key);
+				if (player != null) {
+					SSyncRestrictionPacket.sync(player);
+				}
+			}
+		});
+		if (notifyAll) {
+			level.getServer().getPlayerList().getPlayers().forEach(SSyncRestrictionPacket::sync);
+		}
 		boundsCache.remove(area.getBounds());
 		area.getChunksIn().forEach(chunk -> {
 			Set<Area> areas = chunkLookup.get(chunk);
@@ -259,7 +274,7 @@ public class AreaManager extends SavedData {
 		tag.put("Events", eventList);
 		CompoundTag restrictionsData = new CompoundTag();
 		for (Map.Entry<String, RestrictInstance> entry : restrictions.entrySet()) {
-			entry.getValue().serializeNBT().ifPresent($ -> restrictionsData.put(entry.getKey(), $));
+			entry.getValue().serializeNBT(this).ifPresent($ -> restrictionsData.put(entry.getKey(), $));
 		}
 		tag.put("Restrictions", restrictionsData);
 		return tag;
@@ -314,11 +329,29 @@ public class AreaManager extends SavedData {
 		SSyncRestrictionPacket.sync(player);
 	}
 
+	public void playerJoined(ServerPlayer player) {
+		SSyncRestrictionPacket.sync(player);
+	}
+
 	public RestrictInstance getOrCreateRestrictInstance(String playerName) {
 		return restrictions.computeIfAbsent(playerName, $ -> {
 			RestrictInstance restrictInstance = new RestrictInstance();
 			restrictInstance.setFallback(fallbackRestriction);
 			return restrictInstance;
 		});
+	}
+
+	public void clearEvents() {
+		events.clear();
+		pendingEvents.clear();
+		setDirty();
+	}
+
+	public void clearRestrictions() {
+		restrictions.clear();
+		restrictions.put("*", fallbackRestriction);
+		if (fallbackRestriction.getRules() != null)
+			fallbackRestriction.getRules().clear();
+		setDirty();
 	}
 }

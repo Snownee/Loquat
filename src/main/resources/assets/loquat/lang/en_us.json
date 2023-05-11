@@ -26,6 +26,8 @@
   "loquat.command.nearby.select": "[±]",
   "loquat.command.spawnerNotExists": "Spawner not exists",
   "loquat.command.spawn.success": "Spawner %s is working",
+  "loquat.command.clear.events.success": "Cleared events",
+  "loquat.command.clear.restrictions.success": "Cleared restrictions",
   "loquat.command.lycheeNotInstalled": "Lychee is not installed",
   "loquat.command.areaMustBeBox": "Area must be a box",
   "loquat.command.wrongDimension": "Wrong dimension",

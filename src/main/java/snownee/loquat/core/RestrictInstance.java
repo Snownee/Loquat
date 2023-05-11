@@ -1,6 +1,5 @@
 package snownee.loquat.core;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
@@ -67,14 +66,21 @@ public class RestrictInstance {
 		return (getFlags(area) & (1 << behavior.ordinal())) != 0;
 	}
 
-	public Optional<ListTag> serializeNBT() {
+	public Optional<ListTag> serializeNBT(AreaManager manager) {
 		if (rules == null || rules.isEmpty()) {
 			return Optional.empty();
 		}
-		return Optional.of(AreaManager.saveAreas(rules.keySet(), true, (area, areaTag) -> {
-			areaTag.putUUID("UUID", Objects.requireNonNull(area.getUuid()));
-			areaTag.putInt("Flags", rules.getInt(area));
-		}));
+		if (rules.isEmpty()) {
+			return Optional.empty();
+		}
+		ListTag listTag = new ListTag();
+		rules.forEach((area, flags) -> {
+			CompoundTag tag = new CompoundTag();
+			tag.putUUID("UUID", area.getUuid());
+			tag.putInt("Flags", flags);
+			listTag.add(tag);
+		});
+		return Optional.of(listTag);
 	}
 
 	public void deserializeNBT(AreaManager manager, ListTag listTag) {
@@ -104,5 +110,12 @@ public class RestrictInstance {
 		} else {
 			rules.clear();
 		}
+	}
+
+	public boolean onRemove(Area area) {
+		if (rules == null) {
+			return false;
+		}
+		return rules.removeInt(area) != 0;
 	}
 }

@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -26,10 +27,10 @@ import snownee.loquat.command.LoquatCommand;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
-import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.loquat.spawner.LycheeCompat;
 import snownee.loquat.spawner.SpawnMobAction;
 import snownee.loquat.spawner.SpawnerLoader;
+import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.lychee.PostActionTypes;
 
 public class CommonProxy implements ModInitializer {
@@ -110,6 +111,9 @@ public class CommonProxy implements ModInitializer {
 		});
 		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
 			AreaManager.of(destination).playerChangedWorld(player, origin);
+		});
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			AreaManager.of(handler.player.getLevel()).playerJoined(handler.player);
 		});
 	}
 }
