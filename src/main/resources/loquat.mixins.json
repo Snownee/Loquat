@@ -6,6 +6,7 @@
   "refmap": "loquat.refmap.json",
   "mixins": [
     "CommandsMixin",
+    "EntityMixin",
     "JigsawPlacementMixin",
     "JigsawStructureMixin",
     "MobMixin",

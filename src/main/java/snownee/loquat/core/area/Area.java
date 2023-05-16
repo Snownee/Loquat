@@ -29,6 +29,7 @@ import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public abstract class Area {
 	@Getter
@@ -156,6 +157,8 @@ public abstract class Area {
 		}
 		return attachedData;
 	}
+
+	public abstract Optional<VoxelShape> getVoxelShape();
 
 	public static abstract class Type<T extends Area> {
 		public abstract T deserialize(CompoundTag data);

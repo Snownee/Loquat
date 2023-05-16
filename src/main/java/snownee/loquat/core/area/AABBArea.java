@@ -1,5 +1,6 @@
 package snownee.loquat.core.area;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.util.AABBSerializer;
 import snownee.loquat.util.LoquatUtil;
@@ -99,6 +102,11 @@ public class AABBArea extends Area {
 	}
 
 	@Override
+	public Optional<VoxelShape> getVoxelShape() {
+		return Optional.of(Shapes.create(aabb));
+	}
+
+	@Override
 	public LongCollection getChunksIn() {
 		int minX = SectionPos.blockToSectionCoord(aabb.minX);
 		int minZ = SectionPos.blockToSectionCoord(aabb.minZ);
@@ -115,6 +123,7 @@ public class AABBArea extends Area {
 		}
 		return list;
 	}
+
 
 	@Override
 	public Area.Type<?> getType() {

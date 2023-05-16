@@ -29,7 +29,7 @@ public class RestrictInstance {
 	private Object2IntMap<Area> rules;
 
 	public static RestrictInstance of(ServerPlayer player) {
-		return ((LoquatServerPlayer) player).loquat$getRestrictionManager();
+		return ((LoquatServerPlayer) player).loquat$getRestrictionInstance();
 	}
 
 	public static RestrictInstance of(ServerLevel level, String player) {
@@ -42,7 +42,7 @@ public class RestrictInstance {
 
 	public void restrict(Area area, RestrictCommand.RestrictBehavior behavior, boolean restricted) {
 		if (rules == null) {
-			rules = new Object2IntOpenHashMap<>();
+			rules = new Object2IntLinkedOpenHashMap<>();
 		}
 		rules.computeInt(area, (k, v) -> {
 			int flags = v == null ? 0 : v;
@@ -98,8 +98,12 @@ public class RestrictInstance {
 		});
 	}
 
-	public void getAllRules(BiConsumer<Area, Integer> consumer) {
-		Stream.concat(rules == null ? Stream.empty() : rules.keySet().stream(), fallback == null || fallback.rules == null ? Stream.empty() : fallback.rules.keySet().stream()).distinct().forEach(area -> {
+	public Stream<Area> areaStream() {
+		return Stream.concat(rules == null ? Stream.empty() : rules.keySet().stream(), fallback == null || fallback.rules == null ? Stream.empty() : fallback.rules.keySet().stream()).distinct();
+	}
+
+	public void forEachRules(BiConsumer<Area, Integer> consumer) {
+		areaStream().forEach(area -> {
 			consumer.accept(area, getFlags(area));
 		});
 	}
@@ -117,5 +121,9 @@ public class RestrictInstance {
 			return false;
 		}
 		return rules.removeInt(area) != 0;
+	}
+
+	public boolean isEmpty() {
+		return (rules == null || rules.isEmpty()) && (fallback == null || fallback.isEmpty());
 	}
 }

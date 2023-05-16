@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -27,7 +26,7 @@ public class SSyncRestrictionPacket extends PacketHandler {
 		I.send(player, buf -> {
 			var manager = RestrictInstance.of(player);
 			ListTag listTag = new ListTag();
-			manager.getAllRules((area, flags) -> {
+			manager.forEachRules((area, flags) -> {
 				CompoundTag areaTag = new CompoundTag();
 				areaTag.putString("Type", LoquatRegistries.AREA.getKey(area.getType()).toString());
 				((Area.Type) area.getType()).serialize(areaTag, area);
@@ -42,13 +41,10 @@ public class SSyncRestrictionPacket extends PacketHandler {
 
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
-		var player = Minecraft.getInstance().player;
-		if (player == null)
-			return null;
 		var manager = LoquatClient.restrictInstance;
 		manager.resetForClient();
 		var tag = Objects.requireNonNull(buf.readNbt());
-		Object2IntMap<Area> rules = manager.getRules();
+		Object2IntMap<Area> rules = Objects.requireNonNull(manager.getRules());
 		AreaManager.loadAreas(tag.getList("0", Tag.TAG_COMPOUND), (area, areaTag) -> {
 			rules.put(area, areaTag.getInt("Flags"));
 		});

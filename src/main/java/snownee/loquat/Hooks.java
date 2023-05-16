@@ -5,7 +5,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableObject;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 
 import net.minecraft.client.Minecraft;
@@ -21,9 +23,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import snownee.loquat.command.RestrictCommand;
 import snownee.loquat.core.AreaManager;
+import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
+import snownee.loquat.duck.LoquatServerPlayer;
 import snownee.loquat.duck.LoquatStructurePiece;
 import snownee.loquat.network.CRequestOutlinesPacket;
 import snownee.loquat.network.CSelectAreaPacket;
@@ -94,9 +103,10 @@ public interface Hooks {
 		}
 	}
 
-	static void tickServerPlayer(ServerPlayer player, Set<Area> areasIn) {
+	static void tickServerPlayer(ServerPlayer player, LoquatServerPlayer loquatPlayer) {
 		AreaManager manager = AreaManager.of(player.getLevel());
 		long chunkPos = ChunkPos.asLong(player.blockPosition());
+		Set<Area> areasIn = loquatPlayer.loquat$getAreasIn();
 		Streams.concat(manager.byChunk(chunkPos), areasIn.stream()).distinct().toList().forEach(area -> {
 			boolean inside = area.contains(player.getBoundingBox());
 			if (inside && areasIn.add(area)) {
@@ -117,6 +127,45 @@ public interface Hooks {
 	static void postPlaceStructure(ServerLevel serverLevel, ChunkPos chunkPos, ChunkPos chunkPos2) {
 		ChunkPos.rangeClosed(chunkPos, chunkPos2).forEach(chunkPos3 -> {
 			serverLevel.getChunkSource().removeRegionTicket(LoquatPlacements.TICKET_TYPE, chunkPos3, 1, chunkPos3);
+		});
+	}
+
+	static void collideWithLoquatAreas(RestrictInstance restrictInstance, AABB collisionBox, Vec3 motion, ImmutableList.Builder<VoxelShape> builder) {
+		if (restrictInstance.isEmpty()) {
+			return;
+		}
+		MutableObject<Area> areaIn = new MutableObject<>();
+		restrictInstance.areaStream().filter(area -> {
+			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.EXIT) && area.contains(collisionBox);
+		}).findFirst().filter(area -> {
+			areaIn.setValue(area);
+			return true;
+		}).flatMap(Area::getVoxelShape).ifPresent(shape -> {
+			shape = Shapes.join(shape, Shapes.INFINITY, BooleanOp.ONLY_SECOND);
+			builder.add(shape);
+		});
+		AABB expanded = collisionBox.expandTowards(motion);
+		restrictInstance.areaStream().filter(area -> {
+			return !area.equals(areaIn.getValue()) && restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.ENTER) && area.intersects(expanded);
+		}).forEach(area -> {
+			area.getVoxelShape().ifPresent(builder::add);
+		});
+	}
+
+	static boolean teleportServerPlayer(ServerPlayer player, LoquatServerPlayer loquatServerPlayer, double x, double y, double z) {
+		RestrictInstance restrictInstance = RestrictInstance.of(player);
+		if (restrictInstance.isEmpty()) {
+			return false;
+		}
+		Vec3 pos = player.position();
+		AABB expected = player.getBoundingBox().move(x - pos.x, y - pos.y, z - pos.z);
+		if (restrictInstance.areaStream().filter(area -> {
+			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.EXIT) && area.contains(player.getBoundingBox());
+		}).findFirst().map(area -> !area.contains(expected)).orElse(false)) {
+			return true;
+		}
+		return restrictInstance.areaStream().anyMatch(area -> {
+			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(expected);
 		});
 	}
 }

@@ -10,8 +10,8 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -112,8 +112,10 @@ public class CommonProxy implements ModInitializer {
 		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
 			AreaManager.of(destination).playerChangedWorld(player, origin);
 		});
-		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			AreaManager.of(handler.player.getLevel()).playerJoined(handler.player);
+		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+			if (entity instanceof ServerPlayer player) {
+				AreaManager.of(world).playerLoaded(player);
+			}
 		});
 	}
 }

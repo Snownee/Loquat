@@ -22,13 +22,21 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 	private final Set<Area> loquat$areasIn = Sets.newHashSet();
 	private RestrictInstance loquat$restriction;
 
-	@Inject(at = @At("HEAD"), method = "doTick")
+
+	@Inject(method = "doTick", at = @At("HEAD"))
 	private void loquat$doTick(CallbackInfo ci) {
 		ServerPlayer player = (ServerPlayer) (Object) this;
 		if (player.tickCount % 20 != 0) {
 			return;
 		}
-		Hooks.tickServerPlayer(player, loquat$areasIn);
+		Hooks.tickServerPlayer(player, this);
+	}
+
+	@Inject(method = "teleportTo(DDD)V", at = @At("HEAD"), cancellable = true)
+	private void loquat$teleportTo(double x, double y, double z, CallbackInfo ci) {
+		if (Hooks.teleportServerPlayer((ServerPlayer) (Object) this, this, x, y, z)) {
+			ci.cancel();
+		}
 	}
 
 	@Override
@@ -37,11 +45,18 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 	}
 
 	@Override
-	public RestrictInstance loquat$getRestrictionManager() {
+	public RestrictInstance loquat$getRestrictionInstance() {
 		if (loquat$restriction == null) {
 			ServerPlayer player = (ServerPlayer) (Object) this;
 			loquat$restriction = AreaManager.of(player.getLevel()).getOrCreateRestrictInstance(player.getScoreboardName());
 		}
 		return loquat$restriction;
 	}
+
+	@Override
+	public void loquat$reset() {
+		loquat$areasIn.clear();
+		loquat$restriction = null;
+	}
+
 }

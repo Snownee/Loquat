@@ -31,12 +31,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import snownee.loquat.Loquat;
-import snownee.loquat.LoquatConfig;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.AreaManagerContainer;
+import snownee.loquat.duck.LoquatServerPlayer;
 import snownee.loquat.network.SOutlinesPacket;
 import snownee.loquat.network.SSyncRestrictionPacket;
 
@@ -207,19 +207,23 @@ public class AreaManager extends SavedData {
 		events.removeIf(e -> e.getArea() == area);
 		pendingEvents.removeIf(e -> e.getArea() == area);
 		boolean notifyAll = fallbackRestriction.onRemove(area);
+		Set<String> names = notifyAll ? null : Sets.newHashSet();
 		restrictions.forEach((key, restriction) -> {
 			if (restriction == fallbackRestriction) {
 				return;
 			}
 			if (restriction.onRemove(area) && !notifyAll) {
-				ServerPlayer player = level.getServer().getPlayerList().getPlayerByName(key);
-				if (player != null) {
-					SSyncRestrictionPacket.sync(player);
-				}
+				names.add(key);
 			}
 		});
 		if (notifyAll) {
 			level.getServer().getPlayerList().getPlayers().forEach(SSyncRestrictionPacket::sync);
+		} else {
+			for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
+				if (names.contains(player.getScoreboardName())) {
+					SSyncRestrictionPacket.sync(player);
+				}
+			}
 		}
 		boundsCache.remove(area.getBounds());
 		area.getChunksIn().forEach(chunk -> {
@@ -322,14 +326,14 @@ public class AreaManager extends SavedData {
 	}
 
 	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
-		if (!LoquatConfig.debug)
-			SelectionManager.of(player).reset(player);
+		SelectionManager.of(player).reset(player);
+		((LoquatServerPlayer) player).loquat$reset();
 		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
 		SSyncRestrictionPacket.sync(player);
 	}
 
-	public void playerJoined(ServerPlayer player) {
+	public void playerLoaded(ServerPlayer player) {
 		SSyncRestrictionPacket.sync(player);
 	}
 

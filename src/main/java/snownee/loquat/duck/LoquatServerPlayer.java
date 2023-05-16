@@ -9,5 +9,7 @@ public interface LoquatServerPlayer {
 
 	Set<Area> loquat$getAreasIn();
 
-	RestrictInstance loquat$getRestrictionManager();
+	RestrictInstance loquat$getRestrictionInstance();
+
+	void loquat$reset();
 }
