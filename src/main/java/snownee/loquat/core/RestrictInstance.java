@@ -11,11 +11,15 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import snownee.loquat.command.RestrictCommand;
+import net.minecraft.world.entity.player.Player;
+import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.duck.LoquatServerPlayer;
 
@@ -28,8 +32,13 @@ public class RestrictInstance {
 	@Getter
 	private Object2IntMap<Area> rules;
 
-	public static RestrictInstance of(ServerPlayer player) {
-		return ((LoquatServerPlayer) player).loquat$getRestrictionInstance();
+	public static RestrictInstance of(Player player) {
+		if (player instanceof LoquatServerPlayer) {
+			return ((LoquatServerPlayer) player).loquat$getRestrictionInstance();
+		} else if (player.level.isClientSide && Minecraft.getInstance().player == player) {
+			return LoquatClient.get().restrictInstance;
+		}
+		throw new IllegalArgumentException("Unknown player type: " + player);
 	}
 
 	public static RestrictInstance of(ServerLevel level, String player) {
@@ -40,7 +49,7 @@ public class RestrictInstance {
 		return manager.getOrCreateRestrictInstance(player);
 	}
 
-	public void restrict(Area area, RestrictCommand.RestrictBehavior behavior, boolean restricted) {
+	public void restrict(Area area, RestrictBehavior behavior, boolean restricted) {
 		if (rules == null) {
 			rules = new Object2IntLinkedOpenHashMap<>();
 		}
@@ -62,8 +71,14 @@ public class RestrictInstance {
 		return rules.getInt(area);
 	}
 
-	public boolean isRestricted(Area area, RestrictCommand.RestrictBehavior behavior) {
+	public boolean isRestricted(Area area, RestrictBehavior behavior) {
 		return (getFlags(area) & (1 << behavior.ordinal())) != 0;
+	}
+
+	public boolean isRestricted(BlockPos pos, RestrictBehavior behavior) {
+		return areaStream().anyMatch(area -> {
+			return isRestricted(area, RestrictInstance.RestrictBehavior.PLACE) && area.contains(pos);
+		});
 	}
 
 	public Optional<ListTag> serializeNBT(AreaManager manager) {
@@ -125,5 +140,24 @@ public class RestrictInstance {
 
 	public boolean isEmpty() {
 		return (rules == null || rules.isEmpty()) && (fallback == null || fallback.isEmpty());
+	}
+
+	public enum RestrictBehavior {
+		ENTER("enter"),
+		EXIT("exit"),
+		DESTROY("destroy"),
+		PLACE("place"),
+		;
+
+		public static final RestrictBehavior[] VALUES = values();
+		public final String name;
+
+		RestrictBehavior(String name) {
+			this.name = name;
+		}
+
+		public MutableComponent getDisplayName() {
+			return Component.translatable("loquat.restrict.behavior." + name);
+		}
 	}
 }

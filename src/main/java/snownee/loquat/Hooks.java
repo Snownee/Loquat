@@ -27,7 +27,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import snownee.loquat.command.RestrictCommand;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -136,7 +135,7 @@ public interface Hooks {
 		}
 		MutableObject<Area> areaIn = new MutableObject<>();
 		restrictInstance.areaStream().filter(area -> {
-			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.EXIT) && area.contains(collisionBox);
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(collisionBox);
 		}).findFirst().filter(area -> {
 			areaIn.setValue(area);
 			return true;
@@ -146,7 +145,7 @@ public interface Hooks {
 		});
 		AABB expanded = collisionBox.expandTowards(motion);
 		restrictInstance.areaStream().filter(area -> {
-			return !area.equals(areaIn.getValue()) && restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.ENTER) && area.intersects(expanded);
+			return !area.equals(areaIn.getValue()) && restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && area.intersects(expanded);
 		}).forEach(area -> {
 			area.getVoxelShape().ifPresent(builder::add);
 		});
@@ -160,12 +159,13 @@ public interface Hooks {
 		Vec3 pos = player.position();
 		AABB expected = player.getBoundingBox().move(x - pos.x, y - pos.y, z - pos.z);
 		if (restrictInstance.areaStream().filter(area -> {
-			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.EXIT) && area.contains(player.getBoundingBox());
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(player.getBoundingBox());
 		}).findFirst().map(area -> !area.contains(expected)).orElse(false)) {
 			return true;
 		}
 		return restrictInstance.areaStream().anyMatch(area -> {
-			return restrictInstance.isRestricted(area, RestrictCommand.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(expected);
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(expected);
 		});
 	}
+
 }

@@ -29,12 +29,13 @@ import snownee.loquat.util.RenderUtil;
 
 public class LoquatClient {
 
-	public static final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
-	public static final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
-	public static final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
-	public static final RestrictInstance restrictInstance = new RestrictInstance();
+	private static final LoquatClient INSTANCE = new LoquatClient();
+	public final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
+	public final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
+	public final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
+	public final RestrictInstance restrictInstance = new RestrictInstance();
 
-	static {
+	private LoquatClient() {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
 			var aabb = ((AABBArea) data.area).getAabb().inflate(0.01).move(ctx.pos);
 			var color = data.type.color;
@@ -50,7 +51,11 @@ public class LoquatClient {
 		});
 	}
 
-	public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource, Vec3 pos) {
+	public static LoquatClient get() {
+		return INSTANCE;
+	}
+
+	public void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource, Vec3 pos) {
 		ClientLevel level = Minecraft.getInstance().level;
 		LocalPlayer player = Minecraft.getInstance().player;
 		if (level == null || player == null) {
@@ -71,7 +76,7 @@ public class LoquatClient {
 		}
 	}
 
-	private static void renderAreas(RenderDebugContext context, ClientLevel level, LocalPlayer player, Map<UUID, RenderDebugData> outlines) {
+	private void renderAreas(RenderDebugContext context, ClientLevel level, LocalPlayer player, Map<UUID, RenderDebugData> outlines) {
 		outlines.values().removeIf(data -> context.time >= data.expire);
 		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
@@ -108,14 +113,14 @@ public class LoquatClient {
 		}
 	}
 
-	private static void renderSelections(RenderDebugContext context, ClientLevel level, List<PosSelection> selections) {
+	private void renderSelections(RenderDebugContext context, ClientLevel level, List<PosSelection> selections) {
 		for (PosSelection selection : selections) {
 			AABB aabb = selection.toAABB().inflate(0.01);
 			RenderUtil.renderLineBox(aabb.move(context.pos), 0.4F, 0.4F, 1, 1);
 		}
 	}
 
-	public static void clearDebugAreas() {
+	public void clearDebugAreas() {
 		normalOutlines.clear();
 	}
 

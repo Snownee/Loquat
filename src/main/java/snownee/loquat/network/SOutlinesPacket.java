@@ -40,12 +40,13 @@ public class SOutlinesPacket extends PacketHandler {
 		if (expire == Long.MIN_VALUE) {
 			expire = level.getGameTime() + 10;
 		}
+		LoquatClient client = LoquatClient.get();
 		boolean clear = buf.readBoolean();
 		if (clear) {
-			LoquatClient.clearDebugAreas();
+			client.clearDebugAreas();
 		}
 		boolean highlight = buf.readBoolean();
-		var outlines = highlight ? LoquatClient.highlightOutlines : LoquatClient.normalOutlines;
+		var outlines = highlight ? client.highlightOutlines : client.normalOutlines;
 		CompoundTag tag = buf.readNbt();
 		for (Area area : AreaManager.loadAreas(tag.getList("0", Tag.TAG_COMPOUND))) {
 			var debugData = outlines.get(area.getUuid());

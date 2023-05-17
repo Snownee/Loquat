@@ -77,7 +77,7 @@ public class NearbyCommand {
 
 	private static void printRestrictions(List<MutableComponent> lines, RestrictInstance restrictInstance, Area area, String key) {
 		List<MutableComponent> behaviors = Lists.newArrayList();
-		for (RestrictCommand.RestrictBehavior behavior : RestrictCommand.RestrictBehavior.VALUES) {
+		for (RestrictInstance.RestrictBehavior behavior : RestrictInstance.RestrictBehavior.VALUES) {
 			if (restrictInstance.isRestricted(area, behavior)) {
 				behaviors.add(behavior.getDisplayName().withStyle(ChatFormatting.RED));
 			}

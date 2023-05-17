@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -28,6 +29,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.phys.AABB;
 import snownee.loquat.Loquat;
@@ -52,9 +54,9 @@ public class AreaManager extends SavedData {
 	private final Long2ObjectOpenHashMap<Set<Area>> chunkLookup = new Long2ObjectOpenHashMap<>();
 	@Getter
 	private final RestrictInstance fallbackRestriction = new RestrictInstance();
+	private final Map<String, RestrictInstance> restrictions = Maps.newHashMap();
 	private ServerLevel level;
 	private boolean ticking;
-	private Map<String, RestrictInstance> restrictions = Maps.newHashMap();
 
 	public AreaManager() {
 		restrictions.put("*", fallbackRestriction);
@@ -196,6 +198,10 @@ public class AreaManager extends SavedData {
 
 	public Stream<Area> byChunk(long chunkPos) {
 		return chunkLookup.getOrDefault(chunkPos, Set.of()).stream();
+	}
+
+	public Stream<Area> byPosition(BlockPos pos) {
+		return byChunk(ChunkPos.asLong(pos)).filter(a -> a.contains(pos));
 	}
 
 	public boolean remove(UUID uuid) {

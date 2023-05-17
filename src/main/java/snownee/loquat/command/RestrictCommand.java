@@ -13,7 +13,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
@@ -24,7 +23,7 @@ public class RestrictCommand extends LoquatCommand {
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		var builder = Commands.argument("players", ScoreHolderArgument.scoreHolders());
 		builder.then(register("*"));
-		for (var behavior : RestrictBehavior.values()) {
+		for (var behavior : RestrictInstance.RestrictBehavior.values()) {
 			builder.then(register(behavior.name));
 		}
 		return Commands.literal("restrict").then(builder);
@@ -52,7 +51,7 @@ public class RestrictCommand extends LoquatCommand {
 		forEachSelected(source, (area, manager) -> {
 			for (var player : names) {
 				var restrictions = RestrictInstance.of(source.getLevel(), player);
-				for (RestrictBehavior restrictBehavior : RestrictBehavior.VALUES) {
+				for (RestrictInstance.RestrictBehavior restrictBehavior : RestrictInstance.RestrictBehavior.VALUES) {
 					if (behavior.equals("*") || behavior.equals(restrictBehavior.name)) {
 						restrictions.restrict(area, restrictBehavior, value);
 						changed.increment();
@@ -75,25 +74,6 @@ public class RestrictCommand extends LoquatCommand {
 		}
 		ctx.getSource().sendSuccess(Component.translatable("loquat.command.restrict.success", changed.intValue()), true);
 		return players.size();
-	}
-
-	public enum RestrictBehavior {
-		ENTER("enter"),
-		EXIT("exit"),
-		BREAK("break"),
-		PLACE("place"),
-		;
-
-		public static final RestrictBehavior[] VALUES = values();
-		private final String name;
-
-		RestrictBehavior(String name) {
-			this.name = name;
-		}
-
-		public MutableComponent getDisplayName() {
-			return Component.translatable("loquat.restrict.behavior." + name);
-		}
 	}
 
 }
