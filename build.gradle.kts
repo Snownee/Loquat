@@ -54,6 +54,7 @@ dependencies {
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
     modImplementation("maven.modrinth:jade:ZASePpsm")
+    modImplementation("maven.modrinth:lithium:m6sVgAi6")
     modImplementation("maven.modrinth:huge-structure-blocks:OsfLOdQa")
 
     modImplementation("dev.latvian.mods:kubejs-fabric:1902.6.0-build.119")

@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.server.level.ServerPlayer;
 import snownee.loquat.Hooks;
+import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -26,7 +27,7 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 	@Inject(method = "doTick", at = @At("HEAD"))
 	private void loquat$doTick(CallbackInfo ci) {
 		ServerPlayer player = (ServerPlayer) (Object) this;
-		if (player.tickCount % 20 != 0) {
+		if (player.tickCount % LoquatConfig.postionCheckInterval != 0) {
 			return;
 		}
 		Hooks.tickServerPlayer(player, this);

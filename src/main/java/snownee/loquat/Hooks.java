@@ -3,11 +3,12 @@ package snownee.loquat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.AABB;
@@ -129,25 +133,28 @@ public interface Hooks {
 		});
 	}
 
-	static void collideWithLoquatAreas(RestrictInstance restrictInstance, AABB collisionBox, Vec3 motion, ImmutableList.Builder<VoxelShape> builder) {
-		if (restrictInstance.isEmpty()) {
+	static void collideWithLoquatAreas(@Nullable Entity entity, AABB expanded, Consumer<VoxelShape> consumer) {
+		if (entity == null || entity.getType() != EntityType.PLAYER) {
+			return;
+		}
+		RestrictInstance instance = RestrictInstance.of((Player) entity);
+		if (instance.isEmpty()) {
 			return;
 		}
 		MutableObject<Area> areaIn = new MutableObject<>();
-		restrictInstance.areaStream().filter(area -> {
-			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(collisionBox);
+		instance.areaStream().filter(area -> {
+			return instance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(entity.getBoundingBox());
 		}).findFirst().filter(area -> {
 			areaIn.setValue(area);
 			return true;
 		}).flatMap(Area::getVoxelShape).ifPresent(shape -> {
 			shape = Shapes.join(shape, Shapes.INFINITY, BooleanOp.ONLY_SECOND);
-			builder.add(shape);
+			consumer.accept(shape);
 		});
-		AABB expanded = collisionBox.expandTowards(motion);
-		restrictInstance.areaStream().filter(area -> {
-			return !area.equals(areaIn.getValue()) && restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && area.intersects(expanded);
+		instance.areaStream().filter(area -> {
+			return !area.equals(areaIn.getValue()) && instance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && area.intersects(expanded);
 		}).forEach(area -> {
-			area.getVoxelShape().ifPresent(builder::add);
+			area.getVoxelShape().ifPresent(consumer);
 		});
 	}
 

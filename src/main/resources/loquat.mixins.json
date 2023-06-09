@@ -21,7 +21,8 @@
     "fabric.DifficultyLoaderMixin",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin",
-    "fabric.ZombieMixin"
+    "fabric.ZombieMixin",
+    "lithium.LithiumEntityCollisionsMixin"
   ],
   "client": [
     "client.MultiPlayerGameModeMixin",

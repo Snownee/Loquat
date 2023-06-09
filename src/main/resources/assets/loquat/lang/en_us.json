@@ -38,5 +38,5 @@
   "loquat.restrict.behavior.enter": "enter",
   "loquat.restrict.behavior.exit": "exit",
   "loquat.restrict.behavior.place": "place",
-  "loquat.restrict.behavior.break": "break"
+  "loquat.restrict.behavior.destroy": "destroy"
 }
