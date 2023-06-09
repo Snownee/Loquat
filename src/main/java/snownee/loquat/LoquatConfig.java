@@ -13,6 +13,10 @@ public class LoquatConfig {
 	@KiwiConfig.Path("debug.enable")
 	public static boolean debug;
 
+	@KiwiConfig.Path("general.nearbyRange")
+	@KiwiConfig.Range(min = 1)
+	public static int nearbyRange = 100;
+
 	@KiwiConfig.Path("general.selectionItem")
 	public static String selectionItemId = "minecraft:spectral_arrow";
 
