@@ -38,7 +38,11 @@
   "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
   "loquat.msg.shiftUseStructureBlock": "Cleared structure",
   "loquat.restrict.behavior.enter": "enter",
+  "loquat.restrict.behavior.enter.notification": "You can't enter this area right now.",
   "loquat.restrict.behavior.exit": "exit",
+  "loquat.restrict.behavior.exit.notification": "You can't leave this area right now.",
   "loquat.restrict.behavior.place": "place",
-  "loquat.restrict.behavior.destroy": "destroy"
+  "loquat.restrict.behavior.place.notification": "You can't place blocks in this area right now.",
+  "loquat.restrict.behavior.destroy": "destroy",
+  "loquat.restrict.behavior.destroy.notification": "You can't destroy blocks in this area right now."
 }

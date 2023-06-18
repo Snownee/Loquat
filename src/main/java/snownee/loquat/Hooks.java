@@ -31,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -141,11 +142,15 @@ public interface Hooks {
 		if (instance.isEmpty()) {
 			return;
 		}
+		MutableObject<RestrictInstance.RestrictBehavior> behavior = new MutableObject<>();
 		MutableObject<Area> areaIn = new MutableObject<>();
 		instance.areaStream().filter(area -> {
 			return instance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(entity.getBoundingBox());
 		}).findFirst().filter(area -> {
 			areaIn.setValue(area);
+			if (!area.contains(entity.getBoundingBox().inflate(0.1))) {
+				behavior.setValue(RestrictInstance.RestrictBehavior.EXIT);
+			}
 			return true;
 		}).flatMap(Area::getVoxelShape).ifPresent(shape -> {
 			shape = Shapes.join(shape, Shapes.INFINITY, BooleanOp.ONLY_SECOND);
@@ -155,7 +160,11 @@ public interface Hooks {
 			return !area.equals(areaIn.getValue()) && instance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && area.intersects(expanded);
 		}).forEach(area -> {
 			area.getVoxelShape().ifPresent(consumer);
+			behavior.setValue(RestrictInstance.RestrictBehavior.ENTER);
 		});
+		if (behavior.getValue() != null && ((Player) entity).isLocalPlayer()) {
+			LoquatClient.get().notifyRestriction(behavior.getValue());
+		}
 	}
 
 	static boolean teleportServerPlayer(ServerPlayer player, LoquatServerPlayer loquatServerPlayer, double x, double y, double z) {

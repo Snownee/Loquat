@@ -22,9 +22,9 @@ public class LoquatConfig {
 
 	public static Item selectionItem = Items.SPECTRAL_ARROW;
 
-	@KiwiConfig.Path("restrict.postionCheckInterval")
+	@KiwiConfig.Path("restrict.positionCheckInterval")
 	@KiwiConfig.Range(min = 1)
-	public static int postionCheckInterval = 20;
+	public static int positionCheckInterval = 20;
 
 	public static void onChanged(String path) {
 		if ("general.selectionItem".equals(path)) {

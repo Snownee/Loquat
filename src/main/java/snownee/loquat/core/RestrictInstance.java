@@ -159,5 +159,9 @@ public class RestrictInstance {
 		public MutableComponent getDisplayName() {
 			return Component.translatable("loquat.restrict.behavior." + name);
 		}
+
+		public MutableComponent getNotificationMessage() {
+			return Component.translatable("loquat.restrict.behavior." + name + ".notification");
+		}
 	}
 }

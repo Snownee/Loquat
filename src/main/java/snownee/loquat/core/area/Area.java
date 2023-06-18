@@ -34,9 +34,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public abstract class Area {
 	@Getter
-	private final Set<String> tags = new LinkedHashSet<>();
+	private final Set<String> tags = new LinkedHashSet<>(4);
 	@Getter
-	private final Map<String, Zone> zones = new HashMap<>();
+	private final Map<String, Zone> zones = new HashMap<>(2);
 	@Getter
 	@Setter
 	@Nullable

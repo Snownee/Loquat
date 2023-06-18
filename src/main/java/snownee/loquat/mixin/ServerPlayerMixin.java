@@ -27,7 +27,7 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 	@Inject(method = "doTick", at = @At("HEAD"))
 	private void loquat$doTick(CallbackInfo ci) {
 		ServerPlayer player = (ServerPlayer) (Object) this;
-		if (player.tickCount % LoquatConfig.postionCheckInterval != 0) {
+		if (player.tickCount % LoquatConfig.positionCheckInterval != 0) {
 			return;
 		}
 		Hooks.tickServerPlayer(player, this);

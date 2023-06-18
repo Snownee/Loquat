@@ -8,9 +8,11 @@ import java.util.function.BiConsumer;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import com.google.common.math.LongMath;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -34,6 +36,7 @@ public class LoquatClient {
 	public final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
 	public final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
 	public final RestrictInstance restrictInstance = new RestrictInstance();
+	private long lastNotifyRestrictionTime = Long.MIN_VALUE;
 
 	private LoquatClient() {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
@@ -53,6 +56,15 @@ public class LoquatClient {
 
 	public static LoquatClient get() {
 		return INSTANCE;
+	}
+
+	public void notifyRestriction(RestrictInstance.RestrictBehavior behavior) {
+		long millis = Util.getMillis();
+		if (LongMath.saturatedSubtract(millis, lastNotifyRestrictionTime) < 500) {
+			return;
+		}
+		lastNotifyRestrictionTime = millis;
+		Minecraft.getInstance().getChatListener().handleSystemMessage(behavior.getNotificationMessage(), true);
 	}
 
 	public void render(PoseStack matrixStack, MultiBufferSource.BufferSource bufferSource, Vec3 pos) {
