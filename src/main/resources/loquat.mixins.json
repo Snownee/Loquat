@@ -2,9 +2,11 @@
   "required": true,
   "minVersion": "0.8",
   "package": "snownee.loquat.mixin",
+  "plugin": "snownee.loquat.mixin.MixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "loquat.refmap.json",
   "mixins": [
+    "kubejs.AreaKubeJSMixin",
     "BlockItemMixin",
     "CommandsMixin",
     "EntityMixin",
