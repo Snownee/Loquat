@@ -1,10 +1,11 @@
 package snownee.loquat.core.area;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public abstract class Area {
 	@Getter
-	private final List<String> tags = new ArrayList<>();
+	private final Set<String> tags = new LinkedHashSet<>();
 	@Getter
 	private final Map<String, Zone> zones = new HashMap<>();
 	@Getter
