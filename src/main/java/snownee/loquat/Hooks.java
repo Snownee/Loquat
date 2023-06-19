@@ -14,8 +14,11 @@ import com.google.common.collect.Streams;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -26,6 +29,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -89,7 +93,7 @@ public interface Hooks {
 			if (settings.getBoundingBox() != null && !AABB.of(settings.getBoundingBox()).contains(area.getOrigin())) {
 				continue;
 			}
-			LoquatStructurePiece piece = LoquatStructurePiece.CURRENT.get();
+			LoquatStructurePiece piece = LoquatStructurePiece.current();
 			if (piece != null && piece.loquat$getAttachedData() != null) {
 				CompoundTag data = piece.loquat$getAttachedData();
 				if (data.contains("Tags")) {
@@ -183,4 +187,17 @@ public interface Hooks {
 		});
 	}
 
+	static void addDynamicProcessors(StructurePlaceSettings settings, RegistryAccess registryAccess, CompoundTag data, String key) {
+		if (!data.contains(key)) {
+			return;
+		}
+		ListTag list = data.getList(key, Tag.TAG_STRING);
+		for (int i = 0; i < list.size(); i++) {
+			String s = list.getString(i);
+			StructureProcessorList processorList = registryAccess.registryOrThrow(Registry.PROCESSOR_LIST_REGISTRY).getOptional(ResourceLocation.tryParse(s)).orElseThrow(() -> {
+				return new IllegalStateException("Unknown processor list: " + s);
+			});
+			processorList.list().forEach(settings::addProcessor);
+		}
+	}
 }

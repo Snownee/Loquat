@@ -6,7 +6,6 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "loquat.refmap.json",
   "mixins": [
-    "kubejs.AreaKubeJSMixin",
     "BlockItemMixin",
     "CommandsMixin",
     "EntityMixin",
@@ -19,11 +18,13 @@
     "ServerLevelMixin",
     "ServerPlayerMixin",
     "SinglePoolElementAccess",
+    "SinglePoolElementMixin",
     "StructureTemplateMixin",
     "fabric.DifficultyLoaderMixin",
     "fabric.SlimeMixin",
     "fabric.SpawnerLoaderMixin",
     "fabric.ZombieMixin",
+    "kubejs.AreaKubeJSMixin",
     "lithium.LithiumEntityCollisionsMixin"
   ],
   "client": [

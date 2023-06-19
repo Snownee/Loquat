@@ -19,7 +19,8 @@ ServerEvents.recipes(event => {
 			$.minEdgeDistance = 8;
 		});
 		rooms[random.nextInt(rooms.length)].addChild("door", "loquat:treasure");
-		lastNode.addChild("door", "loquat:end");
+		lastNode = lastNode.addChild("door", "loquat:end");
+		lastNode.lowPriorityProcessors.add(ResourceLocation.tryParse('loquat:replace_diamond'))
 		ctx.root.walk($ => {
 			$.tags.add("test")
 			$.fallbackNodeProvider = joint => {

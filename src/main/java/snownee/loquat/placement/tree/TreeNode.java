@@ -24,6 +24,10 @@ public class TreeNode {
 	@Getter
 	private final List<TreeNode> children = ObjectArrayList.of();
 	@Getter
+	private final List<ResourceLocation> lowPriorityProcessors = ObjectArrayList.of();
+	@Getter
+	private final List<ResourceLocation> highPriorityProcessors = ObjectArrayList.of();
+	@Getter
 	@Setter
 	private String uniqueGroup;
 	@Getter

@@ -88,6 +88,16 @@ public class TreeNodePlacer implements LoquatPlacer {
 						if (step.node.getData() != null) {
 							data.put("Data", step.node.getData());
 						}
+						if (!step.node.getLowPriorityProcessors().isEmpty()) {
+							ListTag processors = new ListTag();
+							step.node.getLowPriorityProcessors().stream().map(Object::toString).map(StringTag::valueOf).forEach(processors::add);
+							data.put("LowPriorityProcessors", processors);
+						}
+						if (!step.node.getHighPriorityProcessors().isEmpty()) {
+							ListTag processors = new ListTag();
+							step.node.getHighPriorityProcessors().stream().map(Object::toString).map(StringTag::valueOf).forEach(processors::add);
+							data.put("HighPriorityProcessors", processors);
+						}
 						((LoquatStructurePiece) step.piece).loquat$setAttachedData(data);
 					}
 					structurePiecesBuilder.addPiece(step.piece);
