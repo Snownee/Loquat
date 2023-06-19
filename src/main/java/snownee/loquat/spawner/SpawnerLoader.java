@@ -37,7 +37,7 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 			.registerTypeAdapter(Difficulty.Provider.class, new Difficulty.DifficultyProviderSerializer())
 			.create();
 	public static final SpawnerLoader INSTANCE = new SpawnerLoader("loquat_spawners");
-	private final Map<String, Spawner> spawners = Maps.newHashMap();
+	private final Map<ResourceLocation, Spawner> spawners = Maps.newHashMap();
 
 	public SpawnerLoader(String dir) {
 		super(GSON, dir);
@@ -48,11 +48,11 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 		spawners.clear();
 		map.forEach((id, json) -> {
 			Fragments.INSTANCE.process(json);
-			spawners.put(id.getPath(), GSON.fromJson(json, Spawner.class));
+			spawners.put(id, GSON.fromJson(json, Spawner.class));
 		});
 	}
 
-	public void spawn(String spawnerId, @Nullable String difficultyId, ServerLevel world, Area area) {
+	public void spawn(ResourceLocation spawnerId, @Nullable String difficultyId, ServerLevel world, Area area) {
 		Spawner spawner = get(spawnerId);
 		if (difficultyId == null) {
 			difficultyId = spawner.difficulty;
@@ -61,7 +61,7 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 		AreaManager.of(world).addEvent(new SpawnMobAreaEvent(area, spawner, spawnerId, difficulty, difficultyId));
 	}
 
-	public Spawner get(String spawnerId) {
+	public Spawner get(ResourceLocation spawnerId) {
 		return spawners.get(spawnerId);
 	}
 

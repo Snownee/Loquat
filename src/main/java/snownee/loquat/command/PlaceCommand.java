@@ -9,12 +9,12 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.program.PlaceProgram;
+import snownee.loquat.program.PlaceProgramLoader;
 
 public class PlaceCommand extends LoquatCommand {
 
@@ -41,7 +41,7 @@ public class PlaceCommand extends LoquatCommand {
 						)
 				)
 				.then(Commands.literal("selection")
-						.then(Commands.argument("program", StringArgumentType.string())
+						.then(Commands.argument("program", ResourceLocationArgument.id())
 								.executes(ctx -> {
 									var source = ctx.getSource();
 									var program = getProgram(ctx);
@@ -57,9 +57,7 @@ public class PlaceCommand extends LoquatCommand {
 
 	public static PlaceProgram getProgram(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
 		try {
-			PlaceProgram.Type<?> type = LoquatRegistries.PLACE_PROGRAM.get(new ResourceLocation(StringArgumentType.getString(ctx, "program")));
-			Preconditions.checkNotNull(type);
-			PlaceProgram program = type.create();
+			PlaceProgram program = PlaceProgramLoader.INSTANCE.get(ResourceLocationArgument.getId(ctx, "program"));
 			Preconditions.checkNotNull(program);
 			return program;
 		} catch (Exception e) {

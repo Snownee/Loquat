@@ -1,5 +1,7 @@
 package snownee.loquat.program;
 
+import com.google.gson.JsonObject;
+
 import net.minecraft.world.level.Level;
 import snownee.loquat.core.area.Area;
 
@@ -9,7 +11,7 @@ public interface PlaceProgram {
 
 	abstract class Type<T extends PlaceProgram> {
 
-		public abstract T create();
+		public abstract T create(JsonObject asJsonObject);
 
 	}
 

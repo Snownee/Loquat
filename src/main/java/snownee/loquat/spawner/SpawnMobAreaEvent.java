@@ -9,6 +9,7 @@ import com.google.common.math.LongMath;
 
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import snownee.loquat.AreaEventTypes;
@@ -24,7 +25,7 @@ import snownee.lychee.core.post.Delay;
 
 public class SpawnMobAreaEvent extends AreaEvent {
 	@Getter
-	private final String spawnerId;
+	private final ResourceLocation spawnerId;
 	@Getter
 	private final Spawner spawner;
 	private final Difficulty difficulty;
@@ -35,7 +36,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 	private boolean hasTimeout;
 	private long timeoutInTicks;
 
-	public SpawnMobAreaEvent(Area area, Spawner spawner, String spawnerId, Difficulty difficulty, String difficultyId) {
+	public SpawnMobAreaEvent(Area area, Spawner spawner, ResourceLocation spawnerId, Difficulty difficulty, String difficultyId) {
 		super(area);
 		Preconditions.checkNotNull(spawner, "Spawner %s not found", spawnerId);
 		this.spawnerId = spawnerId;
@@ -104,7 +105,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 	public static class Type extends AreaEvent.Type<SpawnMobAreaEvent> {
 		@Override
 		public SpawnMobAreaEvent deserialize(Area area, CompoundTag data) {
-			String spawnerId = data.getString("Spawner");
+			ResourceLocation spawnerId = new ResourceLocation(data.getString("Spawner"));
 			String difficultyId = data.getString("Difficulty");
 			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, SpawnerLoader.INSTANCE.get(spawnerId), spawnerId, DifficultyLoader.INSTANCE.get(difficultyId), difficultyId);
 			event.lastWave = data.getInt("LastWave");
@@ -116,7 +117,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 
 		@Override
 		public CompoundTag serialize(CompoundTag data, SpawnMobAreaEvent event) {
-			data.putString("Spawner", event.spawnerId);
+			data.putString("Spawner", event.spawnerId.toString());
 			data.putString("Difficulty", event.difficultyId);
 			data.putInt("LastWave", event.lastWave);
 			data.putBoolean("HasTimeout", event.hasTimeout);

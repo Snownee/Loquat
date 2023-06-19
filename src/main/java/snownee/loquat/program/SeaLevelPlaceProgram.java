@@ -1,5 +1,7 @@
 package snownee.loquat.program;
 
+import com.google.gson.JsonObject;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +22,7 @@ public class SeaLevelPlaceProgram implements PlaceProgram {
 
 	public static class Type extends PlaceProgram.Type<SeaLevelPlaceProgram> {
 
-		public SeaLevelPlaceProgram create() {
+		public SeaLevelPlaceProgram create(JsonObject asJsonObject) {
 			return INSTANCE;
 		}
 
