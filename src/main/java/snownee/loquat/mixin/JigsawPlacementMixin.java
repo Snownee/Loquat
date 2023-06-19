@@ -50,7 +50,7 @@ public class JigsawPlacementMixin {
 		var defaultStartPos = new BlockPos(k, o, l);
 		AABB aabb = new AABB(k - range, o - range, l - range, k + range + 1, o + range + 1, l + range + 1);
 		VoxelShape defaultValidSpace = Shapes.join(Shapes.create(aabb), Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-		cir.setReturnValue(Optional.of(placer.place(extension.structureId(), context.randomState(), defaultStartPos, defaultValidSpace, range, chunkGenerator, structureTemplateManager, levelHeightAccessor, worldgenRandom, poolRegistry, defaultStartPiece)));
+		cir.setReturnValue(Optional.of(placer.place(extension.structureId(), context, defaultStartPos, defaultValidSpace, range, poolRegistry, defaultStartPiece)));
 	}
 
 }

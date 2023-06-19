@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 100,
+    "separation": 8,
+    "spacing": 15
+  },
+  "structures": [
+    {
+      "structure": "loquat:test",
+      "weight": 1
+    }
+  ]
+}

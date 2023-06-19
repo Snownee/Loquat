@@ -21,12 +21,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.JigsawBlock;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.RandomState;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -66,18 +62,18 @@ public class TreeNodePlacer implements LoquatPlacer {
 	}
 
 	@Override
-	public Structure.GenerationStub place(ResourceLocation structureId, RandomState randomState, BlockPos defaultStartPos, VoxelShape defaultValidSpace, int range, ChunkGenerator chunkGenerator, StructureTemplateManager structureTemplateManager, LevelHeightAccessor levelHeightAccessor, WorldgenRandom worldgenRandom, Registry<StructureTemplatePool> pools, PoolElementStructurePiece defaultStartPiece) {
+	public Structure.GenerationStub place(ResourceLocation structureId, Structure.GenerationContext generationContext, BlockPos defaultStartPos, VoxelShape defaultValidSpace, int range, Registry<StructureTemplatePool> pools, PoolElementStructurePiece defaultStartPiece) {
 		return new Structure.GenerationStub(defaultStartPos, structurePiecesBuilder -> {
 			try {
 				TreeNode root = new TreeNode(new ResourceLocation("start"), null);
 				RandomSource random = RandomSource.create();
-				BuildTreeContext ctx = new BuildTreeContext(root, random, structureTemplateManager, pools);
+				BuildTreeContext ctx = new BuildTreeContext(root, random, generationContext, pools);
 				buildTreeFunction.accept(ctx);
 				root = ctx.root;
 				Preconditions.checkState(root.getUniqueGroup() == null, "Root node must not have unique group");
 				StepStack steps = new StepStack();
 				steps.push(new Step(defaultStartPiece, defaultValidSpace, defaultStartPos, root));
-				doPlace(root, steps, structureTemplateManager, random, pools);
+				doPlace(root, steps, generationContext.structureTemplateManager(), random, pools);
 				for (var step : steps) {
 					step.node.tags.addAll(ctx.globalTags);
 					if (step.node.tags.size() > 0 || step.node.getData() != null) {

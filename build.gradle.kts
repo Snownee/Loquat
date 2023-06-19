@@ -92,6 +92,7 @@ tasks.jar {
     exclude("/data/loquat/dimension")
     exclude("/data/loquat/dimension_type")
     exclude("/data/loquat/worldgen/biome")
+	exclude("/data/loquat/worldgen/structure_set")
     from("LICENSE") {
         rename { "${it}_${archives_base_name}" }
     }
