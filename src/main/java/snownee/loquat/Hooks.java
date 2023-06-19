@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -162,8 +161,8 @@ public interface Hooks {
 			area.getVoxelShape().ifPresent(consumer);
 			behavior.setValue(RestrictInstance.RestrictBehavior.ENTER);
 		});
-		if (behavior.getValue() != null && ((Player) entity).isLocalPlayer()) {
-			LoquatClient.get().notifyRestriction(behavior.getValue());
+		if (behavior.getValue() != null) {
+			CommonProxy.notifyRestriction((Player) entity, behavior.getValue());
 		}
 	}
 

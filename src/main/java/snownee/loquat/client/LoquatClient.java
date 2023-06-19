@@ -60,7 +60,7 @@ public class LoquatClient {
 
 	public void notifyRestriction(RestrictInstance.RestrictBehavior behavior) {
 		long millis = Util.getMillis();
-		if (LongMath.saturatedSubtract(millis, lastNotifyRestrictionTime) < 500) {
+		if (LongMath.saturatedSubtract(millis, lastNotifyRestrictionTime) < 5000) {
 			return;
 		}
 		lastNotifyRestrictionTime = millis;

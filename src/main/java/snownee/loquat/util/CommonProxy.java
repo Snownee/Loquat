@@ -11,6 +11,9 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -18,13 +21,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
+import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
 import snownee.loquat.core.AreaManager;
+import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.spawner.LycheeCompat;
@@ -86,6 +94,12 @@ public class CommonProxy implements ModInitializer {
 		PLAYER_LEAVE_AREA.register(listener);
 	}
 
+	public static void notifyRestriction(Player entity, RestrictInstance.RestrictBehavior value) {
+		if (entity.isLocalPlayer()) {
+			LoquatClient.get().notifyRestriction(value);
+		}
+	}
+
 	@Override
 	public void onInitialize() {
 		Loquat.init();
@@ -116,6 +130,28 @@ public class CommonProxy implements ModInitializer {
 			if (entity instanceof ServerPlayer player) {
 				AreaManager.of(world).playerLoaded(player);
 			}
+		});
+		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+			if (RestrictInstance.of(player).isRestricted(pos, RestrictInstance.RestrictBehavior.DESTROY)) {
+				CommonProxy.notifyRestriction(player, RestrictInstance.RestrictBehavior.DESTROY);
+				return InteractionResult.FAIL;
+			}
+			return InteractionResult.PASS;
+		});
+		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) -> {
+			if (RestrictInstance.of(player).isRestricted(pos, RestrictInstance.RestrictBehavior.DESTROY)) {
+				CommonProxy.notifyRestriction(player, RestrictInstance.RestrictBehavior.DESTROY);
+				return false;
+			}
+			return true;
+		});
+		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (stack.getItem() instanceof BlockItem && RestrictInstance.of(player).isRestricted(hitResult.getBlockPos(), RestrictInstance.RestrictBehavior.PLACE)) {
+				CommonProxy.notifyRestriction(player, RestrictInstance.RestrictBehavior.PLACE);
+				return InteractionResult.FAIL;
+			}
+			return InteractionResult.PASS;
 		});
 	}
 }
