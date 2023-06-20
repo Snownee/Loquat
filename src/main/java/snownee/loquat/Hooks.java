@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Streams;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -49,8 +50,8 @@ import snownee.loquat.util.TransformUtil;
 
 public interface Hooks {
 	static boolean handleComponentClicked(String value) {
-		String[] s = StringUtils.split(value, ' ');
-		if (s.length != 4 || !s[0].equals("@loquat")) {
+		String[] s = StringUtils.split(value, " ", 5);
+		if (s.length != 5 || !s[0].equals("@loquat")) {
 			return false;
 		}
 		LocalPlayer player = Minecraft.getInstance().player;
@@ -66,7 +67,13 @@ public interface Hooks {
 			}
 			CRequestOutlinesPacket.request(60, List.of(uuid));
 		} else if (s[1].equals("info")) {
-			// TODO
+			if (Screen.hasControlDown()) {
+				Minecraft.getInstance().keyboardHandler.setClipboard(s[4]);
+				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied"), false);
+			} else {
+				Minecraft.getInstance().keyboardHandler.setClipboard(uuid.toString());
+				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied.uuid"), false);
+			}
 		} else if (s[1].equals("select")) {
 			SelectionManager manager = SelectionManager.of(player);
 			CSelectAreaPacket.send(!manager.getSelectedAreas().contains(uuid), uuid);

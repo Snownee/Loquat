@@ -1,5 +1,7 @@
 package snownee.loquat.compat.kubejs;
 
+import java.util.Objects;
+
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import snownee.loquat.Loquat;
@@ -15,10 +17,10 @@ public class LoquatKubeJSPlugin extends KubeJSPlugin {
 	public void init() {
 		Loquat.LOGGER.info("KubeJS detected, loading Loquat KubeJS plugin");
 		CommonProxy.registerPlayerEnterAreaListener((player, area) -> {
-			LoquatKubeJSEvents.AREA_ENTERED.post(new PlayerAreaEventJS(player, area));
+			LoquatKubeJSEvents.AREA_ENTERED.post(Objects.requireNonNull(area.getUuid()).toString(), new PlayerAreaEventJS(player, area));
 		});
 		CommonProxy.registerPlayerLeaveAreaListener((player, area) -> {
-			LoquatKubeJSEvents.AREA_LEFT.post(new PlayerAreaEventJS(player, area));
+			LoquatKubeJSEvents.AREA_LEFT.post(Objects.requireNonNull(area.getUuid()).toString(), new PlayerAreaEventJS(player, area));
 		});
 	}
 

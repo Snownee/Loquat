@@ -35,6 +35,8 @@
   "loquat.command.wrongDimension": "Wrong dimension",
   "loquat.command.entitySelectorNotAllowed": "@e selector is not supported here",
   "loquat.command.nothingChanged": "Nothing changed",
+  "loquat.msg.copied": "Copied.",
+  "loquat.msg.copied.uuid": "UUID Copied. Ctrl+Click to copy full info.",
   "loquat.msg.shiftClickStructureBlock": "Select all areas in the structure",
   "loquat.msg.shiftUseStructureBlock": "Cleared structure",
   "loquat.restrict.behavior.enter": "enter",

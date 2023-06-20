@@ -1,7 +1,10 @@
 package snownee.loquat.command;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -64,34 +67,35 @@ public class NearbyCommand {
 			);
 			component.append(" ");
 			component.append(Component.translatable("loquat.command.nearby.highlight")
-					.withStyle(clickEvent("highlight", source, area))
+					.withStyle(clickEvent("highlight", source, area, null))
 			);
 			component.append(" ");
+
+			List<MutableComponent> lines = Lists.newArrayList();
+			lines.add(Component.literal("UUID: ").append(Objects.requireNonNull(area.getUuid()).toString()));
+			if (!area.getTags().isEmpty()) {
+				String tags = Joiner.on(", ").join(area.getTags());
+				lines.add(Component.translatable("loquat.command.nearby.more.tags", tags));
+			}
+			if (area.getAttachedData() != null) {
+				lines.add(Component.translatable("loquat.command.nearby.more.data", NbtUtils.toPrettyComponent(area.getAttachedData())));
+			}
+			printRestrictions(lines, manager.getFallbackRestriction(), area, "global");
+			if (source.getPlayer() != null) {
+				RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(source.getPlayer().getScoreboardName());
+				printRestrictions(lines, restrictInstance, area, "player");
+			}
+			Component info = lines.stream().reduce((a, b) -> a.append("\n").append(b)).orElseGet(Component::empty);
+
 			component.append(Component.translatable("loquat.command.nearby.more")
-					.withStyle(clickEvent("info", source, area))
+					.withStyle(clickEvent("info", source, area, info.getString()))
 					.withStyle(style -> {
-						List<MutableComponent> lines = Lists.newArrayList();
-						if (!area.getTags().isEmpty()) {
-							String tags = Joiner.on(", ").join(area.getTags());
-							lines.add(Component.translatable("loquat.command.nearby.more.tags", tags));
-						}
-						if (area.getAttachedData() != null) {
-							lines.add(Component.translatable("loquat.command.nearby.more.data", NbtUtils.toPrettyComponent(area.getAttachedData())));
-						}
-						printRestrictions(lines, manager.getFallbackRestriction(), area, "global");
-						if (source.getPlayer() != null) {
-							RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(source.getPlayer().getScoreboardName());
-							printRestrictions(lines, restrictInstance, area, "player");
-						}
-						if (lines.isEmpty()) {
-							return style;
-						}
-						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, lines.stream().reduce((a, b) -> a.append("\n").append(b)).orElseGet(Component::empty)));
+						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, info));
 					})
 			);
 			component.append(" ");
 			component.append(Component.translatable("loquat.command.nearby.select")
-					.withStyle(clickEvent("select", source, area))
+					.withStyle(clickEvent("select", source, area, null))
 			);
 			source.sendSystemMessage(component);
 		}
@@ -112,8 +116,8 @@ public class NearbyCommand {
 		}
 	}
 
-	private static UnaryOperator<Style> clickEvent(String type, CommandSourceStack source, Area area) {
-		return style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "@loquat %s %s %s".formatted(type, source.getLevel().dimension().location(), area.getUuid())));
+	private static UnaryOperator<Style> clickEvent(String type, CommandSourceStack source, Area area, @Nullable String extra) {
+		return style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "@loquat %s %s %s %s".formatted(type, source.getLevel().dimension().location(), area.getUuid(), extra)));
 	}
 
 }
