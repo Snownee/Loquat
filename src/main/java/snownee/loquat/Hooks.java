@@ -1,6 +1,7 @@
 package snownee.loquat;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -206,5 +207,26 @@ public interface Hooks {
 			});
 			processorList.list().forEach(settings::addProcessor);
 		}
+	}
+
+	static boolean checkServerPlayerRestriction(ServerPlayer player, LoquatServerPlayer loquatServerPlayer) {
+		if (player.isSpectator()) {
+			return false;
+		}
+		RestrictInstance restrictInstance = RestrictInstance.of(player);
+		if (restrictInstance.isEmpty()) {
+			return false;
+		}
+		Vec3 pos = player.position();
+		Vec3 lastPos = Objects.requireNonNull(loquatServerPlayer.loquat$getLastGoodPos());
+		AABB lastBox = player.getBoundingBox().move(lastPos.x - pos.x, lastPos.y - pos.y, lastPos.z - pos.z);
+		if (restrictInstance.areaStream().filter(area -> {
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.EXIT) && area.contains(lastBox);
+		}).findFirst().map(area -> !area.contains(player.getBoundingBox())).orElse(false)) {
+			return true;
+		}
+		return restrictInstance.areaStream().anyMatch(area -> {
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(player.getBoundingBox());
+		});
 	}
 }

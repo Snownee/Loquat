@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import snownee.loquat.core.RestrictInstance;
+import snownee.loquat.util.CommonProxy;
 
 @Mixin(BlockItem.class)
 public class BlockItemMixin {
@@ -18,7 +19,8 @@ public class BlockItemMixin {
 		if (context.getPlayer() == null) {
 			return;
 		}
-		if (!context.getPlayer().isCreative() && RestrictInstance.of(context.getPlayer()).isRestricted(context.getClickedPos(), RestrictInstance.RestrictBehavior.PLACE)) {
+		if (RestrictInstance.of(context.getPlayer()).isRestricted(context.getClickedPos(), RestrictInstance.RestrictBehavior.PLACE)) {
+			CommonProxy.notifyRestriction(context.getPlayer(), RestrictInstance.RestrictBehavior.PLACE);
 			cir.setReturnValue(InteractionResult.FAIL);
 		}
 	}

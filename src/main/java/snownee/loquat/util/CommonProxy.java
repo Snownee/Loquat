@@ -13,7 +13,6 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -25,7 +24,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
@@ -114,8 +112,7 @@ public class CommonProxy implements ModInitializer {
 		});
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);
-			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
-					SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
+			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND && SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
 				return InteractionResultHolder.success(stack);
 			}
 			return InteractionResultHolder.pass(stack);
@@ -144,14 +141,6 @@ public class CommonProxy implements ModInitializer {
 				return false;
 			}
 			return true;
-		});
-		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-			ItemStack stack = player.getItemInHand(hand);
-			if (stack.getItem() instanceof BlockItem && RestrictInstance.of(player).isRestricted(hitResult.getBlockPos(), RestrictInstance.RestrictBehavior.PLACE)) {
-				CommonProxy.notifyRestriction(player, RestrictInstance.RestrictBehavior.PLACE);
-				return InteractionResult.FAIL;
-			}
-			return InteractionResult.PASS;
 		});
 	}
 }
