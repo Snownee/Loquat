@@ -17,7 +17,6 @@
   },
   "license": "ARR",
   "icon": "assets/loquat/logo.png",
-  "environment": "*",
   "entrypoints": {
     "main": [
       "snownee.loquat.util.CommonProxy"
@@ -33,7 +32,16 @@
     "fabricloader": ">=0.14.14",
     "fabric-api": "*",
     "kiwi": ">=8.3.1",
-    "lychee": ">=3.8.3",
-    "minecraft": ">=1.19.2"
+    "minecraft": "1.19.2"
+  },
+  "recommends": {
+    "lychee": ">=3.11.1"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/rRBvGkz"
+      }
+    }
   }
 }

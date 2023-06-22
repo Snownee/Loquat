@@ -1,6 +1,7 @@
 package snownee.loquat.spawner;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -223,6 +224,11 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	@Override
 	public void applyPostActions(LycheeContext ctx, int times) {
 		ctx.enqueueActions(getPostActions(), times, true);
+	}
+
+	@Override
+	public Map<JsonPointer, List<PostAction>> getActionGroups() {
+		return Map.of(); //TODO ?
 	}
 
 }
