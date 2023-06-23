@@ -161,3 +161,7 @@ ignored.
           ]
         }
         ```
+
+!!! tip
+
+    [JSON Fragment](https://lycheetweaker.readthedocs.io/en/latest/fragment/) is supported in spawner and difficulty to help you reuse code.
