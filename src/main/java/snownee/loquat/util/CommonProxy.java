@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -34,10 +35,6 @@ import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.spawner.LycheeCompat;
-import snownee.loquat.spawner.SpawnMobAction;
-import snownee.loquat.spawner.SpawnerLoader;
-import snownee.loquat.spawner.difficulty.DifficultyLoader;
-import snownee.lychee.PostActionTypes;
 
 public class CommonProxy implements ModInitializer {
 
@@ -102,9 +99,6 @@ public class CommonProxy implements ModInitializer {
 	public void onInitialize() {
 		Loquat.init();
 		if (Loquat.hasLychee) {
-			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) DifficultyLoader.INSTANCE);
-			ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) SpawnerLoader.INSTANCE);
-			PostActionTypes.register("loquat:spawn", SpawnMobAction.TYPE);
 			LycheeCompat.init();
 		}
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -142,5 +136,9 @@ public class CommonProxy implements ModInitializer {
 			}
 			return true;
 		});
+	}
+
+	public static void registerReloadListener(PreparableReloadListener instance) {
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) instance);
 	}
 }
