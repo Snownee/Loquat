@@ -5,10 +5,8 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.SharedConstants;
-import snownee.kiwi.Mod;
 import snownee.kiwi.loader.Platform;
 
-@Mod(Loquat.ID)
 public class Loquat {
 
 	public static final String ID = "loquat";
@@ -24,9 +22,6 @@ public class Loquat {
 		}
 		hasLychee = Platform.isModLoaded("lychee");
 		LoquatRegistries.init();
-		AreaTypes.init();
-		AreaEventTypes.init();
-		PlaceProgramTypes.init();
 	}
 
 }

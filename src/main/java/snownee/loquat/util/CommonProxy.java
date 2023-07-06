@@ -26,8 +26,12 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import snownee.kiwi.Mod;
+import snownee.loquat.AreaEventTypes;
+import snownee.loquat.AreaTypes;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
+import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
 import snownee.loquat.core.AreaManager;
@@ -36,6 +40,7 @@ import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.spawner.LycheeCompat;
 
+@Mod(Loquat.ID)
 public class CommonProxy implements ModInitializer {
 
 	public static final Event<LoquatEvents.PlayerEnterArea> PLAYER_ENTER_AREA = EventFactory.createArrayBacked(LoquatEvents.PlayerEnterArea.class, listeners -> (player, area) -> {
@@ -98,6 +103,9 @@ public class CommonProxy implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Loquat.init();
+		AreaTypes.init();
+		AreaEventTypes.init();
+		PlaceProgramTypes.init();
 		if (Loquat.hasLychee) {
 			LycheeCompat.init();
 		}

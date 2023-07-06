@@ -9,7 +9,7 @@ import snownee.loquat.client.LoquatClient;
 public class ClientProxy implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> {
+		WorldRenderEvents.LAST.register(context -> {
 			var matrixStack = context.matrixStack();
 			matrixStack.pushPose();
 			var pos = context.camera().getPosition().reverse();
