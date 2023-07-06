@@ -193,7 +193,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
 	@Override
 	public ResourceLocation lychee$getId() {
-		return new ResourceLocation(Loquat.ID, "spawner/%s/%d".formatted(event.getSpawnerId(), waveIndex));
+		return new ResourceLocation(Loquat.ID, "spawner/%s/%s/%d".formatted(event.getSpawnerId().getNamespace(), event.getSpawnerId().getPath(), waveIndex));
 	}
 
 	@Override
