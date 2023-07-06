@@ -37,6 +37,9 @@
   "recommends": {
     "lychee": ">=3.11.1"
   },
+  "breaks": {
+    "kubejs": "<1902.6.1-"
+  },
   "custom": {
     "modmenu": {
       "links": {

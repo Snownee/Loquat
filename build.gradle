@@ -52,14 +52,14 @@ dependencies {
     modImplementation("maven.modrinth:lazydfu:4SHylIO9")
     modImplementation("maven.modrinth:kiwi:MRPbB9Ra")
     annotationProcessor("maven.modrinth:kiwi:MRPbB9Ra")
-    modImplementation("maven.modrinth:lychee:2VItTQSm")
+    modImplementation("maven.modrinth:lychee:vSXCtfJA")
     modImplementation("maven.modrinth:modmenu:gSoPJyVn")
     modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
     modImplementation("maven.modrinth:jade:ZASePpsm")
     modImplementation("maven.modrinth:lithium:m6sVgAi6")
     modImplementation("maven.modrinth:huge-structure-blocks:OsfLOdQa")
 
-    modImplementation("dev.latvian.mods:kubejs-fabric:1902.6.0-build.119")
+    modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
 }
 
 loom {
