@@ -7,14 +7,14 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraftforge.fml.loading.LoadingModList;
 
 public class MixinPlugin implements IMixinConfigPlugin {
 
 	private boolean hasKubeJS;
 
 	private static boolean hasMod(String modid) {
-		return FabricLoader.getInstance().isModLoaded(modid);
+		return LoadingModList.get().getModFileById(modid) != null;
 	}
 
 	@Override

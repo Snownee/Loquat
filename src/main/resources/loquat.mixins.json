@@ -20,12 +20,10 @@
     "SinglePoolElementAccess",
     "SinglePoolElementMixin",
     "StructureTemplateMixin",
-    "fabric.DifficultyLoaderMixin",
-    "fabric.SlimeMixin",
-    "fabric.SpawnerLoaderMixin",
-    "fabric.ZombieMixin",
+    "forge.SlimeMixin",
+    "forge.ZombieMixin",
     "kubejs.AreaKubeJSMixin",
-    "lithium.LithiumEntityCollisionsMixin"
+    "canary.CanaryEntityCollisionsMixin"
   ],
   "client": [
     "client.MultiPlayerGameModeMixin",

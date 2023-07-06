@@ -1,24 +1,34 @@
 package snownee.loquat;
 
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegistryBuilder;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.program.PlaceProgram;
+import snownee.loquat.util.RegistryBridge;
+import snownee.lychee.Lychee;
 
 public final class LoquatRegistries {
 
-	public static final MappedRegistry<Area.Type<?>> AREA = register("area", Area.Type.class);
-	public static final MappedRegistry<AreaEvent.Type<?>> AREA_EVENT = register("area_event", AreaEvent.Type.class);
-	public static final MappedRegistry<PlaceProgram.Type<?>> PLACE_PROGRAM = register("place_program", PlaceProgram.Type.class);
+	public static RegistryBridge<Area.Type<?>> AREA;
+	public static RegistryBridge<AreaEvent.Type<?>> AREA_EVENT;
+	public static RegistryBridge<PlaceProgram.Type<?>> PLACE_PROGRAM;
 
 	public static void init() {
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(LoquatRegistries::newRegistries);
 	}
 
-	private static <T> MappedRegistry<T> register(String name, Class<?> clazz) {
-		return FabricRegistryBuilder.createSimple((Class<T>) clazz, new ResourceLocation(Loquat.ID, name)).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+	@SuppressWarnings("rawtypes")
+	public static void newRegistries(NewRegistryEvent event) {
+		event.create(register("area"), v -> AREA = new RegistryBridge(v));
+		event.create(register("area_event"), v -> AREA_EVENT = new RegistryBridge(v));
+		event.create(register("place_program"), v -> PLACE_PROGRAM = new RegistryBridge(v));
+	}
+
+	private static <T> RegistryBuilder<T> register(String name) {
+		return new RegistryBuilder<T>().setName(new ResourceLocation(Lychee.ID, name));
 	}
 
 }

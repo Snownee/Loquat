@@ -1,22 +1,32 @@
 package snownee.loquat.util;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import snownee.loquat.client.LoquatClient;
 
-public class ClientProxy implements ClientModInitializer {
-	@Override
-	public void onInitializeClient() {
-		WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> {
-			var matrixStack = context.matrixStack();
+public class ClientProxy {
+	public static void initClient() {
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderLevelStageEvent.class, event -> {
+			if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+				return;
+			}
+			PoseStack matrixStack = event.getPoseStack();
+			Camera camera = event.getCamera();
+			Vec3 pos = camera.getPosition().reverse();
 			matrixStack.pushPose();
-			var pos = context.camera().getPosition().reverse();
 			matrixStack.translate(pos.x, pos.y, pos.z);
-			LoquatClient.get().render(context.matrixStack(), Minecraft.getInstance().renderBuffers().bufferSource(), pos);
+			LoquatClient.get().render(matrixStack, Minecraft.getInstance().renderBuffers().bufferSource(), pos);
 			matrixStack.popPose();
 		});
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LoquatClient.get().clearDebugAreas());
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ClientPlayerNetworkEvent.LoggingOut.class, event -> {
+			LoquatClient.get().clearDebugAreas();
+		});
 	}
 }

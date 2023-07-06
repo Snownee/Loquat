@@ -1,4 +1,4 @@
-package snownee.loquat.mixin.fabric;
+package snownee.loquat.mixin.forge;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.util.CommonProxy;
 
-@Mixin(Slime.class) //TODO Zombie reinforcement
+@Mixin(Slime.class)
 public class SlimeMixin {
 
 	@Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
