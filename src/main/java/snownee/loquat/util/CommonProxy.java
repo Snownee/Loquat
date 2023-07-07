@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
@@ -118,6 +119,11 @@ public class CommonProxy {
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, LivingDeathEvent.class, event -> {
 			Entity entity = event.getEntity();
+			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
+		});
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LivingConversionEvent.Post.class, event -> {
+			Entity entity = event.getEntity();
+			onSuccessiveSpawn(entity, event.getOutcome());
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerChangedDimensionEvent.class, event -> {
