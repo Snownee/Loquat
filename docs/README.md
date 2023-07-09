@@ -20,7 +20,7 @@ Currently, Loquat is in BETA. Please understand that there may be bugs and chang
 You can download Loquat on CurseForge:
 
 - [Loquat (Fabric)](https://www.curseforge.com/minecraft/mc-mods/loquat)
-- Loquat for Forge coming soon...
+- [Loquat (Forge)](https://www.curseforge.com/minecraft/mc-mods/loquat-forge)
 
 ## Optional Dependencies
 

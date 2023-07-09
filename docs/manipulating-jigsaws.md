@@ -92,7 +92,7 @@ ServerEvents.recipes(event => {
 		let lastRoom = ctx.root
 		for (let i = 0; i < 5; i++) {
 			// lastRoom.addChild(target_name, template_pool_name)
-			monsterRooms.push(lastNode = lastRoom.addChild("door", "pack:monster"))
+			monsterRooms.push(lastRoom = lastRoom.addChild("door", "pack:monster"))
 		}
 		// add boss room
 		lastRoom.addChild("door", "pack:boss")
