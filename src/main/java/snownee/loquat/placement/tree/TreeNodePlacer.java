@@ -138,6 +138,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 					continue;
 				}
 				StructureTemplatePool pool = pools.getOptional(child.getPool()).orElseThrow();
+				boolean hasAnyTarget = false;
 				for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
 					if (steps.hasDuplicateElement(child.getUniqueGroup(), template)) {
 						continue;
@@ -148,6 +149,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 							if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
 								continue;
 							}
+							hasAnyTarget = true;
 							BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos.multiply(-1));
 							BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
 							PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
@@ -165,6 +167,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 						}
 					}
 				}
+				Preconditions.checkState(hasAnyTarget, "No valid targets found for joint %s", jointName);
 			}
 			if (selectedJigsaw == null) {
 				while (steps.peek() != step) {
