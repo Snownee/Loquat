@@ -27,7 +27,7 @@ All spawners should be located in the `loquat_spawners` directory in a data pack
 ### Spawner specification
 
 - `waves`: A list of _Wave_.
-- `difficulty` (optional): : The default _Difficulty_. If not specified, it will be `"default"`.
+- `difficulty` (optional): The default _Difficulty_ id. If not specified, it will be `"default"`.
 
 ### Wave specification
 
