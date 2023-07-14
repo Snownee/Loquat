@@ -35,6 +35,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import snownee.loquat.Loquat;
+import snownee.loquat.LoquatConfig;
 import snownee.loquat.duck.LoquatStructurePiece;
 import snownee.loquat.mixin.SinglePoolElementAccess;
 import snownee.loquat.placement.LoquatPlacer;
@@ -124,50 +125,18 @@ public class TreeNodePlacer implements LoquatPlacer {
 			String jointName = jigsawBlock.nbt.getString("name");
 			byJointName.put(jointName, jigsawBlock);
 		}
+		StructureTemplate.StructureBlockInfo selectedJigsaw = null;
 		for (TreeNode child : node.getChildren()) {
 			String jointName = child.getParentEdge();
-			StructureTemplate.StructureBlockInfo selectedJigsaw = null;
-			joints:
 			for (var jigsawBlock : byJointName.get(jointName)) {
-				int minEdgeDistance = node.getMinEdgeDistance();
-				BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
-				Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state);
-				BlockPos thatJointPos = jointPos.relative(direction);
-				double dist = step.jointPos.distSqr(jointPos);
-				if (dist <= minEdgeDistance * minEdgeDistance) {
-					continue;
-				}
-				StructureTemplatePool pool = pools.getOptional(child.getPool()).orElseThrow();
-				boolean hasAnyTarget = false;
-				for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
-					if (steps.hasDuplicateElement(child.getUniqueGroup(), template)) {
-						continue;
+				selectedJigsaw = tryPlaceNode(node, steps, structureTemplateManager, random, pools, child, jigsawBlock, step, false);
+				if (selectedJigsaw != null) {
+					if (doPlace(child, steps, structureTemplateManager, random, pools)) {
+						resolvedJigsaws.add(jigsawBlock);
+						break;
 					}
-					for (Rotation rotation2 : Rotation.getShuffled(random)) {
-						List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
-						for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
-							if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
-								continue;
-							}
-							hasAnyTarget = true;
-							BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos.multiply(-1));
-							BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
-							PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
-							VoxelShape validSpace = steps.peek().validSpace;
-							if (Shapes.joinIsNotEmpty(validSpace, Shapes.create(AABB.of(boundingBox).deflate(0.25)), BooleanOp.ONLY_SECOND)) {
-								continue;
-							}
-							VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-							steps.push(new Step(piece, shape, thatJointPos, child));
-							if (doPlace(child, steps, structureTemplateManager, random, pools)) {
-								resolvedJigsaws.add(jigsawBlock);
-								selectedJigsaw = jigsawBlock;
-								break joints;
-							}
-						}
-					}
+					selectedJigsaw = null;
 				}
-				Preconditions.checkState(hasAnyTarget, "No valid targets found for joint %s", jointName);
 			}
 			if (selectedJigsaw == null) {
 				while (steps.peek() != step) {
@@ -178,7 +147,6 @@ public class TreeNodePlacer implements LoquatPlacer {
 			}
 		}
 		// Find fallbacks
-		joints:
 		for (var jigsawBlock : jigsawBlocks) {
 			if (resolvedJigsaws.contains(jigsawBlock)) {
 				continue;
@@ -188,29 +156,50 @@ public class TreeNodePlacer implements LoquatPlacer {
 			if (fallbackNode == null) {
 				continue;
 			}
-			BlockPos jointPos = blockPos.offset(jigsawBlock.pos);
-			StructureTemplatePool pool = pools.getOptional(fallbackNode.getPool()).orElseThrow();
-			for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
-				if (steps.hasDuplicateElement(fallbackNode.getUniqueGroup(), template)) {
-					continue;
-				}
-				for (Rotation rotation2 : Rotation.getShuffled(random)) {
-					List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
-					for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
-						if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
-							continue;
-						}
-						BlockPos thatPiecePos = jointPos.offset(jigsawBlock1.pos.multiply(-1));
-						BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
-						PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
-						VoxelShape shape = Shapes.joinUnoptimized(steps.peek().validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-						steps.push(new Step(piece, shape, jointPos, fallbackNode));
-						continue joints;
+			tryPlaceNode(node, steps, structureTemplateManager, random, pools, fallbackNode, jigsawBlock, step, true);
+		}
+		return true;
+	}
+
+	private StructureTemplate.StructureBlockInfo tryPlaceNode(TreeNode node, StepStack steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools, TreeNode child, StructureTemplate.StructureBlockInfo jigsawBlock, Step parentStep, boolean fallback) {
+		BlockPos jointPos = parentStep.piece.getPosition().offset(jigsawBlock.pos);
+		Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state);
+		BlockPos thatJointPos = child.isOffsetTowardsJigsawFront() ? jointPos.relative(direction) : jointPos;
+		if (!fallback) {
+			double dist = parentStep.jointPos.distSqr(jointPos);
+			int minEdgeDistance = node.getMinEdgeDistance();
+			if (dist <= minEdgeDistance * minEdgeDistance) {
+				return null;
+			}
+		}
+		StructureTemplatePool pool = pools.getOptional(child.getPool()).orElseThrow();
+		boolean hasAnyTarget = false;
+		for (StructurePoolElement template : pool.getShuffledTemplates(random)) {
+			if (steps.hasDuplicateElement(child.getUniqueGroup(), template)) {
+				continue;
+			}
+			for (Rotation rotation2 : Rotation.getShuffled(random)) {
+				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
+				for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
+					if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
+						continue;
 					}
+					hasAnyTarget = true;
+					BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos.multiply(-1));
+					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
+					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
+					VoxelShape validSpace = steps.peek().validSpace;
+					if (child.isCheckForCollisions() && Shapes.joinIsNotEmpty(validSpace, Shapes.create(AABB.of(boundingBox).deflate(0.25)), BooleanOp.ONLY_SECOND)) {
+						continue;
+					}
+					VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
+					steps.push(new Step(piece, shape, thatJointPos, child));
+					return jigsawBlock;
 				}
 			}
 		}
-		return true;
+		Preconditions.checkState(hasAnyTarget, "No valid targets found for joint %s", child.getParentEdge());
+		return null;
 	}
 
 	private record Step(PoolElementStructurePiece piece, VoxelShape validSpace, BlockPos jointPos, TreeNode node) {
@@ -234,6 +223,9 @@ public class TreeNodePlacer implements LoquatPlacer {
 
 		@Override
 		public Step push(Step step) {
+			if (LoquatConfig.debug) {
+				Loquat.LOGGER.info("Push " + step.structureId());
+			}
 			String group = step.node.getUniqueGroup();
 			if (group != null) {
 				step.structureId().ifPresent(structureId -> uniqueGroups.put(group, structureId));
@@ -247,6 +239,9 @@ public class TreeNodePlacer implements LoquatPlacer {
 			String group = step.node.getUniqueGroup();
 			if (group != null) {
 				step.structureId().ifPresent(structureId -> uniqueGroups.remove(group, structureId));
+			}
+			if (LoquatConfig.debug) {
+				Loquat.LOGGER.info("Pop " + step.structureId());
 			}
 			return step;
 		}

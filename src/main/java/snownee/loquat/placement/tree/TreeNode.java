@@ -39,6 +39,12 @@ public class TreeNode {
 	@Getter
 	@Setter
 	private CompoundTag data;
+	@Getter
+	@Setter
+	private boolean offsetTowardsJigsawFront = true;
+	@Getter
+	@Setter
+	private boolean checkForCollisions = true;
 
 	public TreeNode(ResourceLocation pool) {
 		this(pool, null);

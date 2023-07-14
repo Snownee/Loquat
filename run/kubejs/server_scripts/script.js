@@ -24,9 +24,12 @@ ServerEvents.recipes(event => {
 		ctx.root.walk($ => {
 			$.tags.add("test")
 			$.fallbackNodeProvider = joint => {
-				if (joint === "minecraft:door")
-					return new LoquatTreeNode("loquat:barrier");
-				return null;
+				if (joint !== "minecraft:door")
+					return null
+				let fallback = new LoquatTreeNode("loquat:barrier")
+				fallback.offsetTowardsJigsawFront = false
+				fallback.checkForCollisions = false
+				return fallback
 			}
 		})
 	}));
