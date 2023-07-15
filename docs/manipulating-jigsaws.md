@@ -180,10 +180,15 @@ ServerEvents.recipes(event => {
 		// use node(the root).walk() to iterate all child nodes
 		ctx.root.walk(room => {
 			room.fallbackNodeProvider = joint => {
-				if (joint === "minecraft:door")
-					// LoquatTreeNode is also the type of ctx.root and room
-					return new LoquatTreeNode("pack:barrier");
-				return null;
+				if (joint !== "minecraft:door")
+					return null;
+				// LoquatTreeNode is also the type of ctx.root and room
+				let fallback = new LoquatTreeNode("pack:barrier")
+				// cancel the offset so that the barrier will be pulled one block back
+				fallback.offsetTowardsJigsawFront = false
+				// cancel the collision check so that the barrier can be placed inside or intersect with other structure pieces
+				fallback.checkForCollisions = false
+                return fallback
 			}
 		})
 	}))
