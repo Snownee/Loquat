@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import snownee.loquat.Loquat;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.placement.LoquatPlacements;
@@ -19,11 +18,11 @@ public class LoquatKubeJSPlugin extends KubeJSPlugin {
 		Loquat.LOGGER.info("KubeJS detected, loading Loquat KubeJS plugin");
 		CommonProxy.registerPlayerEnterAreaListener((player, area) -> {
 			if (LoquatKubeJSEvents.AREA_ENTERED.hasListeners())
-				LoquatKubeJSEvents.AREA_ENTERED.post(ScriptType.SERVER, Objects.requireNonNull(area.getUuid()).toString(), new PlayerAreaEventJS(player, area));
+				LoquatKubeJSEvents.AREA_ENTERED.post(new PlayerAreaEventJS(player, area), Objects.requireNonNull(area.getUuid()).toString());
 		});
 		CommonProxy.registerPlayerLeaveAreaListener((player, area) -> {
 			if (LoquatKubeJSEvents.AREA_LEFT.hasListeners())
-				LoquatKubeJSEvents.AREA_LEFT.post(ScriptType.SERVER, Objects.requireNonNull(area.getUuid()).toString(), new PlayerAreaEventJS(player, area));
+				LoquatKubeJSEvents.AREA_LEFT.post(new PlayerAreaEventJS(player, area), Objects.requireNonNull(area.getUuid()).toString());
 		});
 	}
 
