@@ -34,6 +34,13 @@ branch = os.popen('git rev-parse --abbrev-ref HEAD').read().strip()
 platform = branch.split('-')[1]
 tag = platform + '-' + mod_version
 
+# push a new tag to git
+os.system('git add gradle.properties')
+os.system('git commit -m "Publish version ' + mod_version + '"')
+os.system('git tag ' + tag)
+os.system('git push')
+os.system('git push --tags')
+
 # generate changelog from git commits
 recent_tags = os.popen('''git for-each-ref refs/tags --sort=creatordate --format='%(refname:lstrip=2)' --count=6 --merged''').read().split('\n')
 if (len(recent_tags) > 1):
@@ -55,13 +62,6 @@ if (len(recent_tags) > 1):
 else:
     with open('CHANGELOG.md', 'w') as f:
         f.write('')
-
-# push a new tag to git
-os.system('git add gradle.properties')
-os.system('git commit -m "Publish version ' + mod_version + '"')
-os.system('git tag ' + tag)
-os.system('git push')
-os.system('git push --tags')
 
 # run gradle task to publish mod
 os.system('gradlew publishUnified')
