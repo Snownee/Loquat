@@ -1,5 +1,6 @@
 pluginManagement {
-    repositories {
-        gradlePluginPortal()
-    }
+	repositories {
+		maven { url "https://maven.architectury.dev/" }
+		gradlePluginPortal()
+	}
 }

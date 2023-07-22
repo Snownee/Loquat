@@ -125,3 +125,4 @@ run/*
 /run/kubejs/exported
 /run/kubejs/assets/kubejs
 /run/kubejs/README.txt
+/CHANGELOG.md
