@@ -3,11 +3,12 @@ package snownee.loquat.network;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
+import snownee.loquat.client.ClientHooks;
 import snownee.loquat.core.select.PosSelection;
 import snownee.loquat.core.select.SelectionManager;
 
@@ -32,7 +33,7 @@ public class SSyncSelectionPacket extends PacketHandler {
 
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
-		var player = Minecraft.getInstance().player;
+		Player player = ClientHooks.getPlayer();
 		if (player == null)
 			return null;
 		var manager = SelectionManager.of(player);
