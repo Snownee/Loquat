@@ -19,6 +19,8 @@ else:
 publish_type = ['major', 'minor', 'patch'].index(publish_type)
 assert publish_type >= 0, 'publish_type must be major, minor or patch'
 parts[publish_type] = str(int(parts[publish_type]) + 1)
+for i in range(publish_type + 1, 3):
+    parts[i] = '0'
 mod_version = '.'.join(parts)
 print('Publishing version: ' + mod_version)
 
