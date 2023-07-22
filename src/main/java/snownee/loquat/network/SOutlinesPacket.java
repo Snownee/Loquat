@@ -4,13 +4,14 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
+import snownee.loquat.client.ClientHooks;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.Area;
@@ -33,7 +34,7 @@ public class SOutlinesPacket extends PacketHandler {
 
 	@Override
 	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
-		var level = Minecraft.getInstance().level;
+		Level level = ClientHooks.getLevel();
 		if (level == null)
 			return null;
 		long expire = buf.readVarLong();
