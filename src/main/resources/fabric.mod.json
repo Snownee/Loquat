@@ -35,9 +35,10 @@
     "minecraft": "1.19.2"
   },
   "recommends": {
-    "lychee": ">=3.11.1"
+    "lychee": ">=3.14"
   },
   "breaks": {
+    "lychee": "<3.14",
     "kubejs": "<1902.6.1-"
   },
   "custom": {
