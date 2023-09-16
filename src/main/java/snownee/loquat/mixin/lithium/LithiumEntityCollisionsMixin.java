@@ -16,7 +16,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import snownee.loquat.Hooks;
 
-@Mixin(value = LithiumEntityCollisions.class, remap = false)
+@Mixin(LithiumEntityCollisions.class)
 public class LithiumEntityCollisionsMixin {
 
 	@Inject(method = "getEntityWorldBorderCollisions", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/lithium/common/entity/LithiumEntityCollisions;getEntityWorldBorderCollisionIterable(Lnet/minecraft/world/level/EntityGetter;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;Z)Ljava/lang/Iterable;"), locals = LocalCapture.CAPTURE_FAILHARD)

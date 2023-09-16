@@ -12,6 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 public class MixinPlugin implements IMixinConfigPlugin {
 
 	private boolean hasKubeJS;
+	private boolean hasLithium;
 
 	private static boolean hasMod(String modid) {
 		return FabricLoader.getInstance().isModLoaded(modid);
@@ -20,6 +21,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		hasKubeJS = hasMod("kubejs");
+		hasLithium = hasMod("lithium");
 	}
 
 	@Override
@@ -31,6 +33,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
 		if (mixinClassName.startsWith("snownee.loquat.mixin.kubejs.")) {
 			return hasKubeJS;
+		}
+		if (mixinClassName.startsWith("snownee.loquat.mixin.lithium.")) {
+			return hasLithium;
 		}
 		return true;
 	}
