@@ -222,10 +222,10 @@ dependencies {
 	//implementation fg.deobf("maven.modrinth:lazydfu:4SHylIO9")
 	implementation fg.deobf("maven.modrinth:kiwi:wc9IhZWY")
 	annotationProcessor("maven.modrinth:kiwi:wc9IhZWY")
-	implementation fg.deobf("maven.modrinth:lychee:iSMsNQSB")
+	implementation fg.deobf("maven.modrinth:lychee:xoUWAxCV")
 	implementation fg.deobf("maven.modrinth:cloth-config:Fw7B2c97")
 	implementation fg.deobf("maven.modrinth:jade:ZASePpsm")
-	implementation fg.deobf("maven.modrinth:canary:LE99Zz6p")
+	implementation fg.deobf("maven.modrinth:canary:FReV3YPW")
 	implementation fg.deobf("maven.modrinth:huge-structure-blocks:Q2SZF37K")
 
 	implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.loading.LoadingModList;
 public class MixinPlugin implements IMixinConfigPlugin {
 
 	private boolean hasKubeJS;
+	private boolean hasCanary;
 
 	private static boolean hasMod(String modid) {
 		return LoadingModList.get().getModFileById(modid) != null;
@@ -20,6 +21,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	@Override
 	public void onLoad(String mixinPackage) {
 		hasKubeJS = hasMod("kubejs");
+		hasCanary = hasMod("canary");
 	}
 
 	@Override
@@ -31,6 +33,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
 		if (mixinClassName.startsWith("snownee.loquat.mixin.kubejs.")) {
 			return hasKubeJS;
+		}
+		if (mixinClassName.startsWith("snownee.loquat.mixin.canary.")) {
+			return hasCanary;
 		}
 		return true;
 	}

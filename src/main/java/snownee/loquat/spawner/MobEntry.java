@@ -28,7 +28,7 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import snownee.loquat.core.area.Area;
-import snownee.lychee.util.LUtil;
+import snownee.lychee.util.CommonProxy;
 
 public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean randomize, @Nullable Object2DoubleMap<String> attrs) {
 
@@ -57,7 +57,7 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			EntityType<?> entityType = EntityType.byString(entityTypeId).orElseThrow();
 			CompoundTag nbt;
 			if (jsonObject.has("nbt")) {
-				nbt = LUtil.jsonToTag(jsonObject.getAsJsonObject("nbt"));
+				nbt = CommonProxy.jsonToTag(jsonObject.getAsJsonObject("nbt"));
 			} else {
 				nbt = new CompoundTag();
 			}
@@ -82,7 +82,7 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty("type", EntityType.getKey(type).toString());
 		if (nbt.getAllKeys().size() > 1) {
-			jsonObject.add("nbt", LUtil.tagToJson(nbt));
+			jsonObject.add("nbt", CommonProxy.tagToJson(nbt));
 		}
 		if (!randomize) {
 			jsonObject.addProperty("randomize", false);
