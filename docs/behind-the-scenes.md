@@ -81,7 +81,7 @@ function clearDungeon() {
 
 ## Dynamic processor assignment
 
-A [processor list](https://minecraft.fandom.com/wiki/Custom_structure#Processor_List) is a list of processors used to affect blocks in structures, such as replacing blocks.
+A [processor list](https://minecraft.wiki/w/Custom_structure#Processor_List) is a list of processors used to affect blocks in structures, such as replacing blocks.
 
 You can assign a processor list to a node (piece) during the generation process.
 

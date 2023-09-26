@@ -14,7 +14,7 @@ learned for Loquat.
 		The vanilla data pack can be found [here](https://github.com/misode/mcmeta/tree/data).
 
 Here I assume you already have some knowledge of how to use data pack
-to [generate a jigsaw structure](https://minecraft.fandom.com/wiki/Custom_world_generation). So let's do a quick
+to [generate a jigsaw structure](https://minecraft.wiki/w/Custom_world_generation). So let's do a quick
 overview:
 
 ### 1. Create our structure type
@@ -136,7 +136,7 @@ Generally, we use KubeJS to execute the `/place structure` command, to place the
 
 ### During world generation
 
-You can define a [structure set](https://minecraft.fandom.com/wiki/Custom_world_generation/structure_set) to randomly
+You can define a [structure set](https://minecraft.wiki/w/Custom_world_generation/structure_set) to randomly
 place the structure like vanilla does.
 
 !!! example
