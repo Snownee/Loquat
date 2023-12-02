@@ -29,7 +29,7 @@ public class TagCommand extends LoquatCommand {
 									});
 									AreaManager manager = AreaManager.of(source.getLevel());
 									manager.setChanged(areas);
-									source.sendSuccess(Component.translatable("loquat.command.tag.success", count), true);
+									source.sendSuccess(() -> Component.translatable("loquat.command.tag.success", count), true);
 									return count;
 								})
 						))
@@ -49,7 +49,7 @@ public class TagCommand extends LoquatCommand {
 									});
 									AreaManager manager = AreaManager.of(source.getLevel());
 									manager.setChanged(areas);
-									source.sendSuccess(Component.translatable("loquat.command.tag.success", count), true);
+									source.sendSuccess(() -> Component.translatable("loquat.command.tag.success", count), true);
 									return count;
 								})
 						)

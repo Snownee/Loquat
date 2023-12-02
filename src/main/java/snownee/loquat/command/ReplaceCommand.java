@@ -42,7 +42,7 @@ public class ReplaceCommand extends LoquatCommand {
 					areaManager.add(AreaManager.loadAreas(tag).get(0));
 					selections.clear();
 					SSyncSelectionPacket.sync(source.getPlayerOrException());
-					source.sendSuccess(Component.translatable("loquat.command.replace.success"), true);
+					source.sendSuccess(() -> Component.translatable("loquat.command.replace.success"), true);
 					return 1;
 				});
 	}

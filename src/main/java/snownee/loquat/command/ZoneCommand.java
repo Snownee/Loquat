@@ -52,7 +52,7 @@ public class ZoneCommand extends LoquatCommand {
 		}
 		AreaManager manager = AreaManager.of(source.getLevel());
 		manager.setChanged(List.of(area));
-		source.sendSuccess(Component.translatable("loquat.command.zone.remove.success"), true);
+		source.sendSuccess(() -> Component.translatable("loquat.command.zone.remove.success"), true);
 		return 1;
 	}
 
@@ -71,7 +71,7 @@ public class ZoneCommand extends LoquatCommand {
 		manager.setChanged(List.of(area));
 		selections.clear();
 		SSyncSelectionPacket.sync(source.getPlayerOrException());
-		source.sendSuccess(Component.translatable("loquat.command.zone.add.success"), true);
+		source.sendSuccess(() -> Component.translatable("loquat.command.zone.add.success"), true);
 		return 1;
 	}
 

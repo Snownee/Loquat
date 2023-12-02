@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -66,9 +66,7 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			Object2DoubleMap<String> attrs = jsonObject.has("attrs") ? new Object2DoubleArrayMap<>() : null;
 			if (attrs != null) {
 				jsonObject.getAsJsonObject("attrs").entrySet().forEach(entry -> {
-					Attribute attr = SIMPLE_ATTRIBUTES.computeIfAbsent(entry.getKey(), s -> {
-						return Registry.ATTRIBUTE.get(new ResourceLocation(s));
-					});
+					Attribute attr = SIMPLE_ATTRIBUTES.computeIfAbsent(entry.getKey(), s -> BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
 					Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
 					attrs.put(entry.getKey(), entry.getValue().getAsDouble());
 				});

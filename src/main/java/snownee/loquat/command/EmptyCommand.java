@@ -24,7 +24,7 @@ public class EmptyCommand extends LoquatCommand {
 								return 0;
 							}
 							LoquatUtil.emptyBlocks(source.getLevel(), area::allBlockPosIn);
-							source.sendSuccess(Component.translatable("loquat.command.empty.success"), true);
+							source.sendSuccess(() -> Component.translatable("loquat.command.empty.success"), true);
 							return 1;
 						})
 				)
@@ -35,7 +35,7 @@ public class EmptyCommand extends LoquatCommand {
 								LoquatUtil.emptyBlocks(source.getLevel(), area::allBlockPosIn);
 								return true;
 							});
-							source.sendSuccess(Component.translatable("loquat.command.empty.success"), true);
+							source.sendSuccess(() -> Component.translatable("loquat.command.empty.success"), true);
 							return count;
 						})
 				);
