@@ -134,7 +134,7 @@ unifiedPublishing {
 		} catch (e) {
 		}// Optional, in markdown format
 		releaseType = "release" // Optional, use "release", "beta" or "alpha"
-		gameVersions = ["1.19.2"]
+		gameVersions = ["1.20.1", "1.20"]
 		gameLoaders = ["fabric"]
 
 		mainPublication tasks.remapJar // Declares the publicated jar
