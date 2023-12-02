@@ -129,7 +129,10 @@ unifiedPublishing {
 	project {
 		displayName = project.version
 		version = project.mod_version // Optional, Inferred from project by default
-		changelog = file("CHANGELOG.md").text // Optional, in markdown format
+		try {
+			changelog = file("CHANGELOG.md")?.text
+		} catch (e) {
+		}// Optional, in markdown format
 		releaseType = "release" // Optional, use "release", "beta" or "alpha"
 		gameVersions = ["1.19.2"]
 		gameLoaders = ["fabric"]
@@ -137,7 +140,7 @@ unifiedPublishing {
 		mainPublication tasks.remapJar // Declares the publicated jar
 
 		curseforge {
-			token = System.getenv("CURSE_TOKEN")
+			token = System.getenv("CURSE_TOKEN") ?: ""
 			id = "396597" // Required, must be a string, ID of CurseForge project
 
 			relations { // Optional, Inferred from the relations above by default
@@ -150,7 +153,7 @@ unifiedPublishing {
 		}
 
 		modrinth {
-			token = System.getenv("MODRINTH_TOKEN")
+			token = System.getenv("MODRINTH_TOKEN") ?: ""
 			id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
 			displayName = project.mod_version
 
