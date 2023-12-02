@@ -11,5 +11,6 @@
   "spawners": {},
   "spawn_costs": {},
   "carvers": {},
-  "features": []
+  "features": [],
+  "has_precipitation": false
 }

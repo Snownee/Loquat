@@ -21,14 +21,50 @@ import snownee.loquat.Hooks;
 @Mixin(PlaceCommand.class)
 public class PlaceCommandMixin {
 
-	@Inject(method = "placeStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/commands/PlaceCommand;checkLoaded(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/ChunkPos;)V"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private static void prePlaceStructure(CommandSourceStack source, Holder<Structure> structure, BlockPos pos, CallbackInfoReturnable<Integer> cir, ServerLevel serverLevel, Structure structure2, ChunkGenerator chunkGenerator, StructureStart structureStart, BoundingBox boundingBox, ChunkPos chunkPos, ChunkPos chunkPos2) {
+	@Inject(
+			method = "placeStructure",
+			at =
+			@At(
+					value = "INVOKE",
+					target =
+							"Lnet/minecraft/server/commands/PlaceCommand;checkLoaded(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/ChunkPos;Lnet/minecraft/world/level/ChunkPos;)V"),
+			locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private static void prePlaceStructure(
+			CommandSourceStack commandSourceStack,
+			Holder.Reference<Structure> reference,
+			BlockPos blockPos,
+			CallbackInfoReturnable<Integer> cir,
+			ServerLevel serverLevel,
+			Structure structure,
+			ChunkGenerator chunkGenerator,
+			StructureStart structureStart,
+			BoundingBox boundingBox,
+			ChunkPos chunkPos,
+			ChunkPos chunkPos2) {
 		Hooks.prePlaceStructure(serverLevel, chunkPos, chunkPos2);
 	}
 
-	@Inject(method = "placeStructure", at = @At(value = "INVOKE", target = "Lnet/minecraft/commands/CommandSourceStack;sendSuccess(Lnet/minecraft/network/chat/Component;Z)V"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private static void postPlaceStructure(CommandSourceStack source, Holder<Structure> structure, BlockPos pos, CallbackInfoReturnable<Integer> cir, ServerLevel serverLevel, Structure structure2, ChunkGenerator chunkGenerator, StructureStart structureStart, BoundingBox boundingBox, ChunkPos chunkPos, ChunkPos chunkPos2, String string) {
+	@Inject(
+			method = "placeStructure",
+			at =
+			@At(
+					value = "INVOKE",
+					target =
+							"Lnet/minecraft/commands/CommandSourceStack;sendSuccess(Ljava/util/function/Supplier;Z)V"),
+			locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private static void postPlaceStructure(
+			CommandSourceStack commandSourceStack,
+			Holder.Reference<Structure> reference,
+			BlockPos blockPos,
+			CallbackInfoReturnable<Integer> cir,
+			ServerLevel serverLevel,
+			Structure structure2,
+			ChunkGenerator chunkGenerator,
+			StructureStart structureStart,
+			BoundingBox boundingBox,
+			ChunkPos chunkPos,
+			ChunkPos chunkPos2,
+			String string) {
 		Hooks.postPlaceStructure(serverLevel, chunkPos, chunkPos2);
 	}
-
 }
