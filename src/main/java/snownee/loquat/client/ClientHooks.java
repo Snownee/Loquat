@@ -28,31 +28,35 @@ public interface ClientHooks {
 			return true;
 		}
 		UUID uuid = UUID.fromString(s[3]);
-		if (s[1].equals("highlight")) {
-			if (!player.level.dimension().location().equals(dimension)) {
-				player.displayClientMessage(Component.translatable("loquat.command.wrongDimension"), false);
-				return true;
-			}
-			CRequestOutlinesPacket.request(60, List.of(uuid));
-		} else if (s[1].equals("info")) {
-			if (Screen.hasControlDown()) {
-				Minecraft.getInstance().keyboardHandler.setClipboard(s[4]);
-				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied"), false);
-			} else {
-				Minecraft.getInstance().keyboardHandler.setClipboard(uuid.toString());
-				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied.uuid"), false);
-			}
-		} else if (s[1].equals("select")) {
-			SelectionManager manager = SelectionManager.of(player);
-			CSelectAreaPacket.send(!manager.getSelectedAreas().contains(uuid), uuid);
-		}
+        switch (s[1]) {
+            case "highlight" -> {
+                if (!player.level().dimension().location().equals(dimension)) {
+                    player.displayClientMessage(Component.translatable("loquat.command.wrongDimension"), false);
+                    return true;
+                }
+                CRequestOutlinesPacket.request(60, List.of(uuid));
+            }
+            case "info" -> {
+                if (Screen.hasControlDown()) {
+                    Minecraft.getInstance().keyboardHandler.setClipboard(s[4]);
+                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied"), false);
+                } else {
+                    Minecraft.getInstance().keyboardHandler.setClipboard(uuid.toString());
+                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("loquat.msg.copied.uuid"), false);
+                }
+            }
+            case "select" -> {
+                SelectionManager manager = SelectionManager.of(player);
+                CSelectAreaPacket.send(!manager.getSelectedAreas().contains(uuid), uuid);
+            }
+        }
 		return true;
 	}
-	
+
 	static Level getLevel() {
 		return Minecraft.getInstance().level;
 	}
-	
+
 	static Player getPlayer() {
 		return Minecraft.getInstance().player;
 	}

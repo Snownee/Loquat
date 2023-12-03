@@ -14,14 +14,14 @@ public class ClearCommand {
 				.then(Commands.literal("events")
 						.executes(ctx -> {
 							AreaManager.of(ctx.getSource().getLevel()).clearEvents();
-							ctx.getSource().sendSuccess(Component.translatable("loquat.command.clear.events.success"), true);
+							ctx.getSource().sendSuccess(() -> Component.translatable("loquat.command.clear.events.success"), true);
 							return 1;
 						})
 				)
 				.then(Commands.literal("restrictions")
 						.executes(ctx -> {
 							AreaManager.of(ctx.getSource().getLevel()).clearRestrictions();
-							ctx.getSource().sendSuccess(Component.translatable("loquat.command.clear.restrictions.success"), true);
+							ctx.getSource().sendSuccess(() -> Component.translatable("loquat.command.clear.restrictions.success"), true);
 							return 1;
 						})
 				);

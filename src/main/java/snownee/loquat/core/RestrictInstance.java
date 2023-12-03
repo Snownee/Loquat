@@ -35,7 +35,7 @@ public class RestrictInstance {
 	public static RestrictInstance of(Player player) {
 		if (player instanceof LoquatServerPlayer) {
 			return ((LoquatServerPlayer) player).loquat$getRestrictionInstance();
-		} else if (player.level.isClientSide && Minecraft.getInstance().player == player) {
+		} else if (player.level().isClientSide && Minecraft.getInstance().player == player) {
 			return LoquatClient.get().restrictInstance;
 		}
 		throw new IllegalArgumentException("Unknown player type: " + player);
@@ -83,9 +83,6 @@ public class RestrictInstance {
 
 	public Optional<ListTag> serializeNBT(AreaManager manager) {
 		if (rules == null || rules.isEmpty()) {
-			return Optional.empty();
-		}
-		if (rules.isEmpty()) {
 			return Optional.empty();
 		}
 		ListTag listTag = new ListTag();

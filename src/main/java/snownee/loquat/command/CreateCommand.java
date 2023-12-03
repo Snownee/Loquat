@@ -57,7 +57,7 @@ public class CreateCommand {
 			return 0;
 		}
 		manager.add(area);
-		source.sendSuccess(Component.translatable("loquat.command.create.success"), true);
+		source.sendSuccess(() -> Component.translatable("loquat.command.create.success"), true);
 		return 1;
 	}
 

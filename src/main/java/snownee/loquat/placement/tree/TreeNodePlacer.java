@@ -77,9 +77,10 @@ public class TreeNodePlacer implements LoquatPlacer {
 				doPlace(root, steps, generationContext.structureTemplateManager(), random, pools);
 				for (var step : steps) {
 					step.node.tags.addAll(ctx.globalTags);
-					if (step.node.tags.size() > 0 || step.node.getData() != null) {
+					boolean hasTags = !step.node.tags.isEmpty();
+					if (hasTags || step.node.getData() != null) {
 						CompoundTag data = new CompoundTag();
-						if (step.node.tags.size() > 0) {
+						if (hasTags) {
 							ListTag tags = new ListTag();
 							for (var tag : step.node.tags) {
 								tags.add(StringTag.valueOf(tag));
@@ -118,11 +119,11 @@ public class TreeNodePlacer implements LoquatPlacer {
 		ListMultimap<String, StructureTemplate.StructureBlockInfo> byJointName = ArrayListMultimap.create();
 		Set<StructureTemplate.StructureBlockInfo> resolvedJigsaws = Sets.newHashSet();
 		for (var jigsawBlock : jigsawBlocks) {
-			if (step.jointPos.equals(jigsawBlock.pos.offset(blockPos))) {
+			if (step.jointPos.equals(jigsawBlock.pos().offset(blockPos))) {
 				resolvedJigsaws.add(jigsawBlock);
 				continue;
 			}
-			String jointName = jigsawBlock.nbt.getString("name");
+			String jointName = jigsawBlock.nbt().getString("name");
 			byJointName.put(jointName, jigsawBlock);
 		}
 		StructureTemplate.StructureBlockInfo selectedJigsaw = null;
@@ -151,7 +152,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 			if (resolvedJigsaws.contains(jigsawBlock)) {
 				continue;
 			}
-			String jointName = jigsawBlock.nbt.getString("name");
+			String jointName = jigsawBlock.nbt().getString("name");
 			TreeNode fallbackNode = node.getFallbackNodeProvider().apply(jointName);
 			if (fallbackNode == null) {
 				continue;
@@ -162,8 +163,8 @@ public class TreeNodePlacer implements LoquatPlacer {
 	}
 
 	private StructureTemplate.StructureBlockInfo tryPlaceNode(TreeNode node, StepStack steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools, TreeNode child, StructureTemplate.StructureBlockInfo jigsawBlock, Step parentStep, boolean fallback) {
-		BlockPos jointPos = parentStep.piece.getPosition().offset(jigsawBlock.pos);
-		Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state);
+		BlockPos jointPos = parentStep.piece.getPosition().offset(jigsawBlock.pos());
+		Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state());
 		BlockPos thatJointPos = child.isOffsetTowardsJigsawFront() ? jointPos.relative(direction) : jointPos;
 		if (!fallback) {
 			double dist = parentStep.jointPos.distSqr(jointPos);
@@ -185,7 +186,7 @@ public class TreeNodePlacer implements LoquatPlacer {
 						continue;
 					}
 					hasAnyTarget = true;
-					BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos.multiply(-1));
+					BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos().multiply(-1));
 					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
 					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
 					VoxelShape validSpace = steps.peek().validSpace;

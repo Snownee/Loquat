@@ -22,7 +22,7 @@ public class CSelectAreaPacket extends PacketHandler {
 		if (!Objects.requireNonNull(sender).hasPermissions(2)) {
 			return null;
 		}
-		AreaManager manager = AreaManager.of(sender.getLevel());
+		AreaManager manager = AreaManager.of(sender.serverLevel());
 		boolean select = buf.readBoolean();
 		Area area = manager.get(buf.readUUID());
 		if (area == null) {

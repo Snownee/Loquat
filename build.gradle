@@ -50,14 +50,15 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation("maven.modrinth:lazydfu:4SHylIO9")
-	modImplementation("maven.modrinth:kiwi:8hHupPeX")
-	annotationProcessor("maven.modrinth:kiwi:8hHupPeX")
-	modImplementation("maven.modrinth:lychee:Jom2wJAL")
-	modImplementation("maven.modrinth:modmenu:gSoPJyVn")
-	modImplementation("maven.modrinth:cloth-config:EXrxCjl6")
-	modImplementation("maven.modrinth:jade:ZASePpsm")
-	modImplementation("maven.modrinth:lithium:m6sVgAi6")
-	modImplementation("maven.modrinth:huge-structure-blocks:OsfLOdQa")
+	modImplementation(annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}-fabric"))
+	modImplementation("maven.modrinth:lychee:5.1.0-fabric")
+	modImplementation("maven.modrinth:modmenu:${project.modmenu_version}")
+	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	modImplementation("maven.modrinth:jade:11.6.2")
+	modImplementation("maven.modrinth:lithium:mc1.20.1-0.11.2")
+	modImplementation("maven.modrinth:huge-structure-blocks:1.0.9")
 
 	modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
 }
@@ -129,15 +130,18 @@ unifiedPublishing {
 	project {
 		displayName = project.version
 		version = project.mod_version // Optional, Inferred from project by default
-		changelog = file("CHANGELOG.md").text // Optional, in markdown format
+		try {
+			changelog = file("CHANGELOG.md")?.text
+		} catch (e) {
+		}// Optional, in markdown format
 		releaseType = "release" // Optional, use "release", "beta" or "alpha"
-		gameVersions = ["1.19.2"]
+		gameVersions = ["1.20.1", "1.20"]
 		gameLoaders = ["fabric"]
 
 		mainPublication tasks.remapJar // Declares the publicated jar
 
 		curseforge {
-			token = System.getenv("CURSE_TOKEN")
+			token = System.getenv("CURSE_TOKEN") ?: ""
 			id = "396597" // Required, must be a string, ID of CurseForge project
 
 			relations { // Optional, Inferred from the relations above by default
@@ -150,7 +154,7 @@ unifiedPublishing {
 		}
 
 		modrinth {
-			token = System.getenv("MODRINTH_TOKEN")
+			token = System.getenv("MODRINTH_TOKEN") ?: ""
 			id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
 			displayName = project.mod_version
 

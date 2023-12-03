@@ -5,6 +5,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+
+import net.minecraft.core.registries.Registries;
+
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,7 +82,7 @@ public interface Hooks {
 	}
 
 	static void tickServerPlayer(ServerPlayer player, LoquatServerPlayer loquatPlayer) {
-		AreaManager manager = AreaManager.of(player.getLevel());
+		AreaManager manager = AreaManager.of(player.serverLevel());
 		long chunkPos = ChunkPos.asLong(player.blockPosition());
 		Set<Area> areasIn = loquatPlayer.loquat$getAreasIn();
 		Streams.concat(manager.byChunk(chunkPos), areasIn.stream()).distinct().toList().forEach(area -> {
@@ -161,7 +165,7 @@ public interface Hooks {
 		ListTag list = data.getList(key, Tag.TAG_STRING);
 		for (int i = 0; i < list.size(); i++) {
 			String s = list.getString(i);
-			StructureProcessorList processorList = registryAccess.registryOrThrow(Registry.PROCESSOR_LIST_REGISTRY).getOptional(ResourceLocation.tryParse(s)).orElseThrow(() -> {
+			StructureProcessorList processorList = registryAccess.registryOrThrow(Registries.PROCESSOR_LIST).getOptional(ResourceLocation.tryParse(s)).orElseThrow(() -> {
 				return new IllegalStateException("Unknown processor list: " + s);
 			});
 			processorList.list().forEach(settings::addProcessor);

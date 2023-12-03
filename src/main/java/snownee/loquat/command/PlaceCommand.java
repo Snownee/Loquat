@@ -35,7 +35,7 @@ public class PlaceCommand extends LoquatCommand {
 									}
 									var program = getProgram(ctx);
 									program.place(source.getLevel(), area);
-									source.sendSuccess(Component.translatable("loquat.command.place.success"), true);
+									source.sendSuccess(() -> Component.translatable("loquat.command.place.success"), true);
 									return 1;
 								})
 						)
@@ -48,7 +48,7 @@ public class PlaceCommand extends LoquatCommand {
 									int count = forEachSelected(source, (area, manager) -> {
 										return program.place(source.getLevel(), area);
 									});
-									source.sendSuccess(Component.translatable("loquat.command.place.success"), true);
+									source.sendSuccess(() -> Component.translatable("loquat.command.place.success"), true);
 									return count;
 								})
 						)

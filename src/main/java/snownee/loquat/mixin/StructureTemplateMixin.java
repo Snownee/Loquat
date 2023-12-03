@@ -2,6 +2,8 @@ package snownee.loquat.mixin;
 
 import java.util.List;
 
+import net.minecraft.core.HolderGetter;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +36,7 @@ public class StructureTemplateMixin {
 	private Vec3i size;
 
 	@Inject(method = "load", at = @At("HEAD"))
-	private void loquat$load(CompoundTag tag, CallbackInfo ci) {
+	private void loquat$load(HolderGetter<Block> holderGetter, CompoundTag tag, CallbackInfo ci) {
 		loquat$areas.clear();
 		if (tag.contains("Loquat", Tag.TAG_COMPOUND)) {
 			CompoundTag loquat = tag.getCompound("Loquat");
