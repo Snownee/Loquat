@@ -13,7 +13,6 @@ public class ClientProxy implements ClientModInitializer {
 			var matrixStack = context.matrixStack();
 			matrixStack.pushPose();
 			var pos = context.camera().getPosition().reverse();
-			matrixStack.translate(pos.x, pos.y, pos.z);
 			LoquatClient.get().render(context.matrixStack(), Minecraft.getInstance().renderBuffers().bufferSource(), pos);
 			matrixStack.popPose();
 		});
