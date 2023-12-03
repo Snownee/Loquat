@@ -1,5 +1,8 @@
 package snownee.loquat.util;
 
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
 import net.minecraft.commands.CommandSigningContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -12,9 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public interface LoquatUtil {
 

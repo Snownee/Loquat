@@ -1,7 +1,5 @@
 package snownee.loquat.mixin;
 
-import net.minecraft.world.phys.Vec3;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.duck.LoquatMob;
 
