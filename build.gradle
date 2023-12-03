@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.1.8'
+	id 'fabric-loom' version '1.1.+'
 	id 'maven-publish'
-	id "io.freefair.lombok" version "6.6.2"
+	id "io.freefair.lombok" version "8.4"
 	id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
