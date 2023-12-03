@@ -21,7 +21,6 @@ public class ClientProxy {
 			Camera camera = event.getCamera();
 			Vec3 pos = camera.getPosition().reverse();
 			matrixStack.pushPose();
-			matrixStack.translate(pos.x, pos.y, pos.z);
 			LoquatClient.get().render(matrixStack, Minecraft.getInstance().renderBuffers().bufferSource(), pos);
 			matrixStack.popPose();
 		});
