@@ -23,7 +23,7 @@ public class DeleteCommand extends LoquatCommand {
 								source.sendFailure(Component.translatable("loquat.command.areaNotFound"));
 								return 0;
 							}
-							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
+							source.sendSuccess(() -> Component.translatable("loquat.command.delete.success"), true);
 							return 1;
 						})
 				)
@@ -33,7 +33,7 @@ public class DeleteCommand extends LoquatCommand {
 							int count = forEachSelected(source, (area, manager) -> manager.remove(area.getUuid()));
 							SelectionManager.of(source.getPlayerOrException()).getSelectedAreas().clear();
 							SSyncSelectionPacket.sync(source.getPlayerOrException());
-							source.sendSuccess(Component.translatable("loquat.command.delete.success"), true);
+							source.sendSuccess(() -> Component.translatable("loquat.command.delete.success"), true);
 							return count;
 						})
 				);

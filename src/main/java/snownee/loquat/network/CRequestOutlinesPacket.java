@@ -26,9 +26,9 @@ public class CRequestOutlinesPacket extends PacketHandler {
 		if (!Objects.requireNonNull(sender).hasPermissions(2)) {
 			return null;
 		}
-		long expire = LongMath.checkedAdd(buf.readVarLong(), sender.level.getGameTime());
+		long expire = LongMath.checkedAdd(buf.readVarLong(), sender.level().getGameTime());
 		boolean all = buf.readBoolean();
-		AreaManager manager = AreaManager.of(sender.getLevel());
+		AreaManager manager = AreaManager.of(sender.serverLevel());
 		List<Area> areas;
 		if (all) {
 			areas = manager.areas();

@@ -72,7 +72,7 @@ public class RestrictCommand extends LoquatCommand {
 		for (ServerPlayer player : players) {
 			SSyncRestrictionPacket.sync(player);
 		}
-		ctx.getSource().sendSuccess(Component.translatable("loquat.command.restrict.success", changed.intValue()), true);
+		ctx.getSource().sendSuccess(() -> Component.translatable("loquat.command.restrict.success", changed.intValue()), true);
 		return players.size();
 	}
 

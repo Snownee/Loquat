@@ -136,7 +136,7 @@ public class CommonProxy {
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.Clone.class, event -> {
 			if (event.getEntity() instanceof ServerPlayer player) {
-				AreaManager.of(player.getLevel()).playerLoaded(player);
+				AreaManager.of(player.serverLevel()).playerLoaded(player);
 			}
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, PlayerInteractEvent.LeftClickBlock.class, event -> {

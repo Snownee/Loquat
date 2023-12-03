@@ -7,14 +7,14 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
 		//classpath 'org.parchmentmc:librarian:1.+'
 		classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
 	}
 }
 
 plugins {
-	id "io.freefair.lombok" version "6.6.2"
+	id "io.freefair.lombok" version "8.4"
 	id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
@@ -220,13 +220,12 @@ dependencies {
 	implementation(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
 	//implementation fg.deobf("maven.modrinth:lazydfu:4SHylIO9")
-	implementation fg.deobf("maven.modrinth:kiwi:wc9IhZWY")
-	annotationProcessor("maven.modrinth:kiwi:wc9IhZWY")
-	implementation fg.deobf("maven.modrinth:lychee:xoUWAxCV")
-	implementation fg.deobf("maven.modrinth:cloth-config:Fw7B2c97")
-	implementation fg.deobf("maven.modrinth:jade:ZASePpsm")
-	implementation fg.deobf("maven.modrinth:canary:FReV3YPW")
-	implementation fg.deobf("maven.modrinth:huge-structure-blocks:Q2SZF37K")
+	implementation(annotationProcessor(fg.deobf("maven.modrinth:kiwi:${project.kiwi_version}-forge")))
+	implementation fg.deobf("maven.modrinth:lychee:5.1.0-forge")
+	implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.cloth_config_version}"))
+	implementation fg.deobf("maven.modrinth:jade:11.6.2")
+	implementation fg.deobf("maven.modrinth:canary:mc1.20.1-0.2.7")
+	implementation fg.deobf("maven.modrinth:huge-structure-blocks:1.0.9")
 
 	implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
 	implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
