@@ -5,19 +5,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-
-import net.minecraft.core.registries.Registries;
-
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Streams;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

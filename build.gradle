@@ -134,7 +134,7 @@ unifiedPublishing {
 			changelog = file("CHANGELOG.md")?.text
 		} catch (e) {
 		}// Optional, in markdown format
-		releaseType = "release" // Optional, use "release", "beta" or "alpha"
+		releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
 		gameVersions = ["1.20.1", "1.20"]
 		gameLoaders = ["fabric"]
 

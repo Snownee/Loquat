@@ -8,7 +8,7 @@
     "Snownee"
   ],
   "contributors": [
-    "zomb_676"
+    "SettingDust", "zomb_676"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/loquat-fabric",
@@ -35,11 +35,11 @@
     "minecraft": "~1.20"
   },
   "recommends": {
-    "lychee": ">=3.14"
+    "lychee": ">=5.1"
   },
   "breaks": {
-    "lychee": "<3.14",
-    "kubejs": "<1902.6.1-"
+    "lychee": "<5",
+    "kubejs": "<2001.6"
   },
   "custom": {
     "modmenu": {
