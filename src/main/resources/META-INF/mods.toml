@@ -7,7 +7,7 @@ modId="loquat"
 version="${file.jarVersion}"
 displayName="Loquat"
 authors="Snownee"
-credits="zomb_676"
+credits="SettingDust, zomb_676"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/loquat-forge"
 description="Area management tool"
 logoFile="logo.png"
@@ -29,7 +29,7 @@ logoFile="logo.png"
 [[dependencies.loquat]]
     modId="kubejs"
     mandatory=false
-    versionRange="[1902.6.1,)"
+    versionRange="[2001.6,)"
     ordering="NONE"
     side="BOTH"
 
