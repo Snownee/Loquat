@@ -85,9 +85,6 @@ public class RestrictInstance {
 		if (rules == null || rules.isEmpty()) {
 			return Optional.empty();
 		}
-		if (rules.isEmpty()) {
-			return Optional.empty();
-		}
 		ListTag listTag = new ListTag();
 		rules.forEach((area, flags) -> {
 			CompoundTag tag = new CompoundTag();

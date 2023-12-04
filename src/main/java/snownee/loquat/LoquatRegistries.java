@@ -20,11 +20,10 @@ public final class LoquatRegistries {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(LoquatRegistries::newRegistries);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public static void newRegistries(NewRegistryEvent event) {
-		event.create(register("area"), v -> AREA = new RegistryBridge(v));
-		event.create(register("area_event"), v -> AREA_EVENT = new RegistryBridge(v));
-		event.create(register("place_program"), v -> PLACE_PROGRAM = new RegistryBridge(v));
+		event.<Area.Type<?>>create(register("area"), v -> AREA = new RegistryBridge<>(v));
+		event.<AreaEvent.Type<?>>create(register("area_event"), v -> AREA_EVENT = new RegistryBridge<>(v));
+		event.<PlaceProgram.Type<?>>create(register("place_program"), v -> PLACE_PROGRAM = new RegistryBridge<>(v));
 	}
 
 	private static <T> RegistryBuilder<T> register(String name) {
