@@ -69,9 +69,9 @@ public class SelectionManager {
 			} else {
 				if (selections.size() == 1) {
 					AABB aabb = selections.get(0).toAABB();
-					be.setStructurePos(new BlockPos(aabb.minX, aabb.minY, aabb.minZ).subtract(pos));
+					be.setStructurePos(new BlockPos((int) aabb.minX, (int) aabb.minY, (int) aabb.minZ).subtract(pos));
 					if (be.getMode() != StructureMode.LOAD)
-						be.setStructureSize(new BlockPos(aabb.getXsize(), aabb.getYsize(), aabb.getZsize()));
+						be.setStructureSize(new BlockPos((int) aabb.getXsize(), (int) aabb.getYsize(), (int) aabb.getZsize()));
 				}
 			}
 			be.setShowBoundingBox(true);

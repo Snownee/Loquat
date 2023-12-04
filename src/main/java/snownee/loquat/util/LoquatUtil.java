@@ -40,8 +40,22 @@ public interface LoquatUtil {
 	class SilentCommandSourceStack extends CommandSourceStack {
 
 		public SilentCommandSourceStack(ServerLevel world) {
-			super(world.getServer(), Vec3.atLowerCornerOf(world.getSharedSpawnPos()), Vec2.ZERO, world, 4, "Server", Component.literal("Server"), world.getServer(), null, true, (commandContext, bl, i) -> {
-			}, EntityAnchorArgument.Anchor.FEET, CommandSigningContext.ANONYMOUS, TaskChainer.IMMEDIATE);
+			super(
+					world.getServer(),
+					Vec3.atLowerCornerOf(world.getSharedSpawnPos()),
+					Vec2.ZERO,
+					world,
+					4,
+					"Server",
+					Component.literal("Server"),
+					world.getServer(),
+					null,
+					true,
+					(commandContext, bl, i) -> {},
+					EntityAnchorArgument.Anchor.FEET,
+					CommandSigningContext.ANONYMOUS,
+					TaskChainer.immediate(world.getServer()),
+					i -> {});
 		}
 	}
 

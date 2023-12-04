@@ -47,7 +47,7 @@ public class SpawnCommand extends LoquatCommand {
 			source.sendFailure(Component.translatable("loquat.command.spawnerNotExists"));
 			return 0;
 		}
-		source.sendSuccess(Component.translatable("loquat.command.spawn.success", spawnerId), true);
+		source.sendSuccess(() -> Component.translatable("loquat.command.spawn.success", spawnerId), true);
 		return 1;
 	}
 

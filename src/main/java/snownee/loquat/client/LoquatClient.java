@@ -46,11 +46,11 @@ public class LoquatClient {
 			if (ctx.time() + 10 > data.expire) {
 				alpha *= (data.expire - ctx.time()) / 10F;
 			}
-			RenderUtil.renderLineBox(aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
+			RenderUtil.renderLineBox(ctx.poseStack, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha);
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
 			RenderSystem.enableDepthTest();
-			DebugRenderer.renderFilledBox(aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
+			DebugRenderer.renderFilledBox(ctx.poseStack, ctx.bufferSource, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
 		});
 	}
 
@@ -98,7 +98,7 @@ public class LoquatClient {
 				var center = data.area.getCenter();
 				if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
 					var tags = Joiner.on(", ").join(data.area.getTags());
-					DebugRenderer.renderFloatingText(tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
+					DebugRenderer.renderFloatingText(context.poseStack, context.bufferSource, tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
 				}
 			}
 			if (data.type != DebugAreaType.HIGHLIGHT)
@@ -116,8 +116,8 @@ public class LoquatClient {
 						} else {
 							aabb = aabb.deflate(0.2, 0.5, 0.2).move(0, -0.48, 0);
 						}
-						RenderUtil.renderLineBox(aabb.move(context.pos), 1, 0.6F, 0, alpha);
-						DebugRenderer.renderFloatingText(name, center.x, center.y, center.z, 0, 0.045F);
+						RenderUtil.renderLineBox(context.poseStack, aabb.move(context.pos), 1, 0.6F, 0, alpha);
+						DebugRenderer.renderFloatingText(context.poseStack, context.bufferSource, name, center.x, center.y, center.z, 0, 0.045F);
 					}
 				});
 			}
@@ -128,7 +128,7 @@ public class LoquatClient {
 	private void renderSelections(RenderDebugContext context, ClientLevel level, List<PosSelection> selections) {
 		for (PosSelection selection : selections) {
 			AABB aabb = selection.toAABB().inflate(0.01);
-			RenderUtil.renderLineBox(aabb.move(context.pos), 0.4F, 0.4F, 1, 1);
+			RenderUtil.renderLineBox(context.poseStack, aabb.move(context.pos), 0.4F, 0.4F, 1, 1);
 		}
 	}
 

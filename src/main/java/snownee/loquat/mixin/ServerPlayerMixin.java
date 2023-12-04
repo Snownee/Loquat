@@ -60,7 +60,7 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 	public RestrictInstance loquat$getRestrictionInstance() {
 		if (loquat$restriction == null) {
 			ServerPlayer player = (ServerPlayer) (Object) this;
-			loquat$restriction = AreaManager.of(player.getLevel()).getOrCreateRestrictInstance(player.getScoreboardName());
+			loquat$restriction = AreaManager.of(player.serverLevel()).getOrCreateRestrictInstance(player.getScoreboardName());
 		}
 		return loquat$restriction;
 	}

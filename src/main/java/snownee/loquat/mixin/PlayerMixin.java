@@ -22,7 +22,7 @@ public class PlayerMixin implements LoquatPlayer {
 	@Override
 	public SelectionManager loquat$getSelectionManager() {
 		if (loquat$selection == null) {
-			loquat$selection = new SelectionManager(((Entity) (Object) this).level.isClientSide);
+			loquat$selection = new SelectionManager(((Entity) (Object) this).level().isClientSide);
 		}
 		return loquat$selection;
 	}

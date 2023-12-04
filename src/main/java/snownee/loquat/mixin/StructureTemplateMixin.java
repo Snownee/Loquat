@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.google.common.collect.Lists;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -34,7 +35,7 @@ public class StructureTemplateMixin {
 	private Vec3i size;
 
 	@Inject(method = "load", at = @At("HEAD"))
-	private void loquat$load(CompoundTag tag, CallbackInfo ci) {
+	private void loquat$load(HolderGetter<Block> holderGetter, CompoundTag tag, CallbackInfo ci) {
 		loquat$areas.clear();
 		if (tag.contains("Loquat", Tag.TAG_COMPOUND)) {
 			CompoundTag loquat = tag.getCompound("Loquat");

@@ -29,7 +29,7 @@ public class OutlineCommand {
 						SOutlinesPacket.outlines(player, Long.MIN_VALUE, false, false, manager.areas());
 						showOutlinePlayers.remove(source.getEntityOrException().getUUID());
 					}
-					source.sendSuccess(Component.translatable("loquat.command.outline.success", show), true);
+					source.sendSuccess(() -> Component.translatable("loquat.command.outline.success", show), true);
 					return show ? 1 : 0;
 				});
 	}
