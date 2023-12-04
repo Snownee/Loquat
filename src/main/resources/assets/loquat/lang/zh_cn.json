@@ -24,7 +24,7 @@
   "loquat.command.nearby.more.tags": "标签：%s",
   "loquat.command.nearby.more.data": "数据：%s",
   "loquat.command.nearby.more.restrict.global": "全局限制：%s",
-  "loquat.command.nearby.more.restrict.player": "R限制：%s",
+  "loquat.command.nearby.more.restrict.player": "限制：%s",
   "loquat.command.nearby.select": "[±]",
   "loquat.command.spawnerNotExists": "生成器不存在",
   "loquat.command.spawn.success": "生成器%s正在工作",
