@@ -14,7 +14,7 @@ import snownee.loquat.client.LoquatClient;
 public class ClientProxy {
 	public static void initClient() {
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderLevelStageEvent.class, event -> {
-			if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) {
+			if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) {
 				return;
 			}
 			PoseStack matrixStack = event.getPoseStack();

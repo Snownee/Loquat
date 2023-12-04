@@ -15,14 +15,14 @@ logoFile="logo.png"
 [[dependencies.loquat]]
     modId="kiwi"
     mandatory=true
-    versionRange="[8,9)"
+    versionRange="[11,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.loquat]]
     modId="lychee"
     mandatory=false
-    versionRange="[3.14,)"
+    versionRange="[5,)"
     ordering="NONE"
     side="BOTH"
 
