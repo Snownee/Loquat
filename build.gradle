@@ -112,7 +112,7 @@ publishing {
 				builtBy remapJar
 			}
 			// artifact(sourcesJar) {
-			//     builtBy remapSourcesJar
+			//	 builtBy remapSourcesJar
 			// }
 		}
 	}
@@ -128,42 +128,42 @@ publishing {
 
 unifiedPublishing {
 	project {
-		displayName = project.version
+		displayName = "[Fabric $project.supported_version] $project.mod_version"
 		version = project.mod_version // Optional, Inferred from project by default
-		try {
-			changelog = file("CHANGELOG.md")?.text
-		} catch (e) {
-		}// Optional, in markdown format
+		changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : ""
 		releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
-		gameVersions = ["1.20.1", "1.20"]
-		gameLoaders = ["fabric"]
+		gameVersions = ["1.20", "1.20.1"]
+		gameLoaders = ["fabric", "quilt"]
 
 		mainPublication tasks.remapJar // Declares the publicated jar
 
-		curseforge {
-			token = System.getenv("CURSE_TOKEN") ?: ""
-			id = "396597" // Required, must be a string, ID of CurseForge project
+		if (System.getenv("CURSE_TOKEN") != null) {
+			curseforge {
+				token = System.getenv("CURSE_TOKEN")
+				id = "396597" // Required, must be a string, ID of CurseForge project
 
-			relations { // Optional, Inferred from the relations above by default
-				depends "kiwi-fabric"
-				optional "cloth-config"
-				optional "lychee-fabric"
-				optional "kubejs"
-				optional "huge-structure-blocks"
+				relations { // Optional, Inferred from the relations above by default
+					depends "kiwi-fabric"
+					optional "cloth-config"
+					optional "lychee-fabric"
+					optional "kubejs"
+					optional "huge-structure-blocks"
+				}
 			}
 		}
 
-		modrinth {
-			token = System.getenv("MODRINTH_TOKEN") ?: ""
-			id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
-			displayName = project.mod_version
+		if (System.getenv("MODRINTH_TOKEN") != null) {
+			modrinth {
+				token = System.getenv("MODRINTH_TOKEN")
+				id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
 
-			relations { // Optional, Inferred from the relations above by default
-				depends "kiwi"
-				optional "cloth-config"
-				optional "lychee"
-				optional "kubejs"
-				optional "huge-structure-blocks"
+				relations { // Optional, Inferred from the relations above by default
+					depends "kiwi"
+					optional "cloth-config"
+					optional "lychee"
+					optional "kubejs"
+					optional "huge-structure-blocks"
+				}
 			}
 		}
 	}
