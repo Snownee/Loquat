@@ -23,7 +23,7 @@ public class RegistryBridge<T> {
 	}
 
 	public Optional<T> getOptional(ResourceLocation id) {
-		return registry.containsKey(id) ? Optional.of(registry.getValue(id)) : Optional.empty();
+		return registry.containsKey(id) ? Optional.ofNullable(registry.getValue(id)) : Optional.empty();
 	}
 
 	public void register(ResourceLocation id, T value) {

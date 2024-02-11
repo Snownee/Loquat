@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,6 +31,7 @@ import snownee.loquat.core.area.Area;
 @Mixin(value = StructureTemplate.class, priority = 800)
 public class StructureTemplateMixin {
 
+	@Unique
 	private final List<Area> loquat$areas = Lists.newArrayList();
 	@Shadow
 	private Vec3i size;
