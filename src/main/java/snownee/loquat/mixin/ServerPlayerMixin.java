@@ -18,6 +18,7 @@ import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.LoquatServerPlayer;
 
 @Mixin(ServerPlayer.class)
@@ -85,6 +86,8 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 		loquat$areasIn.clear();
 		loquat$restriction = null;
 		loquat$lastGoodPos = null;
+		ServerPlayer player = (ServerPlayer) (Object) this;
+		SelectionManager.of(player).reset(player);
 	}
 
 }

@@ -37,7 +37,6 @@ import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
-import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.AreaManagerContainer;
 import snownee.loquat.duck.LoquatServerPlayer;
 import snownee.loquat.network.SOutlinesPacket;
@@ -332,15 +331,10 @@ public class AreaManager extends SavedData {
 		}
 	}
 
-	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
-		SelectionManager.of(player).reset(player);
+	public void startTrackingPlayer(ServerPlayer player) {
 		((LoquatServerPlayer) player).loquat$reset();
 		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
-		SSyncRestrictionPacket.sync(player);
-	}
-
-	public void playerLoaded(ServerPlayer player) {
 		SSyncRestrictionPacket.sync(player);
 	}
 

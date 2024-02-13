@@ -24,7 +24,6 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
@@ -129,16 +128,9 @@ public class CommonProxy {
 			onSuccessiveSpawn(entity, event.getOutcome());
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerChangedDimensionEvent.class, event -> {
-			if (!(event.getEntity() instanceof ServerPlayer player))
-				return;
-			ServerLevel destination = player.getServer().getLevel(event.getTo());
-			ServerLevel origin = player.getServer().getLevel(event.getFrom());
-			AreaManager.of(destination).playerChangedWorld(player, origin);
-		});
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.Clone.class, event -> {
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StartTracking.class, event -> {
 			if (event.getEntity() instanceof ServerPlayer player) {
-				AreaManager.of(player.serverLevel()).playerLoaded(player);
+				AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
 			}
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, PlayerInteractEvent.LeftClickBlock.class, event -> {
