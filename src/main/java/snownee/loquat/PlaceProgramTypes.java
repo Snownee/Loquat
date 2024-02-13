@@ -1,7 +1,7 @@
 package snownee.loquat;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoadingContext;
+import snownee.kiwi.util.Util;
 import snownee.loquat.program.PlaceProgram;
 import snownee.loquat.program.SeaLevelPlaceProgram;
 
@@ -14,7 +14,7 @@ public class PlaceProgramTypes {
 
 	public static <T extends PlaceProgram.Type<?>> T register(String name, T t) {
 		ModLoadingContext.get().setActiveContainer(null); // bypass Forge warning
-		LoquatRegistries.PLACE_PROGRAM.register(new ResourceLocation(name), t);
+		LoquatRegistries.PLACE_PROGRAM.register(Util.RL(name), t);
 		return t;
 	}
 }

@@ -3,6 +3,7 @@ package snownee.loquat.core.select;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 
@@ -129,6 +130,21 @@ public class SelectionManager {
 
 	public boolean isSelected(Area area) {
 		return selectedAreas.contains(area.getUuid());
+	}
+
+	public Stream<Area> getSelectedAreas(ServerLevel world) {
+		AreaManager areaManager = AreaManager.of(world);
+		List<Area> areas = Lists.newArrayListWithExpectedSize(selectedAreas.size());
+		selectedAreas.removeIf(uuid -> {
+			Area area = areaManager.get(uuid);
+			if (area == null) {
+				return true;
+			} else {
+				areas.add(area);
+				return false;
+			}
+		});
+		return areas.stream();
 	}
 
 	public void reset(ServerPlayer player) {

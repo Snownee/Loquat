@@ -1,14 +1,15 @@
 package snownee.loquat.command;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -22,51 +23,58 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.LoquatConfig;
+import snownee.loquat.command.argument.AreaArgument;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 
-public class NearbyCommand {
+public class ListCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
-		return Commands.literal("nearby")
+		return Commands.literal("list")
 				.executes(ctx -> {
-					return nearby(ctx, LoquatConfig.nearbyRange);
+					var source = ctx.getSource();
+					var manager = AreaManager.of(source.getLevel());
+					Vec3 position = source.getPosition();
+					var areas = manager.areas().stream()
+							.filter($ -> $.getCenter().distanceTo(position) <= LoquatConfig.nearbyRange)
+							.toList();
+					return list(ctx, areas);
 				})
-				.then(Commands.argument("range", IntegerArgumentType.integer(1))
+				.then(Commands.argument("areas", AreaArgument.areas())
 						.executes(ctx -> {
-							return nearby(ctx, IntegerArgumentType.getInteger(ctx, "range"));
+							return list(ctx, AreaArgument.getAreas(ctx, "areas"));
 						}));
 	}
 
-	private static int nearby(CommandContext<CommandSourceStack> ctx, int range) throws CommandSyntaxException {
+	private static int list(CommandContext<CommandSourceStack> ctx, Collection<? extends Area> areas) throws CommandSyntaxException {
 		var source = ctx.getSource();
 		var manager = AreaManager.of(source.getLevel());
-		var selections = SelectionManager.of(source.getPlayerOrException());
-		Vec3 position = ctx.getSource().getPosition();
-		var areas = manager.areas().stream().filter($ -> $.getCenter().distanceTo(position) <= range).toList();
-		source.sendSystemMessage(Component.translatable("loquat.command.nearby.total", areas.size())
+		@Nullable ServerPlayer player = source.getPlayer();
+		List<UUID> selectedAreas = player == null ? List.of() : SelectionManager.of(player).getSelectedAreas();
+		source.sendSystemMessage(Component.translatable("loquat.command.list.total", areas.size())
 				.withStyle(ChatFormatting.YELLOW)
-				.append(Component.translatable("loquat.command.nearby.refresh")
-						.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/loquat nearby %s".formatted(range))))
+				.append(Component.translatable("loquat.command.list.refresh")
+						.withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, '/' + ctx.getInput())))
 				));
 		for (Area area : areas) {
 			var center = area.getCenter();
 			var component = Component.empty();
-			component.append(Component.translatable("loquat.command.nearby.pos", (int) center.x, (int) center.y, (int) center.z)
+			component.append(Component.translatable("loquat.command.list.pos", (int) center.x, (int) center.y, (int) center.z)
 					.withStyle(style -> {
 						style = style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/execute in %s run tp @s %.2f %.2f %.2f".formatted(source.getLevel().dimension().location(), center.x, center.y, center.z)));
-						if (selections.getSelectedAreas().contains(area.getUuid())) {
+						if (selectedAreas.contains(area.getUuid())) {
 							style = style.withColor(ChatFormatting.GREEN);
 						}
-						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("loquat.command.nearby.teleport")));
+						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("loquat.command.list.teleport")));
 					})
 			);
 			component.append(" ");
-			component.append(Component.translatable("loquat.command.nearby.highlight")
+			component.append(Component.translatable("loquat.command.list.highlight")
 					.withStyle(clickEvent("highlight", source, area, null))
 			);
 			component.append(" ");
@@ -75,26 +83,26 @@ public class NearbyCommand {
 			lines.add(Component.literal("UUID: ").append(Objects.requireNonNull(area.getUuid()).toString()));
 			if (!area.getTags().isEmpty()) {
 				String tags = Joiner.on(", ").join(area.getTags());
-				lines.add(Component.translatable("loquat.command.nearby.more.tags", tags));
+				lines.add(Component.translatable("loquat.command.list.more.tags", tags));
 			}
 			if (area.getAttachedData() != null) {
-				lines.add(Component.translatable("loquat.command.nearby.more.data", NbtUtils.toPrettyComponent(area.getAttachedData())));
+				lines.add(Component.translatable("loquat.command.list.more.data", NbtUtils.toPrettyComponent(area.getAttachedData())));
 			}
 			printRestrictions(lines, manager.getFallbackRestriction(), area, "global");
-			if (source.getPlayer() != null) {
-				RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(source.getPlayer().getScoreboardName());
+			if (player != null) {
+				RestrictInstance restrictInstance = manager.getOrCreateRestrictInstance(player.getScoreboardName());
 				printRestrictions(lines, restrictInstance, area, "player");
 			}
 			Component info = lines.stream().reduce((a, b) -> a.append("\n").append(b)).orElseGet(Component::empty);
 
-			component.append(Component.translatable("loquat.command.nearby.more")
+			component.append(Component.translatable("loquat.command.list.more")
 					.withStyle(clickEvent("info", source, area, info.getString()))
 					.withStyle(style -> {
 						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, info));
 					})
 			);
 			component.append(" ");
-			component.append(Component.translatable("loquat.command.nearby.select")
+			component.append(Component.translatable("loquat.command.list.select")
 					.withStyle(clickEvent("select", source, area, null))
 			);
 			source.sendSystemMessage(component);
@@ -111,7 +119,7 @@ public class NearbyCommand {
 		}
 		if (!behaviors.isEmpty()) {
 			behaviors.stream().reduce((a, b) -> a.append(", ").append(b)).ifPresent(component -> {
-				lines.add(Component.translatable("loquat.command.nearby.more.restrict." + key, component));
+				lines.add(Component.translatable("loquat.command.list.more.restrict." + key, component));
 			});
 		}
 	}

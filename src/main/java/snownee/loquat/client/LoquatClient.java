@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.math.LongMath;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -37,6 +39,7 @@ public class LoquatClient {
 	public final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
 	public final RestrictInstance restrictInstance = new RestrictInstance();
 	private long lastNotifyRestrictionTime = Long.MIN_VALUE;
+	private final List<String> recentZoneNames = Lists.newArrayList();
 
 	private LoquatClient() {
 		renderers.put(AreaTypes.BOX, (ctx, data) -> {
@@ -56,6 +59,31 @@ public class LoquatClient {
 
 	public static LoquatClient get() {
 		return INSTANCE;
+	}
+
+	public void suggestAddZone(Consumer<String> builder) {
+		recentZoneNames.forEach(builder);
+	}
+
+	public void newZoneAdded(String newZone) {
+		recentZoneNames.remove(newZone);
+		recentZoneNames.add(0, newZone);
+		if (recentZoneNames.size() > 10) {
+			recentZoneNames.remove(recentZoneNames.size() - 1);
+		}
+	}
+
+	public void suggestRemoveZone(Consumer<String> builder) {
+		List<UUID> selectedAreas = SelectionManager.of(ClientHooks.getPlayer()).getSelectedAreas();
+		if (selectedAreas.isEmpty()) {
+			return;
+		}
+		selectedAreas.stream()
+				.map(normalOutlines::get)
+				.filter(data -> data != null && data.type == DebugAreaType.SELECTED)
+				.flatMap(data -> data.area.getZones().keySet().stream())
+				.distinct()
+				.forEach(builder);
 	}
 
 	public void notifyRestriction(RestrictInstance.RestrictBehavior behavior) {

@@ -1,7 +1,7 @@
 package snownee.loquat;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoadingContext;
+import snownee.kiwi.util.Util;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
 
@@ -14,7 +14,7 @@ public class AreaTypes {
 
 	public static <T extends Area.Type<?>> T register(String name, T t) {
 		ModLoadingContext.get().setActiveContainer(null); // bypass Forge warning
-		LoquatRegistries.AREA.register(new ResourceLocation(name), t);
+		LoquatRegistries.AREA.register(Util.RL(name), t);
 		return t;
 	}
 }

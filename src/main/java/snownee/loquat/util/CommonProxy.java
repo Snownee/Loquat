@@ -7,7 +7,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -27,8 +29,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.RegisterEvent;
+import snownee.kiwi.loader.Platform;
 import snownee.loquat.AreaEventTypes;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.Loquat;
@@ -37,6 +39,7 @@ import snownee.loquat.LoquatRegistries;
 import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
+import snownee.loquat.command.argument.AreaArgument;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -127,9 +130,8 @@ public class CommonProxy {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerChangedDimensionEvent.class, event -> {
-			if (!(event.getEntity() instanceof ServerPlayer))
+			if (!(event.getEntity() instanceof ServerPlayer player))
 				return;
-			ServerPlayer player = (ServerPlayer) event.getEntity();
 			ServerLevel destination = player.getServer().getLevel(event.getTo());
 			ServerLevel origin = player.getServer().getLevel(event.getFrom());
 			AreaManager.of(destination).playerChangedWorld(player, origin);
@@ -157,18 +159,22 @@ public class CommonProxy {
 				event.setCanceled(true);
 			}
 		});
-		if (FMLEnvironment.dist.isClient()) {
+		if (Platform.isPhysicalClient()) {
 			ClientProxy.initClient();
 		}
 	}
 
-	public static void registerThings(RegisterEvent event) {
+	private static void registerThings(RegisterEvent event) {
 		event.register(LoquatRegistries.AREA.getRegistryKey(), $ -> AreaTypes.init());
 		event.register(LoquatRegistries.AREA_EVENT.getRegistryKey(), $ -> AreaEventTypes.init());
 		event.register(LoquatRegistries.PLACE_PROGRAM.getRegistryKey(), $ -> PlaceProgramTypes.init());
+		event.register(Registries.COMMAND_ARGUMENT_TYPE, $ -> {
+			var info = ArgumentTypeInfos.registerByClass(AreaArgument.class, new AreaArgument.Info());
+			$.register(Loquat.id("area"), info);
+		});
 	}
 
-	public static void registerReloadListeners(AddReloadListenerEvent event) {
+	private static void registerReloadListeners(AddReloadListenerEvent event) {
 		pendingReloadListeners.forEach(event::addListener);
 	}
 

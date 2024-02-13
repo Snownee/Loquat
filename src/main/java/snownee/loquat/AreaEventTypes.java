@@ -1,7 +1,7 @@
 package snownee.loquat;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModLoadingContext;
+import snownee.kiwi.util.Util;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.spawner.SpawnMobAreaEvent;
 
@@ -14,7 +14,7 @@ public class AreaEventTypes {
 
 	public static <T extends AreaEvent.Type<?>> T register(String name, T t) {
 		ModLoadingContext.get().setActiveContainer(null); // bypass Forge warning
-		LoquatRegistries.AREA_EVENT.register(new ResourceLocation(name), t);
+		LoquatRegistries.AREA_EVENT.register(Util.RL(name), t);
 		return t;
 	}
 }

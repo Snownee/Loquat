@@ -1,6 +1,5 @@
 package snownee.loquat;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -8,7 +7,6 @@ import snownee.loquat.core.AreaEvent;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.program.PlaceProgram;
 import snownee.loquat.util.RegistryBridge;
-import snownee.lychee.Lychee;
 
 public final class LoquatRegistries {
 
@@ -27,7 +25,7 @@ public final class LoquatRegistries {
 	}
 
 	private static <T> RegistryBuilder<T> register(String name) {
-		return new RegistryBuilder<T>().setName(new ResourceLocation(Lychee.ID, name));
+		return new RegistryBuilder<T>().setName(Loquat.id(name));
 	}
 
 }

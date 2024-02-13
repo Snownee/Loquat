@@ -28,4 +28,12 @@ public class ClientProxy {
 			LoquatClient.get().clearDebugAreas();
 		});
 	}
+
+	public static void registerDisconnectListener(Runnable runnable) {
+		MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> {
+			if (event.getConnection() != null) {
+				runnable.run();
+			}
+		});
+	}
 }
