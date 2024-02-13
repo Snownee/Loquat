@@ -138,6 +138,9 @@ public class CommonProxy implements ModInitializer {
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
 			if (entity instanceof ServerPlayer player) {
 				AreaManager.of(world).playerLoaded(player);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StartTracking.class, event -> {
+			if (event.getEntity() instanceof ServerPlayer player) {
+				AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
 			}
 		});
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
