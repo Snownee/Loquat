@@ -34,6 +34,7 @@ import snownee.loquat.LoquatEvents;
 import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
+import snownee.loquat.command.argument.AreaArgument;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -122,7 +123,17 @@ public class CommonProxy implements ModInitializer {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LivingConversionEvent.Post.class, event -> {
+			Entity entity = event.getEntity();
+			onSuccessiveSpawn(entity, event.getOutcome());
+			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
+		});
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerChangedDimensionEvent.class, event -> {
+			if (!(event.getEntity() instanceof ServerPlayer))
+				return;
+			ServerPlayer player = (ServerPlayer) event.getEntity();
+			ServerLevel destination = player.getServer().getLevel(event.getTo());
+			ServerLevel origin = player.getServer().getLevel(event.getFrom());
 			AreaManager.of(destination).playerChangedWorld(player, origin);
 		});
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
@@ -144,6 +155,23 @@ public class CommonProxy implements ModInitializer {
 			}
 			return true;
 		});
+		if (Platform.isPhysicalClient()) {
+			ClientProxy.initClient();
+		}
+	}
+
+	private static void registerThings(RegisterEvent event) {
+		event.register(LoquatRegistries.AREA.getRegistryKey(), $ -> AreaTypes.init());
+		event.register(LoquatRegistries.AREA_EVENT.getRegistryKey(), $ -> AreaEventTypes.init());
+		event.register(LoquatRegistries.PLACE_PROGRAM.getRegistryKey(), $ -> PlaceProgramTypes.init());
+		event.register(Registries.COMMAND_ARGUMENT_TYPE, $ -> {
+			var info = ArgumentTypeInfos.registerByClass(AreaArgument.class, new AreaArgument.Info());
+			$.register(Loquat.id("area"), info);
+		});
+	}
+
+	private static void registerReloadListeners(AddReloadListenerEvent event) {
+		pendingReloadListeners.forEach(event::addListener);
 	}
 
 	public static void registerReloadListener(PreparableReloadListener instance) {

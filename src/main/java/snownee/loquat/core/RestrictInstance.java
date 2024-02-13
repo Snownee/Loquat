@@ -128,7 +128,7 @@ public class RestrictInstance {
 		}
 	}
 
-	public boolean onRemove(Area area) {
+	public boolean removeArea(Area area) {
 		if (rules == null) {
 			return false;
 		}

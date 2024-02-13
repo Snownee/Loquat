@@ -10,10 +10,10 @@ import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
 
-public class UnselectCommand {
+public class SelectCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
-		return Commands.literal("unselect")
+		return Commands.literal("select")
 				.requires(CommandSourceStack::isPlayer)
 				.then(Commands.argument("areas", AreaArgument.areas())
 						.executes(ctx -> {
@@ -22,13 +22,13 @@ public class UnselectCommand {
 							var selectedAreas = SelectionManager.of(player).getSelectedAreas();
 							int count = 0;
 							for (Area area : AreaArgument.getAreas(ctx, "areas")) {
-								if (selectedAreas.contains(area.getUuid())) {
-									selectedAreas.remove(area.getUuid());
+								if (!selectedAreas.contains(area.getUuid())) {
+									selectedAreas.add(area.getUuid());
 									count++;
 								}
 							}
-							SSyncSelectionPacket.sync(source.getPlayerOrException());
-							return LoquatCommand.countedSuccess(ctx, "unselect", count);
+							SSyncSelectionPacket.sync(player);
+							return LoquatCommand.countedSuccess(ctx, "select", count);
 						})
 				);
 	}

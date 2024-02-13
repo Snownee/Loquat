@@ -1,7 +1,11 @@
 package snownee.loquat.network;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import com.google.common.collect.Lists;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
 import snownee.loquat.client.ClientHooks;
+import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.select.PosSelection;
 import snownee.loquat.core.select.SelectionManager;
 
@@ -17,6 +22,10 @@ public class SSyncSelectionPacket extends PacketHandler {
 	public static SSyncSelectionPacket I;
 
 	public static void sync(ServerPlayer player) {
+		sync(player, "");
+	}
+
+	public static void sync(ServerPlayer player, String newZone) {
 		I.send(player, buf -> {
 			var manager = SelectionManager.of(player);
 			buf.writeVarInt(manager.getSelections().size());
@@ -28,6 +37,7 @@ public class SSyncSelectionPacket extends PacketHandler {
 			for (var uuid : manager.getSelectedAreas()) {
 				buf.writeUUID(uuid);
 			}
+			buf.writeUtf(newZone);
 		});
 	}
 
@@ -36,19 +46,26 @@ public class SSyncSelectionPacket extends PacketHandler {
 		Player player = ClientHooks.getPlayer();
 		if (player == null)
 			return null;
-		var manager = SelectionManager.of(player);
-		var selections = manager.getSelections();
-		var selectedAreas = manager.getSelectedAreas();
-		selections.clear();
-		selectedAreas.clear();
 		int size = buf.readVarInt();
+		List<PosSelection> selections = Lists.newArrayListWithExpectedSize(size);
 		for (int i = 0; i < size; i++) {
 			selections.add(new PosSelection(buf.readBlockPos(), buf.readBlockPos()));
 		}
 		size = buf.readVarInt();
+		List<UUID> selectedAreas = Lists.newArrayListWithExpectedSize(size);
 		for (int i = 0; i < size; i++) {
 			selectedAreas.add(buf.readUUID());
 		}
-		return null;
+		String newZone = buf.readUtf();
+		return executor.apply(() -> {
+			var manager = SelectionManager.of(player);
+			manager.getSelections().clear();
+			manager.getSelections().addAll(selections);
+			manager.getSelectedAreas().clear();
+			manager.getSelectedAreas().addAll(selectedAreas);
+			if (!newZone.isEmpty()) {
+				LoquatClient.get().newZoneAdded(newZone);
+			}
+		});
 	}
 }

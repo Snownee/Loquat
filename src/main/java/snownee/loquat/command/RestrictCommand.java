@@ -2,8 +2,6 @@ package snownee.loquat.command;
 
 import java.util.List;
 
-import org.apache.commons.lang3.mutable.MutableInt;
-
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.context.StringRange;
@@ -14,11 +12,13 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ScoreHolderArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import snownee.loquat.command.argument.AreaArgument;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
+import snownee.loquat.core.area.Area;
 import snownee.loquat.network.SSyncRestrictionPacket;
 
-public class RestrictCommand extends LoquatCommand {
+public class RestrictCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		var builder = Commands.argument("players", ScoreHolderArgument.scoreHolders());
@@ -26,7 +26,9 @@ public class RestrictCommand extends LoquatCommand {
 		for (var behavior : RestrictInstance.RestrictBehavior.values()) {
 			builder.then(register(behavior.name));
 		}
-		return Commands.literal("restrict").then(builder);
+		return Commands.literal("restrict")
+				.then(Commands.argument("areas", AreaArgument.areas())
+						.then(builder));
 	}
 
 	private static LiteralArgumentBuilder<CommandSourceStack> register(String behavior) {
@@ -47,33 +49,30 @@ public class RestrictCommand extends LoquatCommand {
 		}
 		var source = ctx.getSource();
 		var names = ScoreHolderArgument.getNames(ctx, "players", () -> List.of("*"));
-		var changed = new MutableInt();
-		forEachSelected(source, (area, manager) -> {
+		var areas = AreaArgument.getAreas(ctx, "areas");
+		int count = 0;
+		for (Area area : areas) {
 			for (var player : names) {
 				var restrictions = RestrictInstance.of(source.getLevel(), player);
 				for (RestrictInstance.RestrictBehavior restrictBehavior : RestrictInstance.RestrictBehavior.VALUES) {
 					if (behavior.equals("*") || behavior.equals(restrictBehavior.name)) {
 						restrictions.restrict(area, restrictBehavior, value);
-						changed.increment();
+						count++;
 					}
 				}
 			}
-			return true;
-		});
-		if (changed.intValue() == 0) {
-			ctx.getSource().sendFailure(Component.translatable("loquat.command.nothingChanged"));
-			return 0;
 		}
-		AreaManager.of(source.getLevel()).setDirty();
-		List<ServerPlayer> players = source.getLevel().players();
-		if (!names.contains("*")) {
-			players = players.stream().filter($ -> names.contains($.getScoreboardName())).toList();
+		if (count > 0) {
+			AreaManager.of(source.getLevel()).setDirty();
+			List<ServerPlayer> players = source.getLevel().players();
+			if (!names.contains("*")) {
+				players = players.stream().filter($ -> names.contains($.getScoreboardName())).toList();
+			}
+			for (ServerPlayer player : players) {
+				SSyncRestrictionPacket.sync(player);
+			}
 		}
-		for (ServerPlayer player : players) {
-			SSyncRestrictionPacket.sync(player);
-		}
-		ctx.getSource().sendSuccess(() -> Component.translatable("loquat.command.restrict.success", changed.intValue()), true);
-		return players.size();
+		return LoquatCommand.countedSuccess(ctx, "restrict", count);
 	}
 
 }

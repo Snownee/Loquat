@@ -28,7 +28,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Slime;
 import snownee.loquat.Loquat;
 import snownee.loquat.duck.LoquatMob;
-import snownee.loquat.spawner.difficulty.Difficulty;
 import snownee.loquat.util.CommonProxy;
 import snownee.lychee.core.ActionRuntime;
 import snownee.lychee.core.LycheeContext;
@@ -193,7 +192,7 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 
 	@Override
 	public ResourceLocation lychee$getId() {
-		return new ResourceLocation(Loquat.ID, "spawner/%s/%s/%d".formatted(event.getSpawnerId().getNamespace(), event.getSpawnerId().getPath(), waveIndex));
+		return Loquat.id("spawner/%s/%s/%d".formatted(event.getSpawnerId().getNamespace(), event.getSpawnerId().getPath(), waveIndex));
 	}
 
 	@Override

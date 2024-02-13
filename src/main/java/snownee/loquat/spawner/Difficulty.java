@@ -1,4 +1,4 @@
-package snownee.loquat.spawner.difficulty;
+package snownee.loquat.spawner;
 
 import java.lang.reflect.Type;
 import java.util.function.ToIntFunction;
@@ -8,6 +8,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import snownee.loquat.util.LoquatUtil;
 
 public class Difficulty {
+	public static final ResourceLocation DEFAULT_ID = new ResourceLocation("default");
 
 	public Provider provider;
 	public DifficultyLevel[] levels;

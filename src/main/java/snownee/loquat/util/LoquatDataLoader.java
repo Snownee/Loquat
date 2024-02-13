@@ -1,9 +1,10 @@
-package snownee.loquat.spawner;
+package snownee.loquat.util;
 
 import java.lang.reflect.Type;
+import java.util.Locale;
 import java.util.Map;
-
-import org.jetbrains.annotations.Nullable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -12,21 +13,25 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import snownee.loquat.core.AreaManager;
-import snownee.loquat.core.area.Area;
-import snownee.loquat.spawner.difficulty.Difficulty;
-import snownee.loquat.spawner.difficulty.DifficultyLoader;
+import snownee.kiwi.loader.Platform;
+import snownee.kiwi.util.Util;
+import snownee.loquat.spawner.Difficulty;
 import snownee.lychee.core.contextual.ContextualHolder;
 import snownee.lychee.core.post.PostAction;
 import snownee.lychee.fragment.Fragments;
 
-public class SpawnerLoader extends SimpleJsonResourceReloadListener {
+public class LoquatDataLoader<T> extends SimpleJsonResourceReloadListener {
 	public static final Gson GSON = new GsonBuilder()
 			.setPrettyPrinting()
 			.disableHtmlEscaping()
@@ -36,33 +41,48 @@ public class SpawnerLoader extends SimpleJsonResourceReloadListener {
 			.registerTypeAdapter(ContextualHolder.class, new ContextualHolderSerializer())
 			.registerTypeAdapter(Difficulty.Provider.class, new Difficulty.DifficultyProviderSerializer())
 			.create();
-	public static final SpawnerLoader INSTANCE = new SpawnerLoader("loquat_spawners");
-	private final Map<ResourceLocation, Spawner> spawners = Maps.newHashMap();
+	private final Map<ResourceLocation, T> objects = Maps.newHashMap();
+	public final SuggestionProvider<CommandSourceStack> suggestionProvider;
+	private final Function<JsonElement, T> parser;
+	public boolean supportsFragment;
 
-	public SpawnerLoader(String dir) {
+	public LoquatDataLoader(ResourceLocation id, String dir, Function<JsonElement, T> parser) {
 		super(GSON, dir);
+		suggestionProvider = FallbackSuggestionProvider.register(id, this::suggest);
+		this.parser = parser;
+		if (Platform.isPhysicalClient()) {
+			ClientProxy.registerDisconnectListener(this::clear);
+		}
 	}
 
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
-		spawners.clear();
+		clear();
 		map.forEach((id, json) -> {
-			Fragments.INSTANCE.process(json);
-			spawners.put(id, GSON.fromJson(json, Spawner.class));
+			if (supportsFragment) {
+				Fragments.INSTANCE.process(json);
+			}
+			T object = parser.apply(json);
+			if (object != null) {
+				objects.put(id, object);
+			}
 		});
 	}
 
-	public void spawn(ResourceLocation spawnerId, @Nullable String difficultyId, ServerLevel world, Area area) {
-		Spawner spawner = get(spawnerId);
-		if (difficultyId == null) {
-			difficultyId = spawner.difficulty;
-		}
-		Difficulty difficulty = DifficultyLoader.INSTANCE.get(difficultyId);
-		AreaManager.of(world).addEvent(new SpawnMobAreaEvent(area, spawner, spawnerId, difficulty, difficultyId));
+	public void clear() {
+		objects.clear();
 	}
 
-	public Spawner get(ResourceLocation spawnerId) {
-		return spawners.get(spawnerId);
+	public T get(ResourceLocation id) {
+		return objects.get(id);
+	}
+
+	private CompletableFuture<Suggestions> suggest(CommandContext<SharedSuggestionProvider> context, SuggestionsBuilder builder) {
+		String s = builder.getRemaining().toLowerCase(Locale.ROOT);
+		SharedSuggestionProvider.filterResources(objects.keySet(), s, Function.identity(), id -> {
+			builder.suggest(Util.trimRL(id));
+		});
+		return builder.buildFuture();
 	}
 
 	private static class PostActionSerializer implements JsonDeserializer<PostAction> {

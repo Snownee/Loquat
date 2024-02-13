@@ -11,26 +11,16 @@ import net.minecraft.network.chat.Component;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
-import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
 
 public class CreateCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("create")
+				.requires(CommandSourceStack::isPlayer)
 				.executes(ctx -> {
+					var selection = LoquatCommand.getSingleSelectionAndClear(ctx);
 					var source = ctx.getSource();
-					var selections = SelectionManager.of(source.getPlayerOrException()).getSelections();
-					if (selections.isEmpty()) {
-						source.sendFailure(Component.translatable("loquat.command.emptySelection"));
-						return 0;
-					}
-					if (selections.size() > 1) {
-						source.sendFailure(Component.translatable("loquat.command.tooManySelections"));
-						return 0;
-					}
-					var selection = selections.get(0);
-					selections.clear();
 					SSyncSelectionPacket.sync(source.getPlayerOrException());
 					var area = new AABBArea(selection.toAABB());
 					return addArea(source, area);

@@ -1,6 +1,7 @@
 package snownee.loquat;
 
 import net.minecraft.core.Registry;
+import snownee.kiwi.util.Util;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.spawner.SpawnMobAreaEvent;
 
@@ -12,7 +13,7 @@ public class AreaEventTypes {
 	}
 
 	public static <T extends AreaEvent.Type<?>> T register(String name, T t) {
-		Registry.register(LoquatRegistries.AREA_EVENT, name, t);
+		LoquatRegistries.AREA_EVENT.register(Util.RL(name), t);
 		return t;
 	}
 }

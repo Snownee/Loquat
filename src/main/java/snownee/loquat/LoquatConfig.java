@@ -26,9 +26,8 @@ public class LoquatConfig {
 	@KiwiConfig.Range(min = 1)
 	public static int positionCheckInterval = 20;
 
-	public static void onChanged(String path) {
-		if ("general.selectionItem".equals(path)) {
-			selectionItem = Optional.ofNullable(ResourceLocation.tryParse(selectionItemId)).map(BuiltInRegistries.ITEM::get).orElse(Items.AIR);
-		}
+	@KiwiConfig.Listen("general.selectionItem")
+	public static void selectionItemChanged(String path) {
+		selectionItem = Optional.ofNullable(ResourceLocation.tryParse(selectionItemId)).map(BuiltInRegistries.ITEM::get).orElse(Items.AIR);
 	}
 }
