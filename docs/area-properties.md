@@ -112,7 +112,7 @@ Currently, there are four types of restrictions: `enter`, `exit`, `place`, and `
 Add a restriction to the selected area:
 
 ```
-/loquat restrict <players> <type> <true|false>
+/loquat restrict <areas> <players> <type> <true|false>
 ```
 
 The `players` and `type` arguments can be `*` to represent all players and all types.
