@@ -99,8 +99,7 @@ All spawners should be located in the `loquat_spawners` directory in a data pack
 A _Difficulty_ is a manager that determines the amount of mobs to spawn, and scales the mob attributes based on the
 context.
 
-All difficulties should be located in the `loquat_difficulties` directory in a data pack. The namespaced will be
-ignored.
+All difficulties should be located in the `loquat_difficulties` directory in a data pack.
 
 ### Difficulty specification
 

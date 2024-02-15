@@ -1,5 +1,9 @@
 # Preface
 
+!!! note
+
+    This documentation is for Loquat 2.1+. For versions 2.0.X, please see the [docs for Minecraft 1.19.2](https://loquat.readthedocs.io/en/docs-1.19/).
+
 Loquat is an area management mod for Minecraft map & pack makers. You can take advantage of Minecraft's structure template
 system and data-driven world generation with enhanced and scriptable features in Loquat.
 
