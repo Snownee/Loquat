@@ -41,7 +41,7 @@ LoquatEvents.playerEnteredArea(event => {
 	let data = event.area.persistentData
 	let tags = event.area.tags
 	if (data.contains("spawner") && !tags.contains("spawned")) {
-		event.player.runCommandSilent(`loquat spawn ${data.spawner} ${event.area.uuid}`)
+		event.player.runCommandSilent(`loquat spawn ${event.area.uuid} ${data.spawner}`)
 		tags.add("spawned")
 		event.areaManager.setChanged([event.area])
 	}
@@ -70,12 +70,8 @@ Then write code to clean them up if necessary:
 ```js
 // server script
 function clearDungeon() {
-	// pick a random player
-	// make sure there is at least one player online
-	let player = Utils.server.players.stream().findAny().get()
-	player.runCommandSilent(`execute in minecraft:overworld run loquat select_tag big_dungeon`)
-	player.runCommandSilent(`execute in minecraft:overworld run loquat empty selection`)
-	player.runCommandSilent(`execute in minecraft:overworld run loquat delete selection`)
+	Utils.server.runCommandSilent(`execute in minecraft:overworld run loquat empty @a[tag=big_dungeon]`)
+	Utils.server.runCommandSilent(`execute in minecraft:overworld run loquat delete @a[tag=big_dungeon]`)
 }
 ```
 

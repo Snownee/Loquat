@@ -6,21 +6,15 @@
 
 ## Commands
 
-Start a mob spawning session in the selected area:
+Start a mob spawning session in an area:
 
 ```
-/loquat spawn <spawner_id>
-```
-
-Start a mob spawning session in area with given UUID:
-
-```
-/loquat spawn <spawner_id> <area_uuid> [difficulty_id]
+/loquat spawn <area> <spawner_id> [difficulty_id]
 ```
 
 ## Defining spawners
 
-Spawner is where you define waves, and the monster types and the duration of each wave.
+Spawner is where you define monster waves, and the monster types and the duration of each wave.
 
 All spawners should be located in the `loquat_spawners` directory in a data pack.
 
@@ -96,7 +90,7 @@ All spawners should be located in the `loquat_spawners` directory in a data pack
 
 ## Defining difficulties
 
-A _Difficulty_ is a manager that determines the amount of mobs to spawn, and scales the mob attributes based on the
+The _Difficulty_ is a manager that determines the amount of mobs to spawn, and scales the mob attributes based on the
 context.
 
 All difficulties should be located in the `loquat_difficulties` directory in a data pack.

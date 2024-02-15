@@ -39,12 +39,19 @@ You can also directly create an area with two coordinates:
 Shift-click a block with the Spectral Arrow to select all the areas containing the block. Shift-click again to unselect
 them.
 
+Then you can use `@s` to refer to the selected areas in commands. The full instructions for area selectors can be found
+in [this page](area-selectors.md).
+
 Shift-right-click with the Spectral Arrow to reset your selection.
+
+### Commands
+
+You can also select areas through the `/loquat select` command, with various conditions.
 
 Use the following command to unselect all the areas:
 
 ```
-/loquat unselect all
+/loquat unselect @s
 ```
 
 ## Deleting an area
@@ -52,15 +59,21 @@ Use the following command to unselect all the areas:
 Use the following command to delete all the selected areas:
 
 ```
-/loquat delete selection
+/loquat delete @s
 ```
 
-## Viewing nearby areas
+## Viewing list areas
 
-Use the following command to view all the areas near you:
+View all the selected areas:
 
 ```
-/loquat nearby [radius]
+/loquat list @s
+```
+
+View all the areas within 10 blocks of the player:
+
+```
+/loquat list @a[distance=..10]
 ```
 
 ## Emptying blocks in an area
@@ -68,7 +81,7 @@ Use the following command to view all the areas near you:
 Use the following command to empty all the blocks in the selected areas:
 
 ```
-/loquat empty selection
+/loquat empty @s
 ```
 
 ## Replacing area box

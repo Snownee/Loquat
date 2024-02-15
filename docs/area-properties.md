@@ -12,22 +12,28 @@ Tags can be used to identify areas. If you hold down Shift key, you can see the 
 
 ### Commands
 
-Add a tag to the selected areas:
+Add a tag to the [selected areas](basic-area-operations.md#selecting-an-area):
 
 ```
-/loquat tag add <tag>
+/loquat tag <areas> add <tag>
 ```
 
 Remove a tag from the selected areas:
 
 ```
-/loquat tag remove <tag>
+/loquat tag <areas> remove <tag>
 ```
 
-Select areas by tag:
+Select all the areas with given tag:
 
 ```
-/loquat select_tag <tag>
+/loquat select @a[tag=foo]
+```
+
+Select all the areas without given tag:
+
+```
+/loquat select @a[tag=!foo]
 ```
 
 ### KubeJS
@@ -44,7 +50,15 @@ manager.setChanged([area])
 
 ## Attached Data
 
-You can attach data to an area as `CompoundTag`. The data can be seen through the `/loquat nearby` command.
+You can attach data to an area as `CompoundTag`. The data can be seen through the `/loquat list` command.
+
+### Commands
+
+Select areas with given data:
+
+```
+/loquat select @a[nbt={foo:bar}]
+```
 
 ### KubeJS
 
@@ -66,13 +80,13 @@ Add selected boxes as zones to the selected area:
 ("0" if no name is specified)
 
 ```
-/loquat zone add [name]
+/loquat zone <area> add [name]
 ```
 
 Remove zones from the selected area:
 
 ```
-/loquat zone remove <name>
+/loquat zone <area> remove <name>
 ```
 
 ### KubeJS

@@ -9,7 +9,7 @@ Use KubeJS to listen and react to the following events:
 LoquatEvents.playerEnteredArea(event => {
 	let tags = event.area.tags
 	if (tags.contains("mob_room") && !tags.contains("spawned")) {
-		event.player.runCommandSilent(`loquat spawn loquat:1 ${event.area.uuid}`)
+		event.player.runCommandSilent(`loquat spawn ${event.area.uuid} loquat:1`)
 		tags.add("spawned")
 		event.areaManager.setChanged([event.area])
 	}
@@ -27,7 +27,7 @@ LoquatEvents.playerLeftArea(event => {
 
 ## UUID
 
-You can use UUID to specify a specific area in event. UUID can be copied from the `/loquat nearby` command.
+You can use UUID to specify a specific area in event. UUID can be copied from the `/loquat list` command.
 
 ```js
 // server script
