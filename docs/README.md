@@ -1,6 +1,6 @@
 # Preface
 
-Loquat is an area management mod for Minecraft map makers. You can take advantage of Minecraft's structure template
+Loquat is an area management mod for Minecraft map & pack makers. You can take advantage of Minecraft's structure template
 system and data-driven world generation with enhanced and scriptable features in Loquat.
 
 Currently, Loquat is in BETA. Please understand that there may be bugs and changes in the future.
@@ -26,7 +26,7 @@ You can download Loquat on CurseForge:
 
 ### Lychee
 
-Lychee is used to spawn mobs in your areas / structures.
+Lychee is used to spawn waves of monsters in your areas/structures.
 
 ### KubeJS
 
