@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +37,6 @@ import snownee.loquat.Loquat;
 import snownee.loquat.LoquatRegistries;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.area.Zone;
-import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.AreaManagerContainer;
 import snownee.loquat.duck.LoquatServerPlayer;
 import snownee.loquat.network.SOutlinesPacket;
@@ -212,13 +212,13 @@ public class AreaManager extends SavedData {
 		areas.remove(area);
 		events.removeIf(e -> e.getArea() == area);
 		pendingEvents.removeIf(e -> e.getArea() == area);
-		boolean notifyAll = fallbackRestriction.onRemove(area);
+		boolean notifyAll = fallbackRestriction.removeArea(area);
 		Set<String> names = notifyAll ? null : Sets.newHashSet();
 		restrictions.forEach((key, restriction) -> {
 			if (restriction == fallbackRestriction) {
 				return;
 			}
-			if (restriction.onRemove(area) && !notifyAll) {
+			if (restriction.removeArea(area) && !notifyAll) {
 				names.add(key);
 			}
 		});
@@ -331,15 +331,10 @@ public class AreaManager extends SavedData {
 		}
 	}
 
-	public void playerChangedWorld(ServerPlayer player, ServerLevel origin) {
-		SelectionManager.of(player).reset(player);
+	public void startTrackingPlayer(ServerPlayer player) {
 		((LoquatServerPlayer) player).loquat$reset();
 		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
-		SSyncRestrictionPacket.sync(player);
-	}
-
-	public void playerLoaded(ServerPlayer player) {
 		SSyncRestrictionPacket.sync(player);
 	}
 
@@ -351,17 +346,44 @@ public class AreaManager extends SavedData {
 		});
 	}
 
-	public void clearEvents() {
-		events.clear();
-		pendingEvents.clear();
-		setDirty();
+	public int clearEvents(Collection<? extends Area> areas) {
+		MutableInt count = new MutableInt();
+		Set<Area> set = Set.copyOf(areas);
+		events.removeIf(event -> {
+			if (set.contains(event.getArea())) {
+				count.increment();
+				return true;
+			}
+			return false;
+		});
+		pendingEvents.removeIf(event -> {
+			if (set.contains(event.getArea())) {
+				count.increment();
+				return true;
+			}
+			return false;
+		});
+		if (count.intValue() > 0) {
+			setDirty();
+		}
+		return count.intValue();
 	}
 
-	public void clearRestrictions() {
-		restrictions.clear();
-		restrictions.put("*", fallbackRestriction);
-		if (fallbackRestriction.getRules() != null)
-			fallbackRestriction.getRules().clear();
-		setDirty();
+	public int clearRestrictions(Collection<? extends Area> areas) {
+		int count = 0;
+		for (Area area : areas) {
+			for (RestrictInstance restrictInstance : restrictions.values()) {
+				if (restrictInstance.removeArea(area)) {
+					count++;
+				}
+			}
+			if (fallbackRestriction.removeArea(area)) {
+				count++;
+			}
+		}
+		if (count > 0) {
+			setDirty();
+		}
+		return count;
 	}
 }

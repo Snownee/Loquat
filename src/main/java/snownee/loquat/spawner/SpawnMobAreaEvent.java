@@ -16,8 +16,6 @@ import snownee.loquat.AreaEventTypes;
 import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.core.area.Area;
-import snownee.loquat.spawner.difficulty.Difficulty;
-import snownee.loquat.spawner.difficulty.DifficultyLoader;
 import snownee.loquat.util.LoquatUtil;
 import snownee.lychee.core.Job;
 import snownee.lychee.core.LycheeContext;
@@ -29,14 +27,14 @@ public class SpawnMobAreaEvent extends AreaEvent {
 	@Getter
 	private final Spawner spawner;
 	private final Difficulty difficulty;
-	private final String difficultyId;
+	private final ResourceLocation difficultyId;
 	private int lastWave;
 	private final List<ActiveWave> waves = Lists.newArrayList();
 
 	private boolean hasTimeout;
 	private long timeoutInTicks;
 
-	public SpawnMobAreaEvent(Area area, Spawner spawner, ResourceLocation spawnerId, Difficulty difficulty, String difficultyId) {
+	public SpawnMobAreaEvent(Area area, Spawner spawner, ResourceLocation spawnerId, Difficulty difficulty, ResourceLocation difficultyId) {
 		super(area);
 		Preconditions.checkNotNull(spawner, "Spawner %s not found", spawnerId);
 		this.spawnerId = spawnerId;
@@ -106,8 +104,8 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		@Override
 		public SpawnMobAreaEvent deserialize(Area area, CompoundTag data) {
 			ResourceLocation spawnerId = new ResourceLocation(data.getString("Spawner"));
-			String difficultyId = data.getString("Difficulty");
-			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, SpawnerLoader.INSTANCE.get(spawnerId), spawnerId, DifficultyLoader.INSTANCE.get(difficultyId), difficultyId);
+			ResourceLocation difficultyId = new ResourceLocation(data.getString("Difficulty"));
+			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, LycheeCompat.SPAWNERS.get(spawnerId), spawnerId, LycheeCompat.DIFFICULTIES.get(difficultyId), difficultyId);
 			event.lastWave = data.getInt("LastWave");
 			event.hasTimeout = data.getBoolean("HasTimeout");
 			if (event.hasTimeout)
@@ -118,7 +116,7 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		@Override
 		public CompoundTag serialize(CompoundTag data, SpawnMobAreaEvent event) {
 			data.putString("Spawner", event.spawnerId.toString());
-			data.putString("Difficulty", event.difficultyId);
+			data.putString("Difficulty", event.difficultyId.toString());
 			data.putInt("LastWave", event.lastWave);
 			data.putBoolean("HasTimeout", event.hasTimeout);
 			if (event.hasTimeout)

@@ -5,17 +5,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
@@ -31,9 +32,11 @@ import snownee.loquat.AreaEventTypes;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
+import snownee.loquat.LoquatRegistries;
 import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
+import snownee.loquat.command.argument.AreaArgument;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
@@ -43,20 +46,25 @@ import snownee.loquat.spawner.LycheeCompat;
 @Mod(Loquat.ID)
 public class CommonProxy implements ModInitializer {
 
-	public static final Event<LoquatEvents.PlayerEnterArea> PLAYER_ENTER_AREA = EventFactory.createArrayBacked(LoquatEvents.PlayerEnterArea.class, listeners -> (player, area) -> {
-		for (LoquatEvents.PlayerEnterArea listener : listeners) {
-			listener.enterArea(player, area);
-		}
-	});
+	public static final Event<LoquatEvents.PlayerEnterArea> PLAYER_ENTER_AREA = EventFactory.createArrayBacked(
+			LoquatEvents.PlayerEnterArea.class,
+			listeners -> (player, area) -> {
+				for (LoquatEvents.PlayerEnterArea listener : listeners) {
+					listener.enterArea(player, area);
+				}
+			});
 
-	public static final Event<LoquatEvents.PlayerLeaveArea> PLAYER_LEAVE_AREA = EventFactory.createArrayBacked(LoquatEvents.PlayerLeaveArea.class, listeners -> (player, area) -> {
-		for (LoquatEvents.PlayerLeaveArea listener : listeners) {
-			listener.leaveArea(player, area);
-		}
-	});
+	public static final Event<LoquatEvents.PlayerLeaveArea> PLAYER_LEAVE_AREA = EventFactory.createArrayBacked(
+			LoquatEvents.PlayerLeaveArea.class,
+			listeners -> (player, area) -> {
+				for (LoquatEvents.PlayerLeaveArea listener : listeners) {
+					listener.leaveArea(player, area);
+				}
+			});
 
 	private static final ConcurrentLinkedQueue<Consumer<Entity>> entityDeathListeners = new ConcurrentLinkedQueue<>();
-	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners =
+			new ConcurrentLinkedQueue<>();
 
 	public static void registerDeathListener(Consumer<Entity> listener) {
 		entityDeathListeners.add(listener);
@@ -109,12 +117,16 @@ public class CommonProxy implements ModInitializer {
 		if (Loquat.hasLychee) {
 			LycheeCompat.init();
 		}
+		ArgumentTypeRegistry.registerArgumentType(Loquat.id("area"), AreaArgument.class, new AreaArgument.Info());
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			LoquatCommand.register(dispatcher);
 		});
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);
-			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND && SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
+			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
+				SelectionManager.of(player).rightClickItem((ServerLevel) world,
+														   player.pick(5, 0, false),
+														   (ServerPlayer) player)) {
 				return InteractionResultHolder.success(stack);
 			}
 			return InteractionResultHolder.pass(stack);
@@ -122,13 +134,8 @@ public class CommonProxy implements ModInitializer {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-			AreaManager.of(destination).playerChangedWorld(player, origin);
-		});
-		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-			if (entity instanceof ServerPlayer player) {
-				AreaManager.of(world).playerLoaded(player);
-			}
+		EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
+			AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
 		});
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
 			if (RestrictInstance.of(player).isRestricted(pos, RestrictInstance.RestrictBehavior.DESTROY)) {
@@ -144,9 +151,11 @@ public class CommonProxy implements ModInitializer {
 			}
 			return true;
 		});
+
 	}
 
 	public static void registerReloadListener(PreparableReloadListener instance) {
-		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) instance);
+		ResourceManagerHelper.get(PackType.SERVER_DATA)
+							 .registerReloadListener((IdentifiableResourceReloadListener) instance);
 	}
 }

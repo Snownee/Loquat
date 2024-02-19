@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import snownee.loquat.core.AreaEvent;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.program.PlaceProgram;
@@ -19,7 +18,9 @@ public final class LoquatRegistries {
 	}
 
 	private static <T> MappedRegistry<T> register(String name) {
-		return FabricRegistryBuilder.createSimple(ResourceKey.<T>createRegistryKey(new ResourceLocation(Loquat.ID, name))).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+		return FabricRegistryBuilder.createSimple(ResourceKey.<T>createRegistryKey(Loquat.id(name)))
+									.attribute(RegistryAttribute.SYNCED)
+									.buildAndRegister();
 	}
 
 }

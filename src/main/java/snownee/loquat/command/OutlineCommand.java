@@ -16,6 +16,7 @@ public class OutlineCommand {
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("outline")
+				.requires(CommandSourceStack::isPlayer)
 				.executes(ctx -> {
 					var source = ctx.getSource();
 					var manager = AreaManager.of(source.getLevel());

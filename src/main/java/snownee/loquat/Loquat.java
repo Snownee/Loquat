@@ -5,7 +5,12 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.resources.ResourceLocation;
 import snownee.kiwi.loader.Platform;
+import snownee.kiwi.util.Util;
+import snownee.loquat.command.argument.AreaSelectorOptions;
+import snownee.loquat.program.PlaceProgram;
+import snownee.loquat.util.CommonProxy;
 
 public class Loquat {
 
@@ -22,6 +27,11 @@ public class Loquat {
 		}
 		hasLychee = Platform.isModLoaded("lychee");
 		LoquatRegistries.init();
+		AreaSelectorOptions.bootstrap();
+		CommonProxy.registerReloadListener(PlaceProgram.LOADER);
 	}
 
+	public static ResourceLocation id(String s) {
+		return Util.RL(s, ID);
+	}
 }

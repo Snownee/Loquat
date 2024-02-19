@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,13 +18,17 @@ import snownee.loquat.LoquatConfig;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
+import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.duck.LoquatServerPlayer;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin implements LoquatServerPlayer {
 
+	@Unique
 	private final Set<Area> loquat$areasIn = Sets.newHashSet();
+	@Unique
 	private RestrictInstance loquat$restriction;
+	@Unique
 	private Vec3 loquat$lastGoodPos;
 
 
@@ -81,6 +86,8 @@ public class ServerPlayerMixin implements LoquatServerPlayer {
 		loquat$areasIn.clear();
 		loquat$restriction = null;
 		loquat$lastGoodPos = null;
+		ServerPlayer player = (ServerPlayer) (Object) this;
+		SelectionManager.of(player).reset(player);
 	}
 
 }
