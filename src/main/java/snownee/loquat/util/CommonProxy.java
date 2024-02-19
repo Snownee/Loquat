@@ -31,6 +31,7 @@ import snownee.loquat.AreaEventTypes;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
+import snownee.loquat.LoquatRegistries;
 import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
@@ -44,20 +45,25 @@ import snownee.loquat.spawner.LycheeCompat;
 @Mod(Loquat.ID)
 public class CommonProxy implements ModInitializer {
 
-	public static final Event<LoquatEvents.PlayerEnterArea> PLAYER_ENTER_AREA = EventFactory.createArrayBacked(LoquatEvents.PlayerEnterArea.class, listeners -> (player, area) -> {
-		for (LoquatEvents.PlayerEnterArea listener : listeners) {
-			listener.enterArea(player, area);
-		}
-	});
+	public static final Event<LoquatEvents.PlayerEnterArea> PLAYER_ENTER_AREA = EventFactory.createArrayBacked(
+			LoquatEvents.PlayerEnterArea.class,
+			listeners -> (player, area) -> {
+				for (LoquatEvents.PlayerEnterArea listener : listeners) {
+					listener.enterArea(player, area);
+				}
+			});
 
-	public static final Event<LoquatEvents.PlayerLeaveArea> PLAYER_LEAVE_AREA = EventFactory.createArrayBacked(LoquatEvents.PlayerLeaveArea.class, listeners -> (player, area) -> {
-		for (LoquatEvents.PlayerLeaveArea listener : listeners) {
-			listener.leaveArea(player, area);
-		}
-	});
+	public static final Event<LoquatEvents.PlayerLeaveArea> PLAYER_LEAVE_AREA = EventFactory.createArrayBacked(
+			LoquatEvents.PlayerLeaveArea.class,
+			listeners -> (player, area) -> {
+				for (LoquatEvents.PlayerLeaveArea listener : listeners) {
+					listener.leaveArea(player, area);
+				}
+			});
 
 	private static final ConcurrentLinkedQueue<Consumer<Entity>> entityDeathListeners = new ConcurrentLinkedQueue<>();
-	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners = new ConcurrentLinkedQueue<>();
+	private static final ConcurrentLinkedQueue<BiConsumer<Entity, Entity>> entitySuccessiveSpawnListeners =
+			new ConcurrentLinkedQueue<>();
 
 	public static void registerDeathListener(Consumer<Entity> listener) {
 		entityDeathListeners.add(listener);
@@ -115,7 +121,10 @@ public class CommonProxy implements ModInitializer {
 		});
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);
-			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND && SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
+			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
+				SelectionManager.of(player).rightClickItem((ServerLevel) world,
+														   player.pick(5, 0, false),
+														   (ServerPlayer) player)) {
 				return InteractionResultHolder.success(stack);
 			}
 			return InteractionResultHolder.pass(stack);
@@ -123,17 +132,7 @@ public class CommonProxy implements ModInitializer {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LivingConversionEvent.Post.class, event -> {
-			Entity entity = event.getEntity();
-			onSuccessiveSpawn(entity, event.getOutcome());
-			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
-		});
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerChangedDimensionEvent.class, event -> {
-			if (!(event.getEntity() instanceof ServerPlayer))
-				return;
-			ServerPlayer player = (ServerPlayer) event.getEntity();
-			ServerLevel destination = player.getServer().getLevel(event.getTo());
-			ServerLevel origin = player.getServer().getLevel(event.getFrom());
+		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
 			AreaManager.of(destination).playerChangedWorld(player, origin);
 		});
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
@@ -155,9 +154,7 @@ public class CommonProxy implements ModInitializer {
 			}
 			return true;
 		});
-		if (Platform.isPhysicalClient()) {
-			ClientProxy.initClient();
-		}
+
 	}
 
 	private static void registerThings(RegisterEvent event) {
@@ -175,6 +172,7 @@ public class CommonProxy implements ModInitializer {
 	}
 
 	public static void registerReloadListener(PreparableReloadListener instance) {
-		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener((IdentifiableResourceReloadListener) instance);
+		ResourceManagerHelper.get(PackType.SERVER_DATA)
+							 .registerReloadListener((IdentifiableResourceReloadListener) instance);
 	}
 }

@@ -1,6 +1,6 @@
 package snownee.loquat;
 
-import snownee.kiwi.util.Util;
+import net.minecraft.core.Registry;
 import snownee.loquat.core.area.AABBArea;
 import snownee.loquat.core.area.Area;
 
@@ -12,7 +12,7 @@ public class AreaTypes {
 	public static final AABBArea.Type BOX = register("box", new AABBArea.Type());
 
 	public static <T extends Area.Type<?>> T register(String name, T t) {
-		LoquatRegistries.AREA.register(Util.RL(name), t);
+		Registry.register(LoquatRegistries.AREA, name, t);
 		return t;
 	}
 }

@@ -1,6 +1,6 @@
 package snownee.loquat;
 
-import snownee.kiwi.util.Util;
+import net.minecraft.core.Registry;
 import snownee.loquat.program.PlaceProgram;
 import snownee.loquat.program.SeaLevelPlaceProgram;
 
@@ -12,7 +12,7 @@ public class PlaceProgramTypes {
 	}
 
 	public static <T extends PlaceProgram.Type<?>> T register(String name, T t) {
-		LoquatRegistries.PLACE_PROGRAM.register(Util.RL(name), t);
+		Registry.register(LoquatRegistries.PLACE_PROGRAM, name, t);
 		return t;
 	}
 }

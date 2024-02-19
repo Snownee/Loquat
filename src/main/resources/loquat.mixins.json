@@ -22,7 +22,7 @@
     "StructureTemplateMixin",
     "fabric.DifficultyLoaderMixin",
     "fabric.SlimeMixin",
-    "fabric.SpawnerLoaderMixin",
+    "fabric.LoquatDataLoaderMixin",
     "fabric.ZombieMixin",
     "kubejs.AreaKubeJSMixin",
     "lithium.LithiumEntityCollisionsMixin"

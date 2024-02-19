@@ -44,10 +44,12 @@ public class LoquatDataLoader<T> extends SimpleJsonResourceReloadListener {
 	private final Map<ResourceLocation, T> objects = Maps.newHashMap();
 	public final SuggestionProvider<CommandSourceStack> suggestionProvider;
 	private final Function<JsonElement, T> parser;
+	private final ResourceLocation id;
 	public boolean supportsFragment;
 
 	public LoquatDataLoader(ResourceLocation id, String dir, Function<JsonElement, T> parser) {
 		super(GSON, dir);
+		this.id = id;
 		suggestionProvider = FallbackSuggestionProvider.register(id, this::suggest);
 		this.parser = parser;
 		if (Platform.isPhysicalClient()) {

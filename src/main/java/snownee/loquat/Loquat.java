@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.SharedConstants;
 import net.minecraft.resources.ResourceLocation;
 import snownee.kiwi.loader.Platform;
+import snownee.kiwi.util.Util;
 import snownee.loquat.command.argument.AreaSelectorOptions;
 import snownee.loquat.program.PlaceProgram;
 import snownee.loquat.util.CommonProxy;
@@ -31,6 +32,6 @@ public class Loquat {
 	}
 
 	public static ResourceLocation id(String s) {
-		return new ResourceLocation(ID, s);
+		return Util.RL(s, ID);
 	}
 }
