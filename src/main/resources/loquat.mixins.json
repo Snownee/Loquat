@@ -20,7 +20,6 @@
     "SinglePoolElementAccess",
     "SinglePoolElementMixin",
     "StructureTemplateMixin",
-    "fabric.DifficultyLoaderMixin",
     "fabric.SlimeMixin",
     "fabric.LoquatDataLoaderMixin",
     "fabric.ZombieMixin",

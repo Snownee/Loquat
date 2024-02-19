@@ -117,8 +117,8 @@ public class CommonProxy implements ModInitializer {
 		if (Loquat.hasLychee) {
 			LycheeCompat.init();
 		}
+		ArgumentTypeRegistry.registerArgumentType(Loquat.id("area"), AreaArgument.class, new AreaArgument.Info());
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			ArgumentTypeRegistry.registerArgumentType(Loquat.id("area"), AreaArgument.class, new AreaArgument.Info());
 			LoquatCommand.register(dispatcher);
 		});
 		UseItemCallback.EVENT.register((player, world, hand) -> {
