@@ -34,7 +34,8 @@ public interface LoquatUtil {
 	}
 
 	static boolean isAABBFullyInsideAABB(AABB smaller, AABB larger) {
-		return smaller.minX >= larger.minX && smaller.minY >= larger.minY && smaller.minZ >= larger.minZ && smaller.maxX <= larger.maxX && smaller.maxY <= larger.maxY && smaller.maxZ <= larger.maxZ;
+		return smaller.minX >= larger.minX && smaller.minY >= larger.minY && smaller.minZ >= larger.minZ && smaller.maxX <= larger.maxX &&
+				smaller.maxY <= larger.maxY && smaller.maxZ <= larger.maxZ;
 	}
 
 	class SilentCommandSourceStack extends CommandSourceStack {

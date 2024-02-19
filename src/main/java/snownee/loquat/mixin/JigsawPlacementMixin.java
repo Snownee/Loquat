@@ -37,12 +37,46 @@ import snownee.loquat.placement.LoquatPlacer;
 @Mixin(JigsawPlacement.class)
 public class JigsawPlacementMixin {
 
-	@Inject(method = "addPieces(Lnet/minecraft/world/level/levelgen/structure/Structure$GenerationContext;Lnet/minecraft/core/Holder;Ljava/util/Optional;ILnet/minecraft/core/BlockPos;ZLjava/util/Optional;I)Ljava/util/Optional;",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/structure/Structure$GenerationStub;<init>(Lnet/minecraft/core/BlockPos;Ljava/util/function/Consumer;)V"), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private static void loquat$addPieces(Structure.GenerationContext context, Holder<StructureTemplatePool> holder, Optional<ResourceLocation> optional, int size, BlockPos blockPos, boolean bl, Optional<Heightmap.Types> optional2, int range, CallbackInfoReturnable<Optional<Structure.GenerationStub>> cir, RegistryAccess registryAccess, ChunkGenerator chunkGenerator, StructureTemplateManager structureTemplateManager, LevelHeightAccessor levelHeightAccessor, WorldgenRandom worldgenRandom, Registry<StructureTemplatePool> poolRegistry, Rotation rotation, StructureTemplatePool structureTemplatePool, StructurePoolElement structurePoolElement, BlockPos blockPos2, Vec3i vec3i, BlockPos blockPos3, PoolElementStructurePiece defaultStartPiece, BoundingBox boundingBox, int k, int l, int m, int n, int o) {
+	@Inject(
+			method = "addPieces(Lnet/minecraft/world/level/levelgen/structure/Structure$GenerationContext;Lnet/minecraft/core/Holder;Ljava/util/Optional;ILnet/minecraft/core/BlockPos;ZLjava/util/Optional;I)Ljava/util/Optional;",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/world/level/levelgen/structure/Structure$GenerationStub;<init>(Lnet/minecraft/core/BlockPos;Ljava/util/function/Consumer;)V"),
+			cancellable = true,
+			locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private static void loquat$addPieces(
+			Structure.GenerationContext context,
+			Holder<StructureTemplatePool> holder,
+			Optional<ResourceLocation> optional,
+			int size,
+			BlockPos blockPos,
+			boolean bl,
+			Optional<Heightmap.Types> optional2,
+			int range,
+			CallbackInfoReturnable<Optional<Structure.GenerationStub>> cir,
+			RegistryAccess registryAccess,
+			ChunkGenerator chunkGenerator,
+			StructureTemplateManager structureTemplateManager,
+			LevelHeightAccessor levelHeightAccessor,
+			WorldgenRandom worldgenRandom,
+			Registry<StructureTemplatePool> poolRegistry,
+			Rotation rotation,
+			StructureTemplatePool structureTemplatePool,
+			StructurePoolElement structurePoolElement,
+			BlockPos blockPos2,
+			Vec3i vec3i,
+			BlockPos blockPos3,
+			PoolElementStructurePiece defaultStartPiece,
+			BoundingBox boundingBox,
+			int k,
+			int l,
+			int m,
+			int n,
+			int o) {
 		GenerationContextExtension extension = GenerationContextExtension.CACHE.getIfPresent(context);
-		if (extension == null)
+		if (extension == null) {
 			return;
+		}
 		LoquatPlacer placer = LoquatPlacements.getPlacerFor(extension.structureId());
 		if (placer == null) {
 			return;
@@ -50,7 +84,14 @@ public class JigsawPlacementMixin {
 		var defaultStartPos = new BlockPos(k, o, l);
 		AABB aabb = new AABB(k - range, o - range, l - range, k + range + 1, o + range + 1, l + range + 1);
 		VoxelShape defaultValidSpace = Shapes.join(Shapes.create(aabb), Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);
-		cir.setReturnValue(Optional.of(placer.place(extension.structureId(), context, defaultStartPos, defaultValidSpace, range, poolRegistry, defaultStartPiece)));
+		cir.setReturnValue(Optional.of(placer.place(
+				extension.structureId(),
+				context,
+				defaultStartPos,
+				defaultValidSpace,
+				range,
+				poolRegistry,
+				defaultStartPiece)));
 	}
 
 }

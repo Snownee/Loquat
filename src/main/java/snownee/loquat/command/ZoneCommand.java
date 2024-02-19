@@ -24,7 +24,8 @@ import snownee.loquat.core.select.SelectionManager;
 import snownee.loquat.network.SSyncSelectionPacket;
 
 public class ZoneCommand {
-	public static final SimpleCommandExceptionType INVALID_ZONE_NAME = new SimpleCommandExceptionType(Component.translatable("loquat.command.invalidZoneName"));
+	public static final SimpleCommandExceptionType INVALID_ZONE_NAME = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.command.invalidZoneName"));
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("zone")

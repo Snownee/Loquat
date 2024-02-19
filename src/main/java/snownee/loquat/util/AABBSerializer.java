@@ -17,7 +17,13 @@ public interface AABBSerializer {
 	}
 
 	static AABB read(ListTag doubleList) {
-		return new AABB(doubleList.getDouble(0), doubleList.getDouble(1), doubleList.getDouble(2), doubleList.getDouble(3), doubleList.getDouble(4), doubleList.getDouble(5));
+		return new AABB(
+				doubleList.getDouble(0),
+				doubleList.getDouble(1),
+				doubleList.getDouble(2),
+				doubleList.getDouble(3),
+				doubleList.getDouble(4),
+				doubleList.getDouble(5));
 	}
 
 }

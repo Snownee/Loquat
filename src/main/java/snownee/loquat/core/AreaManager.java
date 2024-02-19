@@ -114,10 +114,12 @@ public class AreaManager extends SavedData {
 		for (Area area : areas) {
 			CompoundTag data = new CompoundTag();
 			if (!skipMetadata) {
-				if (area.getUuid() != null)
+				if (area.getUuid() != null) {
 					data.putUUID("UUID", area.getUuid());
-				if (!area.getTags().isEmpty())
+				}
+				if (!area.getTags().isEmpty()) {
 					data.put("Tags", area.getTags().stream().map(StringTag::valueOf).collect(ListTag::new, ListTag::add, ListTag::add));
+				}
 				if (!area.getZones().isEmpty()) {
 					CompoundTag zones = new CompoundTag();
 					area.getZones().forEach((name, zone) -> zones.put(name, zone.serialize(new CompoundTag())));
@@ -258,8 +260,9 @@ public class AreaManager extends SavedData {
 	}
 
 	public void showOutline(long duration, Collection<Area> areas) {
-		if (level == null)
+		if (level == null) {
 			return;
+		}
 		showOutlinePlayers.stream().map(level::getEntity).filter(Objects::nonNull).forEach(player -> {
 			SOutlinesPacket.outlines((ServerPlayer) player, duration, false, false, areas);
 		});

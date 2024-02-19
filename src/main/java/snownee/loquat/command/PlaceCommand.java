@@ -16,7 +16,8 @@ import snownee.loquat.program.PlaceProgram;
 
 public class PlaceCommand {
 
-	public static final SimpleCommandExceptionType PROGRAM_NOT_FOUND = new SimpleCommandExceptionType(Component.translatable("loquat.command.programNotFound"));
+	public static final SimpleCommandExceptionType PROGRAM_NOT_FOUND = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.command.programNotFound"));
 
 	public static LiteralArgumentBuilder<CommandSourceStack> register() {
 		return Commands.literal("place")

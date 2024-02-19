@@ -1,35 +1,35 @@
 {
-  "required": true,
-  "minVersion": "0.8",
-  "package": "snownee.loquat.mixin",
-  "plugin": "snownee.loquat.mixin.MixinPlugin",
-  "compatibilityLevel": "JAVA_17",
-  "refmap": "loquat.refmap.json",
-  "mixins": [
-    "BlockItemMixin",
-    "CommandsMixin",
-    "EntityMixin",
-    "JigsawPlacementMixin",
-    "JigsawStructureMixin",
-    "MobMixin",
-    "PlaceCommandMixin",
-    "PlayerMixin",
-    "PoolElementStructurePieceMixin",
-    "ServerLevelMixin",
-    "ServerPlayerMixin",
-    "SinglePoolElementAccess",
-    "SinglePoolElementMixin",
-    "StructureTemplateMixin",
-    "forge.SlimeMixin",
-    "forge.ZombieMixin",
-    "kubejs.AreaKubeJSMixin",
-    "canary.CanaryEntityCollisionsMixin"
-  ],
-  "client": [
-    "client.MultiPlayerGameModeMixin",
-    "client.ScreenMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
+	"required": true,
+	"minVersion": "0.8",
+	"package": "snownee.loquat.mixin",
+	"plugin": "snownee.loquat.mixin.MixinPlugin",
+	"compatibilityLevel": "JAVA_17",
+	"refmap": "loquat.refmap.json",
+	"mixins": [
+		"BlockItemMixin",
+		"CommandsMixin",
+		"EntityMixin",
+		"JigsawPlacementMixin",
+		"JigsawStructureMixin",
+		"MobMixin",
+		"PlaceCommandMixin",
+		"PlayerMixin",
+		"PoolElementStructurePieceMixin",
+		"ServerLevelMixin",
+		"ServerPlayerMixin",
+		"SinglePoolElementAccess",
+		"SinglePoolElementMixin",
+		"StructureTemplateMixin",
+		"canary.CanaryEntityCollisionsMixin",
+		"forge.SlimeMixin",
+		"forge.ZombieMixin",
+		"kubejs.AreaKubeJSMixin"
+	],
+	"client": [
+		"client.MultiPlayerGameModeMixin",
+		"client.ScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
 	}
 }

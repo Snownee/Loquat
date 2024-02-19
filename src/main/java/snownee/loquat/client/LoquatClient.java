@@ -53,7 +53,14 @@ public class LoquatClient {
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
 			RenderSystem.enableDepthTest();
-			DebugRenderer.renderFilledBox(ctx.poseStack, ctx.bufferSource, aabb, color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, alpha * 0.2F);
+			DebugRenderer.renderFilledBox(
+					ctx.poseStack,
+					ctx.bufferSource,
+					aabb,
+					color.getRed() / 255F,
+					color.getGreen() / 255F,
+					color.getBlue() / 255F,
+					alpha * 0.2F);
 		});
 	}
 
@@ -121,16 +128,29 @@ public class LoquatClient {
 		SelectionManager selectionManager = SelectionManager.of(player);
 		for (var data : outlines.values()) {
 			{
-				if (data.area.distanceToSqr(context.pos.reverse()) > 128 * 128)
+				if (data.area.distanceToSqr(context.pos.reverse()) > 128 * 128) {
 					continue;
+				}
 				var center = data.area.getCenter();
 				if (player.isShiftKeyDown() && !data.area.getTags().isEmpty()) {
 					var tags = Joiner.on(", ").join(data.area.getTags());
-					DebugRenderer.renderFloatingText(context.poseStack, context.bufferSource, tags, center.x, center.y, center.z, 0, 0.045F, true, 0, true);
+					DebugRenderer.renderFloatingText(
+							context.poseStack,
+							context.bufferSource,
+							tags,
+							center.x,
+							center.y,
+							center.z,
+							0,
+							0.045F,
+							true,
+							0,
+							true);
 				}
 			}
-			if (data.type != DebugAreaType.HIGHLIGHT)
+			if (data.type != DebugAreaType.HIGHLIGHT) {
 				data.type = selectionManager.isSelected(data.area) ? DebugAreaType.SELECTED : DebugAreaType.NORMAL;
+			}
 			if (data.type == DebugAreaType.SELECTED) {
 				data.area.getZones().forEach((name, zone) -> {
 					float alpha = 1;
@@ -145,7 +165,15 @@ public class LoquatClient {
 							aabb = aabb.deflate(0.2, 0.5, 0.2).move(0, -0.48, 0);
 						}
 						RenderUtil.renderLineBox(context.poseStack, aabb.move(context.pos), 1, 0.6F, 0, alpha);
-						DebugRenderer.renderFloatingText(context.poseStack, context.bufferSource, name, center.x, center.y, center.z, 0, 0.045F);
+						DebugRenderer.renderFloatingText(
+								context.poseStack,
+								context.bufferSource,
+								name,
+								center.x,
+								center.y,
+								center.z,
+								0,
+								0.045F);
 					}
 				});
 			}

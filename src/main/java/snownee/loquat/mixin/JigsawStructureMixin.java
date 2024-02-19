@@ -17,10 +17,13 @@ import snownee.loquat.placement.GenerationContextExtension;
 public class JigsawStructureMixin {
 
 	@Inject(method = "findGenerationPoint", at = @At("HEAD"))
-	private void loquat$findGenerationPoint(Structure.GenerationContext context, CallbackInfoReturnable<Optional<Structure.GenerationStub>> cir) {
+	private void loquat$findGenerationPoint(
+			Structure.GenerationContext context,
+			CallbackInfoReturnable<Optional<Structure.GenerationStub>> cir) {
 		ResourceLocation key = context.registryAccess().registryOrThrow(Registries.STRUCTURE).getKey((JigsawStructure) (Object) this);
-		if (key == null)
+		if (key == null) {
 			return;
+		}
 		GenerationContextExtension.CACHE.put(context, new GenerationContextExtension(key));
 	}
 

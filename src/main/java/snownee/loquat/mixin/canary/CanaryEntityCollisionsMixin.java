@@ -20,8 +20,19 @@ import snownee.loquat.Hooks;
 @Mixin(value = CanaryEntityCollisions.class, remap = false)
 public class CanaryEntityCollisionsMixin {
 
-	@Inject(method = "getEntityWorldBorderCollisions", at = @At(value = "INVOKE", target = "Lcom/abdelaziz/canary/common/entity/CanaryEntityCollisions;getEntityWorldBorderCollisionIterable(Lnet/minecraft/world/level/EntityGetter;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;Z)Ljava/lang/Iterable;"), locals = LocalCapture.CAPTURE_FAILHARD)
-	private static void loquat$getEntityWorldBorderCollisions(Level world, Entity entity, AABB box, boolean includeWorldBorder, CallbackInfoReturnable<List<VoxelShape>> cir, ArrayList<VoxelShape> shapes) {
+	@Inject(
+			method = "getEntityWorldBorderCollisions",
+			at = @At(
+					value = "INVOKE",
+					target = "Lcom/abdelaziz/canary/common/entity/CanaryEntityCollisions;getEntityWorldBorderCollisionIterable(Lnet/minecraft/world/level/EntityGetter;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;Z)Ljava/lang/Iterable;"),
+			locals = LocalCapture.CAPTURE_FAILHARD)
+	private static void loquat$getEntityWorldBorderCollisions(
+			Level world,
+			Entity entity,
+			AABB box,
+			boolean includeWorldBorder,
+			CallbackInfoReturnable<List<VoxelShape>> cir,
+			ArrayList<VoxelShape> shapes) {
 		Hooks.collideWithLoquatAreas(entity, box, shapes::add);
 	}
 }

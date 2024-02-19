@@ -15,7 +15,10 @@ import snownee.loquat.util.LoquatDataLoader;
 
 @FunctionalInterface
 public interface PlaceProgram {
-	LoquatDataLoader<PlaceProgram> LOADER = new LoquatDataLoader<>(Loquat.id("place_program"), "loquat_place_programs", PlaceProgram::parse);
+	LoquatDataLoader<PlaceProgram> LOADER = new LoquatDataLoader<>(
+			Loquat.id("place_program"),
+			"loquat_place_programs",
+			PlaceProgram::parse);
 
 	@Nullable
 	static PlaceProgram parse(JsonElement json) {

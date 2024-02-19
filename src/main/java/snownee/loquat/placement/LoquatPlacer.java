@@ -11,5 +11,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public interface LoquatPlacer {
 	boolean accept(ResourceLocation structureId);
 
-	Structure.GenerationStub place(ResourceLocation structureId, Structure.GenerationContext generationContext, BlockPos defaultStartPos, VoxelShape defaultValidSpace, int range, Registry<StructureTemplatePool> poolRegistry, PoolElementStructurePiece defaultStartPiece);
+	Structure.GenerationStub place(
+			ResourceLocation structureId,
+			Structure.GenerationContext generationContext,
+			BlockPos defaultStartPos,
+			VoxelShape defaultValidSpace,
+			int range,
+			Registry<StructureTemplatePool> poolRegistry,
+			PoolElementStructurePiece defaultStartPiece);
 }

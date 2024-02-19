@@ -19,21 +19,28 @@ import snownee.loquat.core.select.SelectionManager;
 
 public class LoquatCommand {
 
-	public static final SimpleCommandExceptionType EMPTY_SELECTION = new SimpleCommandExceptionType(Component.translatable("loquat.command.emptySelection"));
-	public static final SimpleCommandExceptionType TOO_MANY_SELECTIONS = new SimpleCommandExceptionType(Component.translatable("loquat.command.tooManySelections"));
-	public static final SimpleCommandExceptionType AREA_MUST_BE_BOX = new SimpleCommandExceptionType(Component.translatable("loquat.command.areaMustBeBox"));
-	public static final SuggestionProvider<CommandSourceStack> SUGGEST_ADD_ZONE = SuggestionProviders.register(Loquat.id("add_zone"), (ctx, builder) -> {
-		if (Platform.isPhysicalClient()) {
-			LoquatClient.get().suggestAddZone(builder::suggest);
-		}
-		return builder.buildFuture();
-	});
-	public static final SuggestionProvider<CommandSourceStack> SUGGEST_REMOVE_ZONE = SuggestionProviders.register(Loquat.id("remove_zone"), (ctx, builder) -> {
-		if (Platform.isPhysicalClient()) {
-			LoquatClient.get().suggestRemoveZone(builder::suggest);
-		}
-		return builder.buildFuture();
-	});
+	public static final SimpleCommandExceptionType EMPTY_SELECTION = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.command.emptySelection"));
+	public static final SimpleCommandExceptionType TOO_MANY_SELECTIONS = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.command.tooManySelections"));
+	public static final SimpleCommandExceptionType AREA_MUST_BE_BOX = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.command.areaMustBeBox"));
+	public static final SuggestionProvider<CommandSourceStack> SUGGEST_ADD_ZONE = SuggestionProviders.register(
+			Loquat.id("add_zone"),
+			(ctx, builder) -> {
+				if (Platform.isPhysicalClient()) {
+					LoquatClient.get().suggestAddZone(builder::suggest);
+				}
+				return builder.buildFuture();
+			});
+	public static final SuggestionProvider<CommandSourceStack> SUGGEST_REMOVE_ZONE = SuggestionProviders.register(
+			Loquat.id("remove_zone"),
+			(ctx, builder) -> {
+				if (Platform.isPhysicalClient()) {
+					LoquatClient.get().suggestRemoveZone(builder::suggest);
+				}
+				return builder.buildFuture();
+			});
 
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal(Loquat.ID).requires(cs -> cs.hasPermission(2))

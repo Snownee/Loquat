@@ -114,7 +114,10 @@ public class CommonProxy {
 			Player player = event.getEntity();
 			InteractionHand hand = event.getHand();
 			Level world = event.getLevel();
-			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND && SelectionManager.of(player).rightClickItem((ServerLevel) world, player.pick(5, 0, false), (ServerPlayer) player)) {
+			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND && SelectionManager.of(player).rightClickItem(
+					(ServerLevel) world,
+					player.pick(5, 0, false),
+					(ServerPlayer) player)) {
 				event.setCancellationResult(InteractionResult.sidedSuccess(world.isClientSide));
 				event.setCanceled(true);
 			}
@@ -144,8 +147,9 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, PlayerEvent.BreakSpeed.class, event -> {
 			Player player = event.getEntity();
 			Optional<BlockPos> pos = event.getPosition();
-			if (pos.isEmpty())
+			if (pos.isEmpty()) {
 				return;
+			}
 			if (RestrictInstance.of(player).isRestricted(pos.get(), RestrictInstance.RestrictBehavior.DESTROY)) {
 				CommonProxy.notifyRestriction(player, RestrictInstance.RestrictBehavior.DESTROY);
 				event.setCanceled(true);

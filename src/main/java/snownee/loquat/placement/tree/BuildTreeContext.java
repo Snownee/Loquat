@@ -25,7 +25,11 @@ public class BuildTreeContext {
 	public final List<String> globalTags = Lists.newArrayList();
 	public TreeNode root;
 
-	public BuildTreeContext(TreeNode root, RandomSource random, GenerationContext generationContext, Registry<StructureTemplatePool> pools) {
+	public BuildTreeContext(
+			TreeNode root,
+			RandomSource random,
+			GenerationContext generationContext,
+			Registry<StructureTemplatePool> pools) {
 		this.root = root;
 		this.random = random;
 		this.generationContext = generationContext;

@@ -23,14 +23,29 @@ public class CommandsMixin {
 	@Final
 	private static Logger LOGGER;
 
-	@Inject(method = "performCommand", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;isDebugEnabled()Z", remap = false), locals = LocalCapture.CAPTURE_FAILSOFT)
-	private void loquat$performCommand(ParseResults<CommandSourceStack> parseResults, String command, CallbackInfoReturnable<Integer> cir, CommandSourceStack commandSourceStack, Exception exception, MutableComponent mutableComponent2) {
-		if (!LoquatConfig.debug || LOGGER.isDebugEnabled())
+	@Inject(
+			method = "performCommand",
+			at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;isDebugEnabled()Z", remap = false),
+			locals = LocalCapture.CAPTURE_FAILSOFT)
+	private void loquat$performCommand(
+			ParseResults<CommandSourceStack> parseResults,
+			String command,
+			CallbackInfoReturnable<Integer> cir,
+			CommandSourceStack commandSourceStack,
+			Exception exception,
+			MutableComponent mutableComponent2) {
+		if (!LoquatConfig.debug || LOGGER.isDebugEnabled()) {
 			return;
+		}
 		LOGGER.error("Command exception: /" + command, exception);
 		StackTraceElement[] stackTraceElements = exception.getStackTrace();
 		for (int j = 0; j < Math.min(stackTraceElements.length, 3); ++j) {
-			mutableComponent2.append("\n\n").append(stackTraceElements[j].getMethodName()).append("\n ").append(stackTraceElements[j].getFileName()).append(":").append(String.valueOf(stackTraceElements[j].getLineNumber()));
+			mutableComponent2.append("\n\n")
+					.append(stackTraceElements[j].getMethodName())
+					.append("\n ")
+					.append(stackTraceElements[j].getFileName())
+					.append(":")
+					.append(String.valueOf(stackTraceElements[j].getLineNumber()));
 		}
 	}
 

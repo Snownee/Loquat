@@ -1,21 +1,21 @@
 {
-  "provider": "execute if entity @a",
-  "levels": [
-    {},
-    {
-      "hp": 2
-    },
-    {
-      "hp": 3
-    },
-    {
-      "hp": 4
-    },
-    {
-      "hp": 5
-    },
-    {
-      "hp": 6
-    }
-  ]
+	"provider": "execute if entity @a",
+	"levels": [
+		{ },
+		{
+			"hp": 2
+		},
+		{
+			"hp": 3
+		},
+		{
+			"hp": 4
+		},
+		{
+			"hp": 5
+		},
+		{
+			"hp": 6
+		}
+	]
 }

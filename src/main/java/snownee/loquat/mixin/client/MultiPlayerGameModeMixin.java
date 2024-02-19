@@ -21,7 +21,12 @@ public class MultiPlayerGameModeMixin {
 	@Shadow
 	private Minecraft minecraft;
 
-	@Inject(method = "startDestroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"), cancellable = true)
+	@Inject(
+			method = "startDestroyBlock",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"),
+			cancellable = true)
 	private void loquat$startDestroyBlock(BlockPos pos, Direction face, CallbackInfoReturnable<Boolean> cir) {
 		if (SelectionManager.isHoldingTool(minecraft.player)) {
 			CSelectionClickPacket.send(pos);
@@ -29,7 +34,12 @@ public class MultiPlayerGameModeMixin {
 		}
 	}
 
-	@Inject(method = "continueDestroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"), cancellable = true)
+	@Inject(
+			method = "continueDestroyBlock",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/tutorial/Tutorial;onDestroyBlock(Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;F)V"),
+			cancellable = true)
 	private void loquat$continueDestroyBlock(BlockPos posBlock, Direction directionFacing, CallbackInfoReturnable<Boolean> cir) {
 		if (SelectionManager.isHoldingTool(minecraft.player)) {
 			cir.setReturnValue(true);

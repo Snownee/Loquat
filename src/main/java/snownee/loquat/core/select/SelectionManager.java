@@ -48,12 +48,14 @@ public class SelectionManager {
 	}
 
 	public static boolean isHoldingTool(Player player) {
-		return LoquatConfig.selectionItem != Items.AIR && player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(LoquatConfig.selectionItem);
+		return LoquatConfig.selectionItem != Items.AIR && player.hasPermissions(2) && player.isCreative() && player.getMainHandItem().is(
+				LoquatConfig.selectionItem);
 	}
 
 	public boolean leftClickBlock(ServerLevel world, BlockPos pos, ServerPlayer player) {
-		if (!isHoldingTool(player))
+		if (!isHoldingTool(player)) {
 			return false;
+		}
 		if (world.getBlockEntity(pos) instanceof StructureBlockEntity be) {
 			if (player.isShiftKeyDown()) {
 				selectedAreas.clear();
@@ -71,8 +73,9 @@ public class SelectionManager {
 				if (selections.size() == 1) {
 					AABB aabb = selections.get(0).toAABB();
 					be.setStructurePos(new BlockPos((int) aabb.minX, (int) aabb.minY, (int) aabb.minZ).subtract(pos));
-					if (be.getMode() != StructureMode.LOAD)
+					if (be.getMode() != StructureMode.LOAD) {
 						be.setStructureSize(new BlockPos((int) aabb.getXsize(), (int) aabb.getYsize(), (int) aabb.getZsize()));
+					}
 				}
 			}
 			be.setShowBoundingBox(true);
@@ -83,8 +86,9 @@ public class SelectionManager {
 			if (player.isShiftKeyDown()) {
 				AreaManager manager = AreaManager.of(world);
 				for (Area area : manager.areas()) {
-					if (!area.contains(pos))
+					if (!area.contains(pos)) {
 						continue;
+					}
 					if (selectedAreas.contains(area.getUuid())) {
 						selectedAreas.remove(area.getUuid());
 					} else {
@@ -108,9 +112,11 @@ public class SelectionManager {
 	}
 
 	public boolean rightClickItem(ServerLevel world, HitResult hit, ServerPlayer player) {
-		if (!isHoldingTool(player) || !player.isShiftKeyDown())
+		if (!isHoldingTool(player) || !player.isShiftKeyDown()) {
 			return false;
-		if (hit instanceof BlockHitResult blockHit && world.getBlockEntity(blockHit.getBlockPos()) instanceof StructureBlockEntity be && be.getMode() == StructureMode.LOAD) {
+		}
+		if (hit instanceof BlockHitResult blockHit && world.getBlockEntity(blockHit.getBlockPos()) instanceof StructureBlockEntity be &&
+				be.getMode() == StructureMode.LOAD) {
 			Vec3i size = be.getStructureSize();
 			if (size.getX() < 1 || size.getY() < 1 || size.getZ() < 1) {
 				return false;

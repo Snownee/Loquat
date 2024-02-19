@@ -66,11 +66,18 @@ public class ListCommand {
 			var component = Component.empty();
 			component.append(Component.translatable("loquat.command.list.pos", (int) center.x, (int) center.y, (int) center.z)
 					.withStyle(style -> {
-						style = style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/execute in %s run tp @s %.2f %.2f %.2f".formatted(source.getLevel().dimension().location(), center.x, center.y, center.z)));
+						style = style.withClickEvent(new ClickEvent(
+								ClickEvent.Action.RUN_COMMAND,
+								"/execute in %s run tp @s %.2f %.2f %.2f".formatted(source.getLevel().dimension().location(),
+										center.x,
+										center.y,
+										center.z)));
 						if (selectedAreas.contains(area.getUuid())) {
 							style = style.withColor(ChatFormatting.GREEN);
 						}
-						return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("loquat.command.list.teleport")));
+						return style.withHoverEvent(new HoverEvent(
+								HoverEvent.Action.SHOW_TEXT,
+								Component.translatable("loquat.command.list.teleport")));
 					})
 			);
 			component.append(" ");
@@ -125,7 +132,9 @@ public class ListCommand {
 	}
 
 	private static UnaryOperator<Style> clickEvent(String type, CommandSourceStack source, Area area, @Nullable String extra) {
-		return style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, "@loquat %s %s %s %s".formatted(type, source.getLevel().dimension().location(), area.getUuid(), extra)));
+		return style -> style.withClickEvent(new ClickEvent(
+				ClickEvent.Action.COPY_TO_CLIPBOARD,
+				"@loquat %s %s %s %s".formatted(type, source.getLevel().dimension().location(), area.getUuid(), extra)));
 	}
 
 }

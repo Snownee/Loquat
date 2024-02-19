@@ -14,7 +14,12 @@ import snownee.loquat.util.CommonProxy;
 @Mixin(BlockItem.class)
 public class BlockItemMixin {
 
-	@Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;"), cancellable = true)
+	@Inject(
+			method = "place",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/world/item/BlockItem;getPlacementState(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;"),
+			cancellable = true)
 	private void loquat$place(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
 		if (context.getPlayer() == null) {
 			return;

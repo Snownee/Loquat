@@ -31,7 +31,9 @@ public class SpawnCommand {
 				);
 	}
 
-	private static int spawn(CommandContext<CommandSourceStack> ctx, @Nullable ResourceLocation difficultyId) throws CommandSyntaxException {
+	private static int spawn(
+			CommandContext<CommandSourceStack> ctx,
+			@Nullable ResourceLocation difficultyId) throws CommandSyntaxException {
 		ResourceLocation spawnerId = ResourceLocationArgument.getId(ctx, "spawner");
 		var source = ctx.getSource();
 		try {

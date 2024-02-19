@@ -34,7 +34,8 @@ public class ServerLevelMixin implements AreaManagerContainer {
 
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raids;tick()V"), method = "tick")
 	private void loquat$tick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		if (loquat$areaManager != null)
+		if (loquat$areaManager != null) {
 			loquat$areaManager.tick();
+		}
 	}
 }

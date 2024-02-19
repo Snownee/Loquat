@@ -17,12 +17,16 @@ public class LoquatKubeJSPlugin extends KubeJSPlugin {
 	public void init() {
 		Loquat.LOGGER.info("KubeJS detected, loading Loquat KubeJS plugin");
 		CommonProxy.registerPlayerEnterAreaListener((player, area) -> {
-			if (LoquatKubeJSEvents.AREA_ENTERED.hasListeners())
-				LoquatKubeJSEvents.AREA_ENTERED.post(new PlayerAreaEventJS(player, area), Objects.requireNonNull(area.getUuid()).toString());
+			if (LoquatKubeJSEvents.AREA_ENTERED.hasListeners()) {
+				LoquatKubeJSEvents.AREA_ENTERED.post(
+						new PlayerAreaEventJS(player, area),
+						Objects.requireNonNull(area.getUuid()).toString());
+			}
 		});
 		CommonProxy.registerPlayerLeaveAreaListener((player, area) -> {
-			if (LoquatKubeJSEvents.AREA_LEFT.hasListeners())
+			if (LoquatKubeJSEvents.AREA_LEFT.hasListeners()) {
 				LoquatKubeJSEvents.AREA_LEFT.post(new PlayerAreaEventJS(player, area), Objects.requireNonNull(area.getUuid()).toString());
+			}
 		});
 	}
 

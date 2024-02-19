@@ -63,7 +63,14 @@ public class TreeNodePlacer implements LoquatPlacer {
 	}
 
 	@Override
-	public Structure.GenerationStub place(ResourceLocation structureId, Structure.GenerationContext generationContext, BlockPos defaultStartPos, VoxelShape defaultValidSpace, int range, Registry<StructureTemplatePool> pools, PoolElementStructurePiece defaultStartPiece) {
+	public Structure.GenerationStub place(
+			ResourceLocation structureId,
+			Structure.GenerationContext generationContext,
+			BlockPos defaultStartPos,
+			VoxelShape defaultValidSpace,
+			int range,
+			Registry<StructureTemplatePool> pools,
+			PoolElementStructurePiece defaultStartPiece) {
 		return new Structure.GenerationStub(defaultStartPos, structurePiecesBuilder -> {
 			try {
 				TreeNode root = new TreeNode(new ResourceLocation("start"), null);
@@ -92,12 +99,20 @@ public class TreeNodePlacer implements LoquatPlacer {
 						}
 						if (!step.node.getLowPriorityProcessors().isEmpty()) {
 							ListTag processors = new ListTag();
-							step.node.getLowPriorityProcessors().stream().map(Object::toString).map(StringTag::valueOf).forEach(processors::add);
+							step.node.getLowPriorityProcessors()
+									.stream()
+									.map(Object::toString)
+									.map(StringTag::valueOf)
+									.forEach(processors::add);
 							data.put("LowPriorityProcessors", processors);
 						}
 						if (!step.node.getHighPriorityProcessors().isEmpty()) {
 							ListTag processors = new ListTag();
-							step.node.getHighPriorityProcessors().stream().map(Object::toString).map(StringTag::valueOf).forEach(processors::add);
+							step.node.getHighPriorityProcessors()
+									.stream()
+									.map(Object::toString)
+									.map(StringTag::valueOf)
+									.forEach(processors::add);
 							data.put("HighPriorityProcessors", processors);
 						}
 						((LoquatStructurePiece) step.piece).loquat$setAttachedData(data);
@@ -110,12 +125,21 @@ public class TreeNodePlacer implements LoquatPlacer {
 		});
 	}
 
-	private boolean doPlace(TreeNode node, StepStack steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools) {
+	private boolean doPlace(
+			TreeNode node,
+			StepStack steps,
+			StructureTemplateManager structureTemplateManager,
+			RandomSource random,
+			Registry<StructureTemplatePool> pools) {
 		Step step = steps.peek();
 		StructurePoolElement element = step.piece.getElement();
 		BlockPos blockPos = step.piece.getPosition();
 		Rotation rotation = step.piece.getRotation();
-		List<StructureTemplate.StructureBlockInfo> jigsawBlocks = element.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation, random);
+		List<StructureTemplate.StructureBlockInfo> jigsawBlocks = element.getShuffledJigsawBlocks(
+				structureTemplateManager,
+				BlockPos.ZERO,
+				rotation,
+				random);
 		ListMultimap<String, StructureTemplate.StructureBlockInfo> byJointName = ArrayListMultimap.create();
 		Set<StructureTemplate.StructureBlockInfo> resolvedJigsaws = Sets.newHashSet();
 		for (var jigsawBlock : jigsawBlocks) {
@@ -162,7 +186,16 @@ public class TreeNodePlacer implements LoquatPlacer {
 		return true;
 	}
 
-	private StructureTemplate.StructureBlockInfo tryPlaceNode(TreeNode node, StepStack steps, StructureTemplateManager structureTemplateManager, RandomSource random, Registry<StructureTemplatePool> pools, TreeNode child, StructureTemplate.StructureBlockInfo jigsawBlock, Step parentStep, boolean fallback) {
+	private StructureTemplate.StructureBlockInfo tryPlaceNode(
+			TreeNode node,
+			StepStack steps,
+			StructureTemplateManager structureTemplateManager,
+			RandomSource random,
+			Registry<StructureTemplatePool> pools,
+			TreeNode child,
+			StructureTemplate.StructureBlockInfo jigsawBlock,
+			Step parentStep,
+			boolean fallback) {
 		BlockPos jointPos = parentStep.piece.getPosition().offset(jigsawBlock.pos());
 		Direction direction = JigsawBlock.getFrontFacing(jigsawBlock.state());
 		BlockPos thatJointPos = child.isOffsetTowardsJigsawFront() ? jointPos.relative(direction) : jointPos;
@@ -180,7 +213,11 @@ public class TreeNodePlacer implements LoquatPlacer {
 				continue;
 			}
 			for (Rotation rotation2 : Rotation.getShuffled(random)) {
-				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(structureTemplateManager, BlockPos.ZERO, rotation2, random);
+				List<StructureTemplate.StructureBlockInfo> jigsawBlocks1 = template.getShuffledJigsawBlocks(
+						structureTemplateManager,
+						BlockPos.ZERO,
+						rotation2,
+						random);
 				for (StructureTemplate.StructureBlockInfo jigsawBlock1 : jigsawBlocks1) {
 					if (!JigsawBlock.canAttach(jigsawBlock, jigsawBlock1)) {
 						continue;
@@ -188,9 +225,18 @@ public class TreeNodePlacer implements LoquatPlacer {
 					hasAnyTarget = true;
 					BlockPos thatPiecePos = thatJointPos.offset(jigsawBlock1.pos().multiply(-1));
 					BoundingBox boundingBox = template.getBoundingBox(structureTemplateManager, thatPiecePos, rotation2);
-					PoolElementStructurePiece piece = new PoolElementStructurePiece(structureTemplateManager, template, thatPiecePos, 0, rotation2, boundingBox);
+					PoolElementStructurePiece piece = new PoolElementStructurePiece(
+							structureTemplateManager,
+							template,
+							thatPiecePos,
+							0,
+							rotation2,
+							boundingBox);
 					VoxelShape validSpace = steps.peek().validSpace;
-					if (child.isCheckForCollisions() && Shapes.joinIsNotEmpty(validSpace, Shapes.create(AABB.of(boundingBox).deflate(0.25)), BooleanOp.ONLY_SECOND)) {
+					if (child.isCheckForCollisions() && Shapes.joinIsNotEmpty(
+							validSpace,
+							Shapes.create(AABB.of(boundingBox).deflate(0.25)),
+							BooleanOp.ONLY_SECOND)) {
 						continue;
 					}
 					VoxelShape shape = Shapes.joinUnoptimized(validSpace, Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST);

@@ -181,9 +181,11 @@ public class ActiveWave implements ILycheeRecipe<LycheeContext> {
 	}
 
 	public void checkIfFinished() {
-		if (isFinished)
+		if (isFinished) {
 			return;
-		isFinished = mobs.isEmpty() && pendingMobs.isEmpty() && context.runtime.state == ActionRuntime.State.STOPPED && successiveSpawnCooldown <= 0;
+		}
+		isFinished = mobs.isEmpty() && pendingMobs.isEmpty() && context.runtime.state == ActionRuntime.State.STOPPED &&
+				successiveSpawnCooldown <= 0;
 	}
 
 	public int getRemainMobs() {

@@ -81,16 +81,20 @@ public class SpawnMobAreaEvent extends AreaEvent {
 					LoquatUtil.runCommandSilently(world, "scoreboard objectives add LoquatSpawner dummy");
 					LoquatUtil.runCommandSilently(world, "scoreboard objectives setdisplay sidebar LoquatSpawner");
 				}
-				LoquatUtil.runCommandSilently(world, "scoreboard objectives modify LoquatSpawner displayname \"Wave: %d/%d\"".formatted(lastWave, spawner.waves.length));
+				LoquatUtil.runCommandSilently(
+						world,
+						"scoreboard objectives modify LoquatSpawner displayname \"Wave: %d/%d\"".formatted(lastWave, spawner.waves.length));
 			}
 			waves.add(activeWave);
 			hasTimeout = wave.timeout > 0;
-			if (hasTimeout)
+			if (hasTimeout) {
 				timeoutInTicks = LongMath.checkedAdd(world.getGameTime(), wave.timeout * 20L);
+			}
 			activeWave.onStart();
 			activeWave.applyPostActions(ctx, 1);
-			if (wave.wait > 0)
+			if (wave.wait > 0) {
 				ctx.runtime.jobs.push(new Job(new Delay(wave.wait), 1));
+			}
 			ctx.runtime.run(activeWave, ctx);
 		}
 	}
@@ -105,11 +109,17 @@ public class SpawnMobAreaEvent extends AreaEvent {
 		public SpawnMobAreaEvent deserialize(Area area, CompoundTag data) {
 			ResourceLocation spawnerId = new ResourceLocation(data.getString("Spawner"));
 			ResourceLocation difficultyId = new ResourceLocation(data.getString("Difficulty"));
-			SpawnMobAreaEvent event = new SpawnMobAreaEvent(area, LycheeCompat.SPAWNERS.get(spawnerId), spawnerId, LycheeCompat.DIFFICULTIES.get(difficultyId), difficultyId);
+			SpawnMobAreaEvent event = new SpawnMobAreaEvent(
+					area,
+					LycheeCompat.SPAWNERS.get(spawnerId),
+					spawnerId,
+					LycheeCompat.DIFFICULTIES.get(difficultyId),
+					difficultyId);
 			event.lastWave = data.getInt("LastWave");
 			event.hasTimeout = data.getBoolean("HasTimeout");
-			if (event.hasTimeout)
+			if (event.hasTimeout) {
 				event.timeoutInTicks = data.getLong("TimeoutInTicks");
+			}
 			return event;
 		}
 
@@ -119,8 +129,9 @@ public class SpawnMobAreaEvent extends AreaEvent {
 			data.putString("Difficulty", event.difficultyId.toString());
 			data.putInt("LastWave", event.lastWave);
 			data.putBoolean("HasTimeout", event.hasTimeout);
-			if (event.hasTimeout)
+			if (event.hasTimeout) {
 				data.putLong("TimeoutInTicks", event.timeoutInTicks);
+			}
 			return data;
 		}
 	}

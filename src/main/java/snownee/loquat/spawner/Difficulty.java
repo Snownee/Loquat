@@ -43,7 +43,10 @@ public class Difficulty {
 
 	public static class DifficultyProviderSerializer implements JsonDeserializer<Provider> {
 		@Override
-		public Provider deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+		public Provider deserialize(
+				JsonElement jsonElement,
+				Type type,
+				JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 			if (jsonElement.isJsonPrimitive()) {
 				var primitive = jsonElement.getAsJsonPrimitive();
 				if (primitive.isNumber()) {

@@ -26,7 +26,14 @@ public class EntityMixin {
 			value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getWorldBorder()Lnet/minecraft/world/level/border/WorldBorder;"
 	), locals = LocalCapture.CAPTURE_FAILHARD, require = 0 // possible conflict with Lithium
 	)
-	private static void loquat$collideBoundingBox(@Nullable Entity entity, Vec3 vec, AABB collisionBox, Level level, List<VoxelShape> potentialHits, CallbackInfoReturnable<Vec3> cir, ImmutableList.Builder<VoxelShape> builder) {
+	private static void loquat$collideBoundingBox(
+			@Nullable Entity entity,
+			Vec3 vec,
+			AABB collisionBox,
+			Level level,
+			List<VoxelShape> potentialHits,
+			CallbackInfoReturnable<Vec3> cir,
+			ImmutableList.Builder<VoxelShape> builder) {
 		Hooks.collideWithLoquatAreas(entity, collisionBox.expandTowards(vec), builder::add);
 	}
 

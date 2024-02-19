@@ -14,8 +14,23 @@ import snownee.loquat.util.CommonProxy;
 @Mixin(Slime.class)
 public class SlimeMixin {
 
-	@Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void onRemove(Entity.RemovalReason reason, CallbackInfo ci, int i, Component component, boolean bl, float f, int j, int k, int l, float g, float h, Slime slime) {
+	@Inject(
+			method = "remove",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+			locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private void onRemove(
+			Entity.RemovalReason reason,
+			CallbackInfo ci,
+			int i,
+			Component component,
+			boolean bl,
+			float f,
+			int j,
+			int k,
+			int l,
+			float g,
+			float h,
+			Slime slime) {
 		CommonProxy.onSuccessiveSpawn((Entity) (Object) this, slime);
 	}
 

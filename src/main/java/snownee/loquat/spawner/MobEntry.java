@@ -66,7 +66,9 @@ public record MobEntry(EntityType<?> type, @NotNull CompoundTag nbt, boolean ran
 			Object2DoubleMap<String> attrs = jsonObject.has("attrs") ? new Object2DoubleArrayMap<>() : null;
 			if (attrs != null) {
 				jsonObject.getAsJsonObject("attrs").entrySet().forEach(entry -> {
-					Attribute attr = SIMPLE_ATTRIBUTES.computeIfAbsent(entry.getKey(), s -> BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
+					Attribute attr = SIMPLE_ATTRIBUTES.computeIfAbsent(
+							entry.getKey(),
+							s -> BuiltInRegistries.ATTRIBUTE.get(new ResourceLocation(s)));
 					Preconditions.checkNotNull(attr, "Invalid attribute: " + entry.getKey());
 					attrs.put(entry.getKey(), entry.getValue().getAsDouble());
 				});

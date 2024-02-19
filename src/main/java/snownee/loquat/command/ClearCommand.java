@@ -20,7 +20,9 @@ public class ClearCommand {
 						)
 						.then(Commands.literal("restrictions")
 								.executes(ctx -> {
-									int count = AreaManager.of(ctx.getSource().getLevel()).clearRestrictions(AreaArgument.getAreas(ctx, "areas"));
+									int count = AreaManager.of(ctx.getSource().getLevel()).clearRestrictions(AreaArgument.getAreas(
+											ctx,
+											"areas"));
 									return LoquatCommand.countedSuccess(ctx, "clear.restrictions", count);
 								})
 						)
