@@ -5,17 +5,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
@@ -117,6 +118,7 @@ public class CommonProxy implements ModInitializer {
 			LycheeCompat.init();
 		}
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			ArgumentTypeRegistry.registerArgumentType(Loquat.id("area"), AreaArgument.class, new AreaArgument.Info());
 			LoquatCommand.register(dispatcher);
 		});
 		UseItemCallback.EVENT.register((player, world, hand) -> {
@@ -132,16 +134,8 @@ public class CommonProxy implements ModInitializer {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, world) -> {
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
 		});
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-			AreaManager.of(destination).playerChangedWorld(player, origin);
-		});
-		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-			if (entity instanceof ServerPlayer player) {
-				AreaManager.of(world).playerLoaded(player);
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StartTracking.class, event -> {
-			if (event.getEntity() instanceof ServerPlayer player) {
-				AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
-			}
+		EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
+			AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
 		});
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
 			if (RestrictInstance.of(player).isRestricted(pos, RestrictInstance.RestrictBehavior.DESTROY)) {
@@ -158,20 +152,6 @@ public class CommonProxy implements ModInitializer {
 			return true;
 		});
 
-	}
-
-	private static void registerThings(RegisterEvent event) {
-		event.register(LoquatRegistries.AREA.getRegistryKey(), $ -> AreaTypes.init());
-		event.register(LoquatRegistries.AREA_EVENT.getRegistryKey(), $ -> AreaEventTypes.init());
-		event.register(LoquatRegistries.PLACE_PROGRAM.getRegistryKey(), $ -> PlaceProgramTypes.init());
-		event.register(Registries.COMMAND_ARGUMENT_TYPE, $ -> {
-			var info = ArgumentTypeInfos.registerByClass(AreaArgument.class, new AreaArgument.Info());
-			$.register(Loquat.id("area"), info);
-		});
-	}
-
-	private static void registerReloadListeners(AddReloadListenerEvent event) {
-		pendingReloadListeners.forEach(event::addListener);
 	}
 
 	public static void registerReloadListener(PreparableReloadListener instance) {
