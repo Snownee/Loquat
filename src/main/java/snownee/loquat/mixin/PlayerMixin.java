@@ -29,7 +29,9 @@ public class PlayerMixin implements LoquatPlayer {
 
 	@Inject(method = "blockActionRestricted", at = @At("HEAD"), cancellable = true)
 	private void loquat$blockActionRestricted(Level level, BlockPos pos, GameType gameMode, CallbackInfoReturnable<Boolean> cir) {
-		if (!gameMode.isCreative() && RestrictInstance.of((Player) (Object) this).isRestricted(pos, RestrictInstance.RestrictBehavior.DESTROY)) {
+		if (!gameMode.isCreative() && RestrictInstance.of((Player) (Object) this).isRestricted(
+				pos,
+				RestrictInstance.RestrictBehavior.DESTROY)) {
 			cir.setReturnValue(true);
 		}
 	}

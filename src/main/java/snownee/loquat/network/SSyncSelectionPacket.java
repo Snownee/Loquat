@@ -42,10 +42,14 @@ public class SSyncSelectionPacket extends PacketHandler {
 	}
 
 	@Override
-	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
+	public CompletableFuture<FriendlyByteBuf> receive(
+			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
+			FriendlyByteBuf buf,
+			ServerPlayer sender) {
 		Player player = ClientHooks.getPlayer();
-		if (player == null)
+		if (player == null) {
 			return null;
+		}
 		int size = buf.readVarInt();
 		List<PosSelection> selections = Lists.newArrayListWithExpectedSize(size);
 		for (int i = 0; i < size; i++) {

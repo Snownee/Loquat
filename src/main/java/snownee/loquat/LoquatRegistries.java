@@ -19,8 +19,8 @@ public final class LoquatRegistries {
 
 	private static <T> MappedRegistry<T> register(String name) {
 		return FabricRegistryBuilder.createSimple(ResourceKey.<T>createRegistryKey(Loquat.id(name)))
-									.attribute(RegistryAttribute.SYNCED)
-									.buildAndRegister();
+				.attribute(RegistryAttribute.SYNCED)
+				.buildAndRegister();
 	}
 
 }

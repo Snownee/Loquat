@@ -1,51 +1,52 @@
 {
-  "schemaVersion": 1,
-  "id": "loquat",
-  "version": "${version}",
-  "name": "Loquat",
-  "description": "Area management tool",
-  "authors": [
-    "Snownee"
-  ],
-  "contributors": [
-    "SettingDust", "zomb_676"
-  ],
-  "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/loquat-fabric",
-    "sources": "https://github.com/Snownee/Loquat",
-    "issues": "https://github.com/Snownee/Loquat/issues"
-  },
-  "license": "ARR",
-  "icon": "assets/loquat/logo.png",
-  "entrypoints": {
-    "main": [
-      "snownee.loquat.util.CommonProxy"
-    ],
-    "client": [
-      "snownee.loquat.util.ClientProxy"
-    ]
-  },
-  "mixins": [
-    "loquat.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.14.14",
-    "fabric-api": "*",
-    "kiwi": ">=11",
-    "minecraft": "~1.20"
-  },
-  "recommends": {
-    "lychee": ">=5.1"
-  },
-  "breaks": {
-    "lychee": "<5",
-    "kubejs": "<2001.6"
-  },
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.discord": "https://discord.gg/rRBvGkz"
-      }
-    }
-  }
+	"schemaVersion": 1,
+	"id": "loquat",
+	"version": "${version}",
+	"name": "Loquat",
+	"description": "Area management tool",
+	"authors": [
+		"Snownee"
+	],
+	"contributors": [
+		"SettingDust",
+		"zomb_676"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/loquat-fabric",
+		"sources": "https://github.com/Snownee/Loquat",
+		"issues": "https://github.com/Snownee/Loquat/issues"
+	},
+	"license": "ARR",
+	"icon": "assets/loquat/logo.png",
+	"entrypoints": {
+		"main": [
+			"snownee.loquat.util.CommonProxy"
+		],
+		"client": [
+			"snownee.loquat.util.ClientProxy"
+		]
+	},
+	"mixins": [
+		"loquat.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.14",
+		"fabric-api": "*",
+		"kiwi": ">=11",
+		"minecraft": "~1.20"
+	},
+	"recommends": {
+		"lychee": ">=5.1"
+	},
+	"breaks": {
+		"lychee": "<5",
+		"kubejs": "<2001.6"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/rRBvGkz"
+			}
+		}
+	}
 }

@@ -15,7 +15,22 @@ public interface RenderUtil {
 		Tesselator tesselator = Tesselator.getInstance();
 		BufferBuilder bufferBuilder = tesselator.getBuilder();
 		bufferBuilder.begin(RenderType.lines().mode(), RenderType.lines().format());
-		LevelRenderer.renderLineBox(poseStack, bufferBuilder, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, red, green, blue, alpha, red, green, blue);
+		LevelRenderer.renderLineBox(
+				poseStack,
+				bufferBuilder,
+				box.minX,
+				box.minY,
+				box.minZ,
+				box.maxX,
+				box.maxY,
+				box.maxZ,
+				red,
+				green,
+				blue,
+				alpha,
+				red,
+				green,
+				blue);
 		tesselator.end();
 		RenderType.lines().clearRenderState();
 	}

@@ -15,7 +15,10 @@ public class CSelectionClickPacket extends PacketHandler {
 	public static CSelectionClickPacket I;
 
 	@Override
-	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
+	public CompletableFuture<FriendlyByteBuf> receive(
+			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
+			FriendlyByteBuf buf,
+			ServerPlayer sender) {
 		BlockPos pos = buf.readBlockPos();
 		return executor.apply(() -> SelectionManager.of(sender).leftClickBlock(sender.serverLevel(), pos, sender));
 	}

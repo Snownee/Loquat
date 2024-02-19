@@ -22,7 +22,10 @@ public class CRequestOutlinesPacket extends PacketHandler {
 	public static CRequestOutlinesPacket I;
 
 	@Override
-	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
+	public CompletableFuture<FriendlyByteBuf> receive(
+			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
+			FriendlyByteBuf buf,
+			ServerPlayer sender) {
 		if (!Objects.requireNonNull(sender).hasPermissions(2)) {
 			return null;
 		}

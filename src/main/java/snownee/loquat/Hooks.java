@@ -53,7 +53,13 @@ public interface Hooks {
 		}
 	}
 
-	static void placeInWorld(AreaManager manager, BlockPos pos, BlockPos blockPos, List<Area> areas, StructurePlaceSettings settings, Vec3i size) {
+	static void placeInWorld(
+			AreaManager manager,
+			BlockPos pos,
+			BlockPos blockPos,
+			List<Area> areas,
+			StructurePlaceSettings settings,
+			Vec3i size) {
 		manager.removeAllInside(TransformUtil.transform(settings, pos, new AABB(pos, pos.offset(size))));
 		for (Area area : areas) {
 			area = TransformUtil.transform(settings, pos, area);
@@ -127,7 +133,8 @@ public interface Hooks {
 			consumer.accept(shape);
 		});
 		instance.areaStream().filter(area -> {
-			return !area.equals(areaIn.getValue()) && instance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && area.intersects(expanded);
+			return !area.equals(areaIn.getValue()) && instance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) &&
+					area.intersects(expanded);
 		}).forEach(area -> {
 			area.getVoxelShape().ifPresent(consumer);
 			behavior.setValue(RestrictInstance.RestrictBehavior.ENTER);
@@ -150,7 +157,8 @@ public interface Hooks {
 			return true;
 		}
 		return restrictInstance.areaStream().anyMatch(area -> {
-			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(expected);
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) &&
+					!loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(expected);
 		});
 	}
 
@@ -161,9 +169,11 @@ public interface Hooks {
 		ListTag list = data.getList(key, Tag.TAG_STRING);
 		for (int i = 0; i < list.size(); i++) {
 			String s = list.getString(i);
-			StructureProcessorList processorList = registryAccess.registryOrThrow(Registries.PROCESSOR_LIST).getOptional(ResourceLocation.tryParse(s)).orElseThrow(() -> {
-				return new IllegalStateException("Unknown processor list: " + s);
-			});
+			StructureProcessorList processorList = registryAccess.registryOrThrow(Registries.PROCESSOR_LIST)
+					.getOptional(ResourceLocation.tryParse(s))
+					.orElseThrow(() -> {
+						return new IllegalStateException("Unknown processor list: " + s);
+					});
 			processorList.list().forEach(settings::addProcessor);
 		}
 	}
@@ -185,7 +195,8 @@ public interface Hooks {
 			return true;
 		}
 		return restrictInstance.areaStream().anyMatch(area -> {
-			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) && !loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(player.getBoundingBox());
+			return restrictInstance.isRestricted(area, RestrictInstance.RestrictBehavior.ENTER) &&
+					!loquatServerPlayer.loquat$getAreasIn().contains(area) && area.intersects(player.getBoundingBox());
 		});
 	}
 }

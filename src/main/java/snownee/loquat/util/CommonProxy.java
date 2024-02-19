@@ -16,7 +16,6 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
@@ -32,7 +31,6 @@ import snownee.loquat.AreaEventTypes;
 import snownee.loquat.AreaTypes;
 import snownee.loquat.Loquat;
 import snownee.loquat.LoquatEvents;
-import snownee.loquat.LoquatRegistries;
 import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
@@ -124,9 +122,10 @@ public class CommonProxy implements ModInitializer {
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);
 			if (!world.isClientSide && hand == InteractionHand.MAIN_HAND &&
-				SelectionManager.of(player).rightClickItem((ServerLevel) world,
-														   player.pick(5, 0, false),
-														   (ServerPlayer) player)) {
+					SelectionManager.of(player).rightClickItem(
+							(ServerLevel) world,
+							player.pick(5, 0, false),
+							(ServerPlayer) player)) {
 				return InteractionResultHolder.success(stack);
 			}
 			return InteractionResultHolder.pass(stack);
@@ -156,6 +155,6 @@ public class CommonProxy implements ModInitializer {
 
 	public static void registerReloadListener(PreparableReloadListener instance) {
 		ResourceManagerHelper.get(PackType.SERVER_DATA)
-							 .registerReloadListener((IdentifiableResourceReloadListener) instance);
+				.registerReloadListener((IdentifiableResourceReloadListener) instance);
 	}
 }

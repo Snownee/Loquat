@@ -34,12 +34,28 @@ public class PoolElementStructurePieceMixin implements LoquatStructurePiece {
 	}
 
 	@Inject(method = "place", at = @At("HEAD"))
-	private void loquat$beforePlace(WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator, RandomSource random, BoundingBox box, BlockPos pos, boolean keepJigsaws, CallbackInfo ci) {
+	private void loquat$beforePlace(
+			WorldGenLevel level,
+			StructureManager structureManager,
+			ChunkGenerator generator,
+			RandomSource random,
+			BoundingBox box,
+			BlockPos pos,
+			boolean keepJigsaws,
+			CallbackInfo ci) {
 		LoquatStructurePiece.CURRENT.set(Pair.of(this, level.registryAccess()));
 	}
 
 	@Inject(method = "place", at = @At("RETURN"))
-	private void loquat$afterPlace(WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator, RandomSource random, BoundingBox box, BlockPos pos, boolean keepJigsaws, CallbackInfo ci) {
+	private void loquat$afterPlace(
+			WorldGenLevel level,
+			StructureManager structureManager,
+			ChunkGenerator generator,
+			RandomSource random,
+			BoundingBox box,
+			BlockPos pos,
+			boolean keepJigsaws,
+			CallbackInfo ci) {
 		LoquatStructurePiece.CURRENT.remove();
 	}
 

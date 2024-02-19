@@ -47,15 +47,23 @@ public class StructureTemplateMixin {
 
 	@Inject(method = "save", at = @At("HEAD"))
 	private void loquat$save(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-		if (loquat$areas.isEmpty())
+		if (loquat$areas.isEmpty()) {
 			return;
+		}
 		CompoundTag loquat = new CompoundTag();
 		loquat.put("Areas", AreaManager.saveAreas(loquat$areas));
 		tag.put("Loquat", loquat);
 	}
 
 	@Inject(method = "placeInWorld", at = @At("HEAD"))
-	private void loquat$placeInWorld(ServerLevelAccessor serverLevel, BlockPos pos, BlockPos blockPos, StructurePlaceSettings settings, RandomSource random, int flags, CallbackInfoReturnable<Boolean> cir) {
+	private void loquat$placeInWorld(
+			ServerLevelAccessor serverLevel,
+			BlockPos pos,
+			BlockPos blockPos,
+			StructurePlaceSettings settings,
+			RandomSource random,
+			int flags,
+			CallbackInfoReturnable<Boolean> cir) {
 		if (loquat$areas.isEmpty()) {
 			return;
 		}

@@ -10,6 +10,8 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 
 public record GenerationContextExtension(ResourceLocation structureId) {
 
-	public static final Cache<Structure.GenerationContext, GenerationContextExtension> CACHE = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.SECONDS).build();
+	public static final Cache<Structure.GenerationContext, GenerationContextExtension> CACHE = CacheBuilder.newBuilder()
+			.expireAfterAccess(1, TimeUnit.SECONDS)
+			.build();
 
 }

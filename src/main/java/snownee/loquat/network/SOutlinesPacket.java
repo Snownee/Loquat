@@ -33,10 +33,14 @@ public class SOutlinesPacket extends PacketHandler {
 	}
 
 	@Override
-	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
+	public CompletableFuture<FriendlyByteBuf> receive(
+			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
+			FriendlyByteBuf buf,
+			ServerPlayer sender) {
 		Level level = ClientHooks.getLevel();
-		if (level == null)
+		if (level == null) {
 			return null;
+		}
 		long expire = buf.readVarLong();
 		if (expire == Long.MIN_VALUE) {
 			expire = level.getGameTime() + 10;
@@ -51,7 +55,10 @@ public class SOutlinesPacket extends PacketHandler {
 		CompoundTag tag = buf.readNbt();
 		for (Area area : AreaManager.loadAreas(tag.getList("0", Tag.TAG_COMPOUND))) {
 			var debugData = outlines.get(area.getUuid());
-			debugData = new LoquatClient.RenderDebugData(area, highlight ? LoquatClient.DebugAreaType.HIGHLIGHT : LoquatClient.DebugAreaType.NORMAL, expire);
+			debugData = new LoquatClient.RenderDebugData(
+					area,
+					highlight ? LoquatClient.DebugAreaType.HIGHLIGHT : LoquatClient.DebugAreaType.NORMAL,
+					expire);
 			outlines.put(area.getUuid(), debugData);
 		}
 		return null;

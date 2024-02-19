@@ -89,14 +89,20 @@ public class LoquatDataLoader<T> extends SimpleJsonResourceReloadListener {
 
 	private static class PostActionSerializer implements JsonDeserializer<PostAction> {
 		@Override
-		public PostAction deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+		public PostAction deserialize(
+				JsonElement jsonElement,
+				Type type,
+				JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 			return PostAction.parse(jsonElement.getAsJsonObject());
 		}
 	}
 
 	private static class ContextualHolderSerializer implements JsonDeserializer<ContextualHolder> {
 		@Override
-		public ContextualHolder deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+		public ContextualHolder deserialize(
+				JsonElement jsonElement,
+				Type type,
+				JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 			ContextualHolder holder = new ContextualHolder();
 			holder.parseConditions(jsonElement);
 			return holder;

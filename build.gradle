@@ -1,8 +1,8 @@
 plugins {
-	id 'fabric-loom' version '1.1.+'
-	id 'maven-publish'
-	id "io.freefair.lombok" version "8.4"
-	id "me.shedaniel.unified-publishing" version "0.1.+"
+    id 'fabric-loom' version '1.1.+'
+    id 'maven-publish'
+    id "io.freefair.lombok" version "8.4"
+    id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -13,158 +13,158 @@ version = project.minecraft_version + "-fabric-" + project.mod_version
 group = project.maven_group
 
 repositories {
-	maven { url "https://api.modrinth.com/maven" }
-	maven {
-		// Shedaniel's maven (Architectury API)
-		url = "https://maven.architectury.dev"
-		content {
-			includeGroup "dev.architectury"
-		}
-	}
-	maven {
-		// saps.dev Maven (KubeJS and Rhino)
-		url = "https://maven.saps.dev/minecraft"
-		content {
-			includeGroup "dev.latvian.mods"
-		}
-	}
-	maven { url "https://maven.parchmentmc.org" }
-	maven { url "https://maven.shedaniel.me/" }
-	maven { url = "https://maven.blamejared.com/" }
-	maven { url "https://maven.terraformersmc.com/releases/" }
-	maven {
-		url "https://cursemaven.com"
-		content {
-			includeGroup "curse.maven"
-		}
-	}
+    maven { url "https://api.modrinth.com/maven" }
+    maven {
+        // Shedaniel's maven (Architectury API)
+        url = "https://maven.architectury.dev"
+        content {
+            includeGroup "dev.architectury"
+        }
+    }
+    maven {
+        // saps.dev Maven (KubeJS and Rhino)
+        url = "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+        }
+    }
+    maven { url "https://maven.parchmentmc.org" }
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url = "https://maven.blamejared.com/" }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation(annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}-fabric"))
-	modImplementation("maven.modrinth:lychee:5.1.0-fabric")
-	modImplementation("maven.modrinth:modmenu:${project.modmenu_version}")
-	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-	modImplementation("maven.modrinth:jade:11.6.2")
-	modImplementation("maven.modrinth:lithium:mc1.20.1-0.11.2")
-	modImplementation("maven.modrinth:huge-structure-blocks:1.0.9")
-	modImplementation("maven.modrinth:debugutils:woRp83Qc")
+    modImplementation(annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}-fabric"))
+    modImplementation("maven.modrinth:lychee:5.1.0-fabric")
+    modImplementation("maven.modrinth:modmenu:${project.modmenu_version}")
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    modImplementation("maven.modrinth:jade:11.6.2")
+    modImplementation("maven.modrinth:lithium:mc1.20.1-0.11.2")
+    modImplementation("maven.modrinth:huge-structure-blocks:1.0.9")
+    modImplementation("maven.modrinth:debugutils:woRp83Qc")
 
-	modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
+    modImplementation("dev.latvian.mods:kubejs-fabric:${project.kubejs_version}")
 }
 
 loom {
-	//accessWidenerPath = file("src/main/resources/${project.mod_id}.accesswidener")
-	mixin {
-		defaultRefmapName = "${project.mod_id}.refmap.json"
-	}
+    //accessWidenerPath = file("src/main/resources/${project.mod_id}.accesswidener")
+    mixin {
+        defaultRefmapName = "${project.mod_id}.refmap.json"
+    }
 }
 
 processResources {
-	inputs.property "version", project.mod_version
+    inputs.property "version", project.mod_version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.mod_version
-	}
+    filesMatching("fabric.mod.json") {
+        expand "version": project.mod_version
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
-	it.options.encoding = "UTF-8"
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    // If Javadoc is generated, this must be specified in that task too.
+    it.options.encoding = "UTF-8"
 
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+    it.options.release = 17
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	// withSourcesJar()
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    // withSourcesJar()
 }
 
 jar {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}" }
-	}
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
 }
 
 // configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			// artifact(sourcesJar) {
-			//	 builtBy remapSourcesJar
-			// }
-		}
-	}
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            // artifact(sourcesJar) {
+            //	 builtBy remapSourcesJar
+            // }
+        }
+    }
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
 }
 
 unifiedPublishing {
-	project {
-		displayName = "[Fabric $project.supported_version] $project.mod_version"
-		version = project.mod_version // Optional, Inferred from project by default
-		changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : ""
-		releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
-		gameVersions = ["1.20", "1.20.1"]
-		gameLoaders = ["fabric", "quilt"]
+    project {
+        displayName = "[Fabric $project.supported_version] $project.mod_version"
+        version = project.mod_version // Optional, Inferred from project by default
+        changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : ""
+        releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
+        gameVersions = ["1.20", "1.20.1"]
+        gameLoaders = ["fabric", "quilt"]
 
-		mainPublication tasks.remapJar // Declares the publicated jar
+        mainPublication tasks.remapJar // Declares the publicated jar
 
-		if (System.getenv("CURSE_TOKEN") != null) {
-			curseforge {
-				token = System.getenv("CURSE_TOKEN")
-				id = "396597" // Required, must be a string, ID of CurseForge project
+        if (System.getenv("CURSE_TOKEN") != null) {
+            curseforge {
+                token = System.getenv("CURSE_TOKEN")
+                id = "396597" // Required, must be a string, ID of CurseForge project
 
-				relations { // Optional, Inferred from the relations above by default
-					depends "kiwi-fabric"
-					optional "cloth-config"
-					optional "lychee-fabric"
-					optional "kubejs"
-					optional "huge-structure-blocks"
-				}
-			}
-		}
+                relations { // Optional, Inferred from the relations above by default
+                    depends "kiwi-fabric"
+                    optional "cloth-config"
+                    optional "lychee-fabric"
+                    optional "kubejs"
+                    optional "huge-structure-blocks"
+                }
+            }
+        }
 
-		if (System.getenv("MODRINTH_TOKEN") != null) {
-			modrinth {
-				token = System.getenv("MODRINTH_TOKEN")
-				id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
+        if (System.getenv("MODRINTH_TOKEN") != null) {
+            modrinth {
+                token = System.getenv("MODRINTH_TOKEN")
+                id = "xnn6vBkh" // Required, must be a string, ID of Modrinth project
 
-				relations { // Optional, Inferred from the relations above by default
-					depends "kiwi"
-					optional "cloth-config"
-					optional "lychee"
-					optional "kubejs"
-					optional "huge-structure-blocks"
-				}
-			}
-		}
-	}
+                relations { // Optional, Inferred from the relations above by default
+                    depends "kiwi"
+                    optional "cloth-config"
+                    optional "lychee"
+                    optional "kubejs"
+                    optional "huge-structure-blocks"
+                }
+            }
+        }
+    }
 }

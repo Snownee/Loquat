@@ -40,7 +40,10 @@ public class SSyncRestrictionPacket extends PacketHandler {
 	}
 
 	@Override
-	public CompletableFuture<FriendlyByteBuf> receive(Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor, FriendlyByteBuf buf, ServerPlayer sender) {
+	public CompletableFuture<FriendlyByteBuf> receive(
+			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
+			FriendlyByteBuf buf,
+			ServerPlayer sender) {
 		var manager = LoquatClient.get().restrictInstance;
 		manager.resetForClient();
 		var tag = Objects.requireNonNull(buf.readNbt());

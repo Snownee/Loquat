@@ -18,11 +18,14 @@ public interface TransformUtil {
 	}
 
 	static Vec3 calculateRelativePosition(StructurePlaceSettings settings, BlockPos offset, Vec3 pos) {
-		return StructureTemplate.transform(pos, settings.getMirror(), settings.getRotation(), settings.getRotationPivot()).add(offset.getX(), offset.getY(), offset.getZ());
+		return StructureTemplate.transform(pos, settings.getMirror(), settings.getRotation(), settings.getRotationPivot())
+				.add(offset.getX(), offset.getY(), offset.getZ());
 	}
 
 	static AABB transform(StructurePlaceSettings settings, BlockPos offset, AABB aabb) {
-		return new AABB(calculateRelativePosition(settings, offset, new Vec3(aabb.minX, aabb.minY, aabb.minZ)), calculateRelativePosition(settings, offset, new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ)));
+		return new AABB(
+				calculateRelativePosition(settings, offset, new Vec3(aabb.minX, aabb.minY, aabb.minZ)),
+				calculateRelativePosition(settings, offset, new Vec3(aabb.maxX, aabb.maxY, aabb.maxZ)));
 	}
 
 	static Zone transform(StructurePlaceSettings settings, BlockPos offset, Zone zone) {

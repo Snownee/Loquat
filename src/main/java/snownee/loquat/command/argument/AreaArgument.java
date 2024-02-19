@@ -23,8 +23,10 @@ import snownee.loquat.core.area.Area;
 
 public class AreaArgument implements ArgumentType<AreaSelector> {
 	private static final Collection<String> EXAMPLES = List.of("@p", "@a[limit=1]", "dd12be42-52a9-4a91-a8a1-11c01849e498");
-	public static final SimpleCommandExceptionType ERROR_NOT_SINGLE_AREA = new SimpleCommandExceptionType(Component.translatable("loquat.argument.area.tooMany"));
-	public static final SimpleCommandExceptionType NO_AREAS_FOUND = new SimpleCommandExceptionType(Component.translatable("loquat.argument.area.notFound"));
+	public static final SimpleCommandExceptionType ERROR_NOT_SINGLE_AREA = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.argument.area.tooMany"));
+	public static final SimpleCommandExceptionType NO_AREAS_FOUND = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.argument.area.notFound"));
 	private final boolean single;
 
 	public static AreaArgument area() {
@@ -48,7 +50,9 @@ public class AreaArgument implements ArgumentType<AreaSelector> {
 		}
 	}
 
-	public static Collection<? extends Area> getOptionalAreas(CommandContext<CommandSourceStack> context, String s) throws CommandSyntaxException {
+	public static Collection<? extends Area> getOptionalAreas(
+			CommandContext<CommandSourceStack> context,
+			String s) throws CommandSyntaxException {
 		return context.getArgument(s, AreaSelector.class).findAreas(context.getSource());
 	}
 

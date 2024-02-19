@@ -12,7 +12,10 @@ import snownee.loquat.client.ClientHooks;
 @Mixin(Screen.class)
 public class ScreenMixin {
 
-	@Inject(method = "handleComponentClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyboardHandler;setClipboard(Ljava/lang/String;)V"), cancellable = true)
+	@Inject(
+			method = "handleComponentClicked",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyboardHandler;setClipboard(Ljava/lang/String;)V"),
+			cancellable = true)
 	private void loquat$handleComponentClicked(Style style, CallbackInfoReturnable<Boolean> cir) {
 		if (ClientHooks.handleComponentClicked(style.getClickEvent().getValue())) {
 			cir.setReturnValue(true);

@@ -15,7 +15,9 @@ import net.minecraft.resources.ResourceLocation;
 public class FallbackSuggestionProvider implements SuggestionProvider<SharedSuggestionProvider> {
 	private final SuggestionProvider<SharedSuggestionProvider> delegate;
 
-	public static <S extends SharedSuggestionProvider> SuggestionProvider<S> register(ResourceLocation id, SuggestionProvider<SharedSuggestionProvider> delegate) {
+	public static <S extends SharedSuggestionProvider> SuggestionProvider<S> register(
+			ResourceLocation id,
+			SuggestionProvider<SharedSuggestionProvider> delegate) {
 		return SuggestionProviders.register(id, new FallbackSuggestionProvider(delegate));
 	}
 
@@ -24,7 +26,9 @@ public class FallbackSuggestionProvider implements SuggestionProvider<SharedSugg
 	}
 
 	@Override
-	public CompletableFuture<Suggestions> getSuggestions(CommandContext<SharedSuggestionProvider> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+	public CompletableFuture<Suggestions> getSuggestions(
+			CommandContext<SharedSuggestionProvider> context,
+			SuggestionsBuilder builder) throws CommandSyntaxException {
 		CompletableFuture<Suggestions> suggestions = delegate.getSuggestions(context, builder);
 		if (suggestions.isDone() && !suggestions.join().isEmpty()) {
 			return suggestions;

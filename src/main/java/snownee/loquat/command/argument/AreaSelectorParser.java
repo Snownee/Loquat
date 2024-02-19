@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -27,13 +29,11 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
-import org.jetbrains.annotations.Nullable;
-
 import snownee.loquat.core.area.Area;
 
 public class AreaSelectorParser {
-	public static final SimpleCommandExceptionType ERROR_INVALID_NAME_OR_UUID = new SimpleCommandExceptionType(Component.translatable("loquat.argument.area.invalid"));
+	public static final SimpleCommandExceptionType ERROR_INVALID_NAME_OR_UUID = new SimpleCommandExceptionType(Component.translatable(
+			"loquat.argument.area.invalid"));
 	@Getter
 	private final StringReader reader;
 	@Setter
@@ -93,7 +93,10 @@ public class AreaSelectorParser {
 				aabb = null;
 			}
 		} else {
-			aabb = this.createAabb(this.deltaX == null ? 0.0 : this.deltaX, this.deltaY == null ? 0.0 : this.deltaY, this.deltaZ == null ? 0.0 : this.deltaZ);
+			aabb = this.createAabb(
+					this.deltaX == null ? 0.0 : this.deltaX,
+					this.deltaY == null ? 0.0 : this.deltaY,
+					this.deltaZ == null ? 0.0 : this.deltaZ);
 		}
 
 		UnaryOperator<Vec3> position;
@@ -353,7 +356,9 @@ public class AreaSelectorParser {
 		return builder.buildFuture();
 	}
 
-	private CompletableFuture<Suggestions> suggestOptionsKeyOrClose(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> builderConsumer) {
+	private CompletableFuture<Suggestions> suggestOptionsKeyOrClose(
+			SuggestionsBuilder builder,
+			Consumer<SuggestionsBuilder> builderConsumer) {
 		builder.suggest(String.valueOf(']'));
 		AreaSelectorOptions.suggestNames(this, builder);
 		return builder.buildFuture();
@@ -364,7 +369,9 @@ public class AreaSelectorParser {
 		return builder.buildFuture();
 	}
 
-	private CompletableFuture<Suggestions> suggestOptionsNextOrClose(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> builderConsumer) {
+	private CompletableFuture<Suggestions> suggestOptionsNextOrClose(
+			SuggestionsBuilder builder,
+			Consumer<SuggestionsBuilder> builderConsumer) {
 		builder.suggest(String.valueOf(','));
 		builder.suggest(String.valueOf(']'));
 		return builder.buildFuture();

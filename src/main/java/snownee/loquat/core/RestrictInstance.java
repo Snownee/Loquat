@@ -111,7 +111,9 @@ public class RestrictInstance {
 	}
 
 	public Stream<Area> areaStream() {
-		return Stream.concat(rules == null ? Stream.empty() : rules.keySet().stream(), fallback == null || fallback.rules == null ? Stream.empty() : fallback.rules.keySet().stream()).distinct();
+		return Stream.concat(
+				rules == null ? Stream.empty() : rules.keySet().stream(),
+				fallback == null || fallback.rules == null ? Stream.empty() : fallback.rules.keySet().stream()).distinct();
 	}
 
 	public void forEachRules(BiConsumer<Area, Integer> consumer) {
