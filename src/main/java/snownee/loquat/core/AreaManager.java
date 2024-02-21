@@ -334,7 +334,7 @@ public class AreaManager extends SavedData {
 		}
 	}
 
-	public void startTrackingPlayer(ServerPlayer player) {
+	public void onPlayerAdded(ServerPlayer player) {
 		((LoquatServerPlayer) player).loquat$reset();
 		boolean showOutline = showOutlinePlayers.contains(player.getUUID());
 		SOutlinesPacket.outlines(player, Long.MAX_VALUE, true, false, showOutline ? areas : List.of());
