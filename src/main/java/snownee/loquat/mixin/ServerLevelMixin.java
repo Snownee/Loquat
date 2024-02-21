@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.duck.AreaManagerContainer;
 
@@ -36,6 +37,13 @@ public class ServerLevelMixin implements AreaManagerContainer {
 	private void loquat$tick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
 		if (loquat$areaManager != null) {
 			loquat$areaManager.tick();
+		}
+	}
+
+	@Inject(method = "addPlayer", at = @At("RETURN"))
+	private void loquat$addPlayer(ServerPlayer player, CallbackInfo ci) {
+		if (loquat$areaManager != null) {
+			loquat$areaManager.onPlayerAdded(player);
 		}
 	}
 }

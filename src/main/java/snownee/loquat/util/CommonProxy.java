@@ -39,7 +39,6 @@ import snownee.loquat.PlaceProgramTypes;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.command.LoquatCommand;
 import snownee.loquat.command.argument.AreaArgument;
-import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
 import snownee.loquat.core.area.Area;
 import snownee.loquat.core.select.SelectionManager;
@@ -130,11 +129,6 @@ public class CommonProxy {
 			Entity entity = event.getEntity();
 			onSuccessiveSpawn(entity, event.getOutcome());
 			entityDeathListeners.forEach(consumer -> consumer.accept(entity));
-		});
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerEvent.StartTracking.class, event -> {
-			if (event.getEntity() instanceof ServerPlayer player) {
-				AreaManager.of(player.serverLevel()).startTrackingPlayer(player);
-			}
 		});
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, PlayerInteractEvent.LeftClickBlock.class, event -> {
 			Player player = event.getEntity();
