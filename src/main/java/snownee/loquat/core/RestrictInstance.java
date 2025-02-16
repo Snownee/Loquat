@@ -11,7 +11,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -35,8 +34,8 @@ public class RestrictInstance {
 	public static RestrictInstance of(Player player) {
 		if (player instanceof LoquatServerPlayer) {
 			return ((LoquatServerPlayer) player).loquat$getRestrictionInstance();
-		} else if (player.level().isClientSide && Minecraft.getInstance().player == player) {
-			return LoquatClient.get().restrictInstance;
+		} else if (player.level().isClientSide) {
+			return LoquatClient.get().restrictionOf(player);
 		}
 		throw new IllegalArgumentException("Unknown player type: " + player);
 	}

@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import snownee.kiwi.network.KiwiPacket;
 import snownee.kiwi.network.PacketHandler;
 import snownee.loquat.LoquatRegistries;
+import snownee.loquat.client.ClientHooks;
 import snownee.loquat.client.LoquatClient;
 import snownee.loquat.core.AreaManager;
 import snownee.loquat.core.RestrictInstance;
@@ -44,7 +45,7 @@ public class SSyncRestrictionPacket extends PacketHandler {
 			Function<Runnable, CompletableFuture<FriendlyByteBuf>> executor,
 			FriendlyByteBuf buf,
 			ServerPlayer sender) {
-		var manager = LoquatClient.get().restrictInstance;
+		var manager = LoquatClient.get().restrictionOf(ClientHooks.getPlayer());
 		manager.resetForClient();
 		var tag = Objects.requireNonNull(buf.readNbt());
 		Object2IntMap<Area> rules = Objects.requireNonNull(manager.getRules());

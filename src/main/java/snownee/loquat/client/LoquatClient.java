@@ -20,6 +20,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.loquat.AreaTypes;
@@ -37,7 +38,8 @@ public class LoquatClient {
 	public final Map<UUID, RenderDebugData> normalOutlines = Maps.newConcurrentMap();
 	public final Map<UUID, RenderDebugData> highlightOutlines = Maps.newConcurrentMap();
 	public final Map<Area.Type<?>, BiConsumer<RenderDebugContext, RenderDebugData>> renderers = Maps.newHashMap();
-	public final RestrictInstance restrictInstance = new RestrictInstance();
+	private final RestrictInstance localRestriction = new RestrictInstance();
+	private final RestrictInstance dummyRemoteRestriction = new RestrictInstance();
 	private long lastNotifyRestrictionTime = Long.MIN_VALUE;
 	private final List<String> recentZoneNames = Lists.newArrayList();
 
@@ -190,6 +192,10 @@ public class LoquatClient {
 
 	public void clearDebugAreas() {
 		normalOutlines.clear();
+	}
+
+	public RestrictInstance restrictionOf(Player player) {
+		return Minecraft.getInstance().player != player ? dummyRemoteRestriction : localRestriction;
 	}
 
 	public enum DebugAreaType {
