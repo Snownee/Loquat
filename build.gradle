@@ -25,9 +25,9 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "${minecraft_version}-forge-${mod_version}"
+version = "${minecraft_version}-Forge-${mod_version}"
 group = "${mod_base_package}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = mod_name
+var realVersion = project.mod_version + '+forge'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -224,10 +224,10 @@ dependencies {
     implementation(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
     //implementation fg.deobf("maven.modrinth:lazydfu:4SHylIO9")
-    implementation(annotationProcessor(fg.deobf("maven.modrinth:kiwi:${project.kiwi_version}-forge")))
-    implementation fg.deobf("maven.modrinth:lychee:5.1.9-forge")
+    implementation(annotationProcessor(fg.deobf("maven.modrinth:kiwi:${project.kiwi_version}+forge")))
+    implementation fg.deobf("maven.modrinth:lychee:5.1.17+forge")
     implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.cloth_config_version}"))
-    implementation fg.deobf("maven.modrinth:jade:11.8.0")
+    implementation fg.deobf("maven.modrinth:jade:11.12.3+forge")
     implementation fg.deobf("maven.modrinth:canary:mc1.20.1-0.3.3")
 
     implementation fg.deobf("maven.modrinth:huge-structure-blocks:1.0.9")
@@ -251,7 +251,7 @@ jar {
                     "Specification-Vendor"    : mod_authors,
                     "Specification-Version"   : "1", // We are version 1 of ourselves
                     "Implementation-Title"    : project.name,
-                    "Implementation-Version"  : mod_version,
+                    "Implementation-Version"  : realVersion,
                     "Implementation-Vendor"   : mod_authors,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                     "MixinConfigs"            : "${mod_id}.mixins.json"])
@@ -281,7 +281,7 @@ publishing {
 unifiedPublishing {
     project {
         displayName = "[Forge $project.supported_version] $project.mod_version"
-        version = project.mod_version // Optional, Inferred from project by default
+        version = realVersion // Optional, Inferred from project by default
         changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : ""
         releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
         gameVersions = ["1.20", "1.20.1"]
