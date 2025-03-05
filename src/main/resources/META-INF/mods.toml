@@ -15,23 +15,17 @@ logoFile = "logo.png"
 [[dependencies.loquat]]
 modId = "kiwi"
 mandatory = true
-versionRange = "[11,)"
-ordering = "NONE"
-side = "BOTH"
+versionRange = "[11.8,)"
 
 [[dependencies.loquat]]
 modId = "lychee"
 mandatory = false
 versionRange = "[5,)"
-ordering = "NONE"
-side = "BOTH"
 
 [[dependencies.loquat]]
 modId = "kubejs"
 mandatory = false
 versionRange = "[2001.6,)"
-ordering = "NONE"
-side = "BOTH"
 
 [modproperties.loquat]
 catalogueItemIcon = "minecraft:jigsaw" #Support for Catalogue mod
