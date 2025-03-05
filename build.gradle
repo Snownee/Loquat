@@ -9,8 +9,9 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.minecraft_version + "-fabric-" + project.mod_version
+version = project.minecraft_version + "-Fabric-" + project.mod_version
 group = project.maven_group
+var realVersion = project.mod_version + "+fabric"
 
 repositories {
     maven { url "https://api.modrinth.com/maven" }
@@ -49,8 +50,8 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation(annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}-fabric"))
-    modImplementation("maven.modrinth:lychee:5.1.0-fabric")
+    modImplementation(annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}+fabric"))
+    modImplementation("maven.modrinth:lychee:5.1.15+fabric")
     modImplementation("maven.modrinth:modmenu:${project.modmenu_version}")
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
@@ -71,10 +72,10 @@ loom {
 }
 
 processResources {
-    inputs.property "version", project.mod_version
+    inputs.property "version", realVersion
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.mod_version
+        expand "version": realVersion
     }
 }
 
@@ -129,7 +130,7 @@ publishing {
 unifiedPublishing {
     project {
         displayName = "[Fabric $project.supported_version] $project.mod_version"
-        version = project.mod_version // Optional, Inferred from project by default
+        version = realVersion // Optional, Inferred from project by default
         changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : ""
         releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
         gameVersions = ["1.20", "1.20.1"]

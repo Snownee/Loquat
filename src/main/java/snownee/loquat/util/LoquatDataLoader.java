@@ -26,30 +26,36 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import snownee.kiwi.loader.Platform;
 import snownee.kiwi.util.Util;
+import snownee.loquat.Loquat;
 import snownee.loquat.spawner.Difficulty;
 import snownee.lychee.core.contextual.ContextualHolder;
 import snownee.lychee.core.post.PostAction;
 import snownee.lychee.fragment.Fragments;
 
 public class LoquatDataLoader<T> extends SimpleJsonResourceReloadListener {
-	public static final Gson GSON = new GsonBuilder()
-			.setPrettyPrinting()
-			.disableHtmlEscaping()
-			.setLenient()
-			.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
-			.registerTypeAdapter(PostAction.class, new PostActionSerializer())
-			.registerTypeAdapter(ContextualHolder.class, new ContextualHolderSerializer())
-			.registerTypeAdapter(Difficulty.Provider.class, new Difficulty.DifficultyProviderSerializer())
-			.create();
+	public static final Gson GSON;
+
+	static {
+		GsonBuilder gsonBuilder = new GsonBuilder()
+				.setPrettyPrinting()
+				.disableHtmlEscaping()
+				.setLenient()
+				.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
+				.registerTypeAdapter(Difficulty.Provider.class, new Difficulty.DifficultyProviderSerializer());
+		if (Loquat.hasLychee) {
+			gsonBuilder.registerTypeAdapter(PostAction.class, new PostActionSerializer());
+			gsonBuilder.registerTypeAdapter(ContextualHolder.class, new ContextualHolderSerializer());
+		}
+		GSON = gsonBuilder.create();
+	}
+
 	private final Map<ResourceLocation, T> objects = Maps.newHashMap();
 	public final SuggestionProvider<CommandSourceStack> suggestionProvider;
 	private final Function<JsonElement, T> parser;
-	private final ResourceLocation id;
 	public boolean supportsFragment;
 
 	public LoquatDataLoader(ResourceLocation id, String dir, Function<JsonElement, T> parser) {
 		super(GSON, dir);
-		this.id = id;
 		suggestionProvider = FallbackSuggestionProvider.register(id, this::suggest);
 		this.parser = parser;
 		if (Platform.isPhysicalClient()) {
