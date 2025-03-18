@@ -35,15 +35,13 @@ public class ServerLevelMixin implements AreaManagerContainer {
 
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raids;tick()V"), method = "tick")
 	private void loquat$tick(BooleanSupplier hasTimeLeft, CallbackInfo ci) {
-		if (loquat$areaManager != null) {
-			loquat$areaManager.tick();
-		}
+		// ensure area manager is initialized
+		AreaManager.of((ServerLevel) (Object) this).tick();
 	}
 
 	@Inject(method = "addPlayer", at = @At("RETURN"))
 	private void loquat$addPlayer(ServerPlayer player, CallbackInfo ci) {
-		if (loquat$areaManager != null) {
-			loquat$areaManager.onPlayerAdded(player);
-		}
+		// ensure area manager is initialized
+		AreaManager.of((ServerLevel) (Object) this).onPlayerAdded(player);
 	}
 }
