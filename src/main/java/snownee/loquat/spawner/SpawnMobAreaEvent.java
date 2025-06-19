@@ -2,9 +2,8 @@ package snownee.loquat.spawner;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
-
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.math.LongMath;
 
 import lombok.Getter;
