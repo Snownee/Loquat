@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
